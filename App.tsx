@@ -23,11 +23,12 @@ import Footer from './src/components/Footer';
 import PantallaDeCarga from './src/components/PantallaDeCarga';
 import Menu from './src/menu/Menu';
 import Header from './src/components/Header';
-import FotosCalidad from './src/FotosCalidad/FotosCalidad';
 import DescarteLavado from './src/Proceso/Aplicaciones/descarteLavado/DescarteLavado';
 import HistorialDescarteLavadoProceso from './src/Proceso/historial/historialDescarteLavado/HistorialDescarteLavadoProceso';
 import DescarteEncerado from './src/Proceso/Aplicaciones/descarteEncerado/DescarteEncerado';
 import HistorialDescarteEnceradoProceso from './src/Proceso/historial/historialDescarteEncerado/HistorialDescarteEnceradoProceso';
+import FotosCalidad from './src/Proceso/Aplicaciones/FotosCalidad/FotosCalidad';
+import HistorialFotosCalidad from './src/Proceso/historial/fotosCalidad/HistorialFotosCalidad';
 
 
 
@@ -69,16 +70,19 @@ function App(): React.JSX.Element {
             setIslogin={setIslogin} />
           :
           <View style={styles.container}>
-            <Header seleccionWindow={seleccionWindow}/>
+            <Header seleccionWindow={seleccionWindow} />
             {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
             {section === 'Proceso//Aplicaciones//Fotos calidad' && <FotosCalidad />}
             {section === 'Proceso//Aplicaciones//Descarte Lavado' && <DescarteLavado />}
             {section === 'Proceso//Aplicaciones//Descarte Encerado' && <DescarteEncerado />}
             {section === 'Proceso//Historial//Descarte Lavado' && <HistorialDescarteLavadoProceso />}
             {section === 'Proceso//Historial//Descarte Encerado' && <HistorialDescarteEnceradoProceso />}
+            {section === 'Proceso//Historial//Fotos calidad' && <HistorialFotosCalidad />}
           </View>
       }
-      <Footer />
+
+      {section !== 'Proceso//Aplicaciones//Fotos calidad' ?
+        <Footer /> : null}
 
     </SafeAreaView>
   );
@@ -89,7 +93,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    width:'100%',
+    width: '100%',
   },
 });
 

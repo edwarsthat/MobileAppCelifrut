@@ -6,8 +6,8 @@ import { proveedoresType } from './proveedoresType';
 /* eslint-disable @typescript-eslint/ban-types */
 export type lotesType = {
     _id: string
-    enf?: string
-    predio?:proveedoresType
+    enf: string
+    predio:proveedoresType
     canastillas?: string
     tipoFruta?: string
     observaciones?: string

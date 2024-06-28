@@ -3,24 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 // import * as Keychain from 'react-native-keychain';
 import HeaderFotos from './components/HeaderFotos';
+import { lotesType } from '../../../../types/lotesType';
+import Camara from './components/Camara';
 
 export default function FotosCalidad(): React.JSX.Element {
-    const [lote, setLote] = useState<string>('Seleccionar Lote');
+    const [lote, setLote] = useState<lotesType | null>(null);
+    const [lotes, setLotes] = useState<lotesType[]>([]);
 
     useEffect(() => {
-        // obtenerToken();
         obtenerDataPredios();
     }, []);
-    // const obtenerToken = async () => {
-    //     try {
-    //         const credentials = await Keychain.getGenericPassword();
-    //         if (credentials) {
-    //             console.log(credentials.password);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error retrieving the token securely', error);
-    //     }
-    // };
+
     const obtenerDataPredios = async () => {
         try{
             const responseJSON = await fetch('http://192.168.0.172:3010/proceso/lotes-fotos-calidad/',{
@@ -30,7 +23,10 @@ export default function FotosCalidad(): React.JSX.Element {
                 },
             });
             const response = await responseJSON.json();
-            console.log(response);
+            if(response.status !== 200){
+                throw new Error(`Code ${response.status}: ${response.message}`);
+            }
+            setLotes(response.data);
         } catch (err){
             if(err instanceof Error){
                 console.log(err.name,err.message);
@@ -41,7 +37,8 @@ export default function FotosCalidad(): React.JSX.Element {
 
     return (
         <View style={styles.container}>
-            <HeaderFotos  lote={lote} setLote={setLote}/>
+            <HeaderFotos lotes={lotes}  lote={lote} setLote={setLote}/>
+            <Camara lote={lote} />
         </View>
     );
 }
@@ -49,5 +46,8 @@ export default function FotosCalidad(): React.JSX.Element {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems:'center',
     },
 });
