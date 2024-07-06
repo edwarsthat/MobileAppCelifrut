@@ -6,13 +6,14 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StatusBar,
   useColorScheme,
   StyleSheet,
   View,
+  Dimensions,
 } from 'react-native';
 
 import {
@@ -29,10 +30,11 @@ import DescarteEncerado from './src/Proceso/Aplicaciones/descarteEncerado/Descar
 import HistorialDescarteEnceradoProceso from './src/Proceso/historial/historialDescarteEncerado/HistorialDescarteEnceradoProceso';
 import FotosCalidad from './src/Proceso/Aplicaciones/FotosCalidad/FotosCalidad';
 import HistorialFotosCalidad from './src/Proceso/historial/fotosCalidad/HistorialFotosCalidad';
+import ListaDeEmpaque from './src/Proceso/Aplicaciones/listaDeEmpaque/ListaDeEmpaque';
 
 
 
-
+export const deviceWidth = createContext<number>(0);
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -40,6 +42,13 @@ function App(): React.JSX.Element {
   const [permisos, setPermisos] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [section, setSection] = useState<string>('menu');
+  const [anchoDevice, setAnchoDevice] = useState<number>(0);
+
+  useEffect(() => {
+    const { width } = Dimensions.get('window');
+    setAnchoDevice(width);
+
+  }, []);
 
   const showLoading = (): void => {
     setLoading(true);
@@ -47,7 +56,6 @@ function App(): React.JSX.Element {
       setLoading(false);
     }, 3000);
   };
-
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
@@ -56,35 +64,41 @@ function App(): React.JSX.Element {
     setSection(data);
   };
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      {loading ? <PantallaDeCarga />
-        :
-        !isLogin ?
-          <Login
-            setPermisos={setPermisos}
-            showLoading={showLoading}
-            setIslogin={setIslogin} />
+    <deviceWidth.Provider value={anchoDevice}>
+      <SafeAreaView style={styles.container}>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
+        />
+        {loading ? <PantallaDeCarga />
           :
-          <View style={styles.container}>
-            <Header seleccionWindow={seleccionWindow} />
-            {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
-            {section === 'Proceso//Aplicaciones//Fotos calidad' && <FotosCalidad />}
-            {section === 'Proceso//Aplicaciones//Descarte Lavado' && <DescarteLavado />}
-            {section === 'Proceso//Aplicaciones//Descarte Encerado' && <DescarteEncerado />}
-            {section === 'Proceso//Historial//Descarte Lavado' && <HistorialDescarteLavadoProceso />}
-            {section === 'Proceso//Historial//Descarte Encerado' && <HistorialDescarteEnceradoProceso />}
-            {section === 'Proceso//Historial//Fotos calidad' && <HistorialFotosCalidad />}
-          </View>
-      }
+          !isLogin ?
+            <Login
+              setPermisos={setPermisos}
+              showLoading={showLoading}
+              setIslogin={setIslogin} />
+            :
+            <View style={styles.container}>
+              {section !== 'Proceso//Aplicaciones//Lista de empaque' ? <Header seleccionWindow={seleccionWindow} /> : null}
+              {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
+              {/* Aplicaciones */}
+              {section === 'Proceso//Aplicaciones//Fotos calidad' && <FotosCalidad />}
+              {section === 'Proceso//Aplicaciones//Descarte Lavado' && <DescarteLavado />}
+              {section === 'Proceso//Aplicaciones//Descarte Encerado' && <DescarteEncerado />}
+              {section === 'Proceso//Aplicaciones//Lista de empaque' && <ListaDeEmpaque setSection={setSection} />}
 
-      {section !== 'Proceso//Aplicaciones//Fotos calidad' ?
-        <Footer /> : null}
+              {/* Historiales aplicaciones */}
+              {section === 'Proceso//Historial//Descarte Lavado' && <HistorialDescarteLavadoProceso />}
+              {section === 'Proceso//Historial//Descarte Encerado' && <HistorialDescarteEnceradoProceso />}
+              {section === 'Proceso//Historial//Fotos calidad' && <HistorialFotosCalidad />}
+            </View>
+        }
 
-    </SafeAreaView>
+        {section !== 'Proceso//Aplicaciones//Fotos calidad' && section !== 'Proceso//Aplicaciones//Lista de empaque' ?
+          <Footer /> : null}
+
+      </SafeAreaView>
+    </deviceWidth.Provider>
   );
 }
 

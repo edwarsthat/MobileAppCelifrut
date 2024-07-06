@@ -3,7 +3,6 @@
 import { proveedoresType } from './proveedoresType';
 
 
-/* eslint-disable @typescript-eslint/ban-types */
 export type lotesType = {
     _id: string
     enf: string
