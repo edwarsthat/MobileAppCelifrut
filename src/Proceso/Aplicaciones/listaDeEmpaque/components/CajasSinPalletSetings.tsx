@@ -1,8 +1,9 @@
 /* eslint-disable prettier/prettier */
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Modal, Button, View, StyleSheet, Text, TextInputChangeEventData, TouchableOpacity, TextInput, NativeSyntheticEvent, Alert } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, loteSeleccionadoContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { itemType } from "../types/types";
+import { deviceWidth } from "../../../../../App";
 
 type propsType = {
     openModalSinPallet: boolean;
@@ -15,12 +16,14 @@ export default function CajasSinPalletSetings(props: propsType): React.JSX.Eleme
     const pallet = useContext(palletSeleccionadoContext);
     const contenedorSeleccionado = useContext(contenedorSeleccionadoContext);
     const contenedor = useContext(contenedoresContext).find(cont => cont.numeroContenedor === contenedorSeleccionado);
-
+    const anchoDevice = useContext(deviceWidth);
+    const [isTablet, setIsTablet] = useState<boolean>(false);
     const [radioButtonTipoCaja, setRadioButtonTipoCaja] = useState<string>('');
     const [radioButtonCalidad, setRadioButtonCalidad] = useState<string>('');
     const [radioButtonCalibre, setRadioButtonCalibre] = useState<string>('');
     const [cajas, setCajas] = useState<string>('');
 
+    useEffect(()=>{setIsTablet(anchoDevice >= 721);},[anchoDevice]);
     const getInput = (
         e: NativeSyntheticEvent<TextInputChangeEventData>,
     ): void => {
@@ -57,7 +60,7 @@ export default function CajasSinPalletSetings(props: propsType): React.JSX.Eleme
             visible={props.openModalSinPallet}
             animationType="fade">
             <View style={styles.centerModal}>
-                <View style={styles.viewModal}>
+                <View style={isTablet ? styles.viewModal : stylesCel.viewModal}>
                     <View style={styles.modal}>
                         <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
                         <View style={styles.containerConfigurarPallet}>
@@ -236,5 +239,20 @@ const styles = StyleSheet.create({
         marginTop: 40,
         justifyContent: 'center',
         marginRight: 45,
+    },
+});
+
+const stylesCel = StyleSheet.create({
+    viewModal: {
+        display: 'flex',
+        backgroundColor: 'white',
+        width: 'auto',
+        flexDirection: 'column',
+        borderRadius: 20,
+        paddingBottom: 20,
+        paddingTop: 10,
+        gap: 50,
+        shadowColor: '#52006A',
+        elevation: 20,
     },
 });

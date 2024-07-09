@@ -77,7 +77,7 @@ export default function DescarteEncerado(): React.JSX.Element {
             }
             const { password } = credentials;
             const token = password;
-            console.log(request);
+
             const responseJSON = await fetchWithTimeout(`${URL}/proceso/ingresar_descarte_encerado`, {
                 method: "PUT",
                 headers: {

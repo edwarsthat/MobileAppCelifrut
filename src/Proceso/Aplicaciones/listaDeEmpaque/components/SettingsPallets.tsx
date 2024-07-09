@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { View, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { settingsType } from "../types/types";
+import { deviceWidth } from "../../../../../App";
 
 type propsType = {
     openModal: boolean;
@@ -15,8 +16,11 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
     const pallet = useContext(palletSeleccionadoContext);
     const contenedorSeleccionado = useContext(contenedorSeleccionadoContext);
     const contenedor = useContext(contenedoresContext).find(cont => cont.numeroContenedor === contenedorSeleccionado);
+    const anchoDevice = useContext(deviceWidth);
+    const [isTablet, setIsTablet] = useState<boolean>(false);
 
     useEffect(() => {
+        setIsTablet(anchoDevice >= 721);
         if (pallet !== -1 && contenedor) {
             const infoLiberacion = contenedor.pallets[pallet].listaLiberarPallet;
             setRotulado(infoLiberacion.rotulado);
@@ -31,7 +35,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
             setEstadoCajas(false);
             setEstiba(false);
         }
-    }, [props.openModal, contenedor, pallet]);
+    }, [props.openModal, contenedor, pallet, anchoDevice]);
 
     const [radioButtonTipoCaja, setRadioButtonTipoCaja] = useState<string>('');
     const [radioButtonCalidad, setRadioButtonCalidad] = useState<string>('');
@@ -72,8 +76,8 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
         <Modal transparent={true}
             visible={props.openModal}
             animationType="fade">
-            <View style={styles.centerModal}>
-                <View style={styles.viewModal}>
+            <View style={isTablet ? styles.centerModal : stylesCel.centerModal}>
+                <View style={isTablet ? styles.viewModal : stylesCel.viewModal}>
                     <View style={styles.modal}>
                         <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
                         <View style={styles.containerConfigurarPallet}>
@@ -133,7 +137,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                         <View style={styles.modal}>
                             <Text style={styles.tituloModal}>Liberacion pallets</Text>
                         </View>
-                        <View style={styles.contenedorLiberacionPallet}>
+                        <View style={isTablet ? styles.contenedorLiberacionPallet :  stylesCel.contenedorLiberacionPallet}>
                             <TouchableOpacity onPress={() => setRotulado(!rotulado)}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
@@ -259,6 +263,45 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         gap: 15,
+    },
+    viewButtonsLiberacionPallet: {
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 20,
+        justifyContent: 'center',
+        paddingTop: 35,
+    },
+});
+
+const stylesCel = StyleSheet.create({
+    centerModal: {
+        flex: 1,
+        alignItems: 'flex-start',
+
+        justifyContent:'center',
+        alignContent:'center',
+    },
+    viewModal: {
+        display: 'flex',
+        backgroundColor: 'white',
+        width: 'auto',
+        flexDirection: 'column',
+        borderRadius: 20,
+        paddingBottom: 20,
+        paddingTop: 10,
+        gap: 50,
+        shadowColor: '#52006A',
+        elevation: 20,
+    },
+
+
+
+
+    contenedorLiberacionPallet: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 15,
+        padding:20,
     },
     viewButtonsLiberacionPallet: {
         display: 'flex',

@@ -31,6 +31,8 @@ import HistorialDescarteEnceradoProceso from './src/Proceso/historial/historialD
 import FotosCalidad from './src/Proceso/Aplicaciones/FotosCalidad/FotosCalidad';
 import HistorialFotosCalidad from './src/Proceso/historial/fotosCalidad/HistorialFotosCalidad';
 import ListaDeEmpaque from './src/Proceso/Aplicaciones/listaDeEmpaque/ListaDeEmpaque';
+import PrecioLimon from './src/comercial/precios/limon/PrecioLimon';
+import PrecioNaranja from './src/comercial/precios/naranja/PrecioNaranja';
 
 
 
@@ -91,6 +93,10 @@ function App(): React.JSX.Element {
               {section === 'Proceso//Historial//Descarte Lavado' && <HistorialDescarteLavadoProceso />}
               {section === 'Proceso//Historial//Descarte Encerado' && <HistorialDescarteEnceradoProceso />}
               {section === 'Proceso//Historial//Fotos calidad' && <HistorialFotosCalidad />}
+
+              {/* comercial */}
+              {section === 'Comercial//Precios proveedor//Limon' && <PrecioLimon />}
+              {section === 'Comercial//Precios proveedor//Naranja' && <PrecioNaranja />}
             </View>
         }
 

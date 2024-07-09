@@ -53,11 +53,14 @@ export default function Login(props: propsType): React.JSX.Element {
             }
         }
     };
+    const handleUser = (e:string) => {
+        setUser(e.toLowerCase().trim());
+    };
     return <View style={styles.container}>
         <Image style={styles.imgStyle} source={require('../../assets/CELIFRUT.png')} />
         <View>
             <Text style={styles.textStyle}>Usuario</Text>
-            <TextInput style={styles.inputStyle} onChangeText={setUser} />
+            <TextInput style={styles.inputStyle} onChangeText={handleUser} />
             <Text style={styles.errorStyle}>{error === 401 && 'Error en el usuario'}</Text>
             <Text style={styles.textStyle}>Contraseña</Text>
             <TextInput

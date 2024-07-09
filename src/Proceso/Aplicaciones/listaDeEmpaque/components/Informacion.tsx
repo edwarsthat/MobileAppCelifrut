@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
 const stylesCel = StyleSheet.create({
 
     textHeaders: {
-        fontSize: 12,
+        fontSize: 10,
         fontWeight: 'bold',
     },
     view3: { display: 'flex', flexDirection: 'row' },
@@ -191,7 +191,7 @@ const stylesCel = StyleSheet.create({
         borderRadius: 8,
         borderColor: 'red',
         borderWidth: 2,
-        flexWrap: 'wrap', width: '75%',
+        flexWrap: 'wrap', width: '70%',
     },
     touchable: {
         backgroundColor: 'white',
@@ -200,7 +200,7 @@ const stylesCel = StyleSheet.create({
         borderRadius: 8,
         display: 'flex',
         flexDirection: 'column',
-        flexWrap: 'wrap', width: '75%',
+        flexWrap: 'wrap', width: '70%',
     },
     view4: { display: 'flex', flexDirection: 'row', gap: 10, width: '100%' },
 });

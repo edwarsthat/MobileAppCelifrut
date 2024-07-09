@@ -161,7 +161,7 @@ export default function Footer(props: propsType): React.JSX.Element {
       <View style={styles.viewTextInput}>
         <TextInput
           keyboardType="numeric"
-          style={styles.textInput}
+          style={isTablet ? styles.textInput : stylesCel.textInput}
           value={String(cajas)}
           onChange={e => setCajas(Number(e.nativeEvent.text))} />
       </View>
@@ -384,12 +384,12 @@ const styles = StyleSheet.create({
 const stylesCel = StyleSheet.create({
   container: {
     backgroundColor: '#8B9E39',
-    height: '180%',
+    height: '100%',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     padding: 10,
     gap:10,
-    alignItems:'center',
+    width:'100%',
   },
   buttons: {
     backgroundColor: '#390D52',
@@ -406,9 +406,11 @@ const stylesCel = StyleSheet.create({
   },
   textInput: {
     width: 150,
-    height: 50,
+    height: 30,
     backgroundColor: 'white',
     borderRadius: 12,
+    fontSize:10,
+    padding:0,
   },
   viewTextInput: {
     display: 'flex',
