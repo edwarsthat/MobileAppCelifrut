@@ -8,7 +8,7 @@ export type lotesType = {
     enf: string
     predio:proveedoresType
     canastillas?: string
-    tipoFruta?: string
+    tipoFruta: string
     observaciones?: string
     kilos?: number
     placa?: string

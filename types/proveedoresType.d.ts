@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/ban-types */
 export type proveedoresType = {
-  _id?: string
-  PREDIO?: string
+  _id: string
+  PREDIO: string
   ICA?: string
   'CODIGO INTERNO'?: string
   GGN?: string

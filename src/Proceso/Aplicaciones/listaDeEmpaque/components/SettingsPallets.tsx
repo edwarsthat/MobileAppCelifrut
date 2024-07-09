@@ -8,6 +8,7 @@ type propsType = {
     openModal: boolean;
     closeModal: () => void;
     guardarPalletSettings: (settings: settingsType,) => Promise<void>;
+    liberarPallet: (item:any) => void
 
 }
 export default function SettingsPallets(props: propsType): React.JSX.Element {
@@ -22,7 +23,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
             setPaletizado(infoLiberacion.paletizado);
             setEnzunchado(infoLiberacion.enzunchado);
             setEstadoCajas(infoLiberacion.estadoCajas);
-            setEstiba(infoLiberacion.pallet);
+            setEstiba(infoLiberacion.estiba);
         } else {
             setRotulado(false);
             setPaletizado(false);
@@ -56,7 +57,17 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
         setRadioButtonTipoCaja('');
         setRadioButtonCalidad('');
     };
-
+    const liberarPallets = ():void => {
+        const item = {
+            rotulado:rotulado,
+            paletizado:paletizado,
+            enzunchado:enzunchado,
+            estadoCajas:estadoCajas,
+            estiba:estiba,
+        };
+        props.liberarPallet(item);
+        props.closeModal();
+    };
     return (
         <Modal transparent={true}
             visible={props.openModal}
@@ -165,7 +176,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.viewButtonsLiberacionPallet}>
-                            <Button title="Guardar" />
+                            <Button title="Guardar" onPress={liberarPallets}/>
                             <Button title="Cancelar" onPress={props.closeModal} />
                         </View>
                     </View>

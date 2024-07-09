@@ -1,19 +1,24 @@
 /* eslint-disable prettier/prettier */
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { cajasSinPalletContext, contenedorSeleccionadoContext, contenedoresContext, itemSeleccionContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
+import { deviceWidth } from "../../../../../App";
 
 type propsType = {
     setSeleccion: (data: number[]) => void;
 };
 
 export default function Informacion(props: propsType): React.JSX.Element {
+    const anchoDevice = useContext(deviceWidth);
     const pallet = useContext(palletSeleccionadoContext);
     const numeroContenedor = useContext(contenedorSeleccionadoContext);
     const contenedor = useContext(contenedoresContext).find(item => item.numeroContenedor === numeroContenedor);
     const seleccion = useContext(itemSeleccionContext);
     const cajasSinPallet = useContext(cajasSinPalletContext);
-
+    const [isTablet, setIsTablet] = useState<boolean>(false);
+    useEffect(() => {
+        setIsTablet(anchoDevice >= 721);
+    }, [anchoDevice]);
 
     const handleSeleccion = (index: number) => {
         if (seleccion.includes(index)) {
@@ -81,38 +86,40 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                 <View style={styles.container} key={index + index}>
                                     <View style={styles.containerHeader}>
                                         <View key={index + 'view2'}>
-                                            <Text style={styles.textHeaders}>{item.lote.enf}</Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.lote.enf}</Text>
                                         </View>
                                         <View key={item.lote.enf + 'view3'}>
                                             <View style={styles.view3} key={index + 'view4'}>
-                                                <Text key={index + 'nombrPredioHeader'} style={styles.textHeaders}>
+                                                <Text key={index + 'nombrPredioHeader'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
                                                     Nombre Predio:{' '}
                                                 </Text>
-                                                <Text key={index + 'nombrPredio'} style={styles.textHeaders}>
+                                                <Text key={index + 'nombrPredio'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
                                                     {item.lote.predio}
                                                 </Text>
                                             </View>
                                         </View>
                                     </View>
                                     <TouchableOpacity
-                                        style={seleccion.includes(index) ? styles.touchablePress : styles.touchable}
+                                        style={isTablet ? seleccion.includes(index) ? styles.touchablePress : styles.touchable
+                                                    : seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable
+                                        }
                                         onPress={() => handleSeleccion(index)}>
                                         <View style={styles.view3}>
-                                            <Text>{'No. Cajas:'} </Text>
-                                            <Text>{item.cajas}</Text>
+                                            <Text style={isTablet ? null : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
+                                            <Text style={isTablet ? null : stylesCel.textHeaders}>{item.cajas}</Text>
                                         </View>
-                                        <View style={styles.view4}>
+                                        <View style={isTablet ? styles.view4 : stylesCel.view4}>
                                             <View style={styles.view3}>
-                                                <Text>{'Tipo Caja:'} </Text>
-                                                <Text>{item.tipoCaja}</Text>
+                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
+                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{item.tipoCaja}</Text>
                                             </View>
                                             <View style={styles.view3}>
-                                                <Text>Calibre: </Text>
-                                                <Text>{item.calibre}</Text>
+                                                <Text style={isTablet ? null : stylesCel.textHeaders}>Calibre: </Text>
+                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{item.calibre}</Text>
                                             </View>
                                             <View style={styles.view3}>
-                                                <Text>Calidad: </Text>
-                                                <Text>{item.calidad}</Text>
+                                                <Text style={isTablet ? null : stylesCel.textHeaders}>Calidad: </Text>
+                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{item.calidad}</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -168,4 +175,32 @@ const styles = StyleSheet.create({
 
     },
     view4: { display: 'flex', flexDirection: 'row', gap: 20, width: '100%' },
+});
+
+const stylesCel = StyleSheet.create({
+
+    textHeaders: {
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    view3: { display: 'flex', flexDirection: 'row' },
+    touchablePress: {
+        backgroundColor: 'white',
+        marginTop: 8,
+        padding: 5,
+        borderRadius: 8,
+        borderColor: 'red',
+        borderWidth: 2,
+        flexWrap: 'wrap', width: '75%',
+    },
+    touchable: {
+        backgroundColor: 'white',
+        marginTop: 8,
+        padding: 5,
+        borderRadius: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'wrap', width: '75%',
+    },
+    view4: { display: 'flex', flexDirection: 'row', gap: 10, width: '100%' },
 });

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
-import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal } from "react-native";
+import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal, Alert } from "react-native";
 import { deviceWidth } from "../../../../../App";
 import { predioType } from "../../../../../types/predioType";
 import { contenedorSeleccionadoContext, contenedoresContext, loteSeleccionadoContext } from "../ListaDeEmpaque";
@@ -10,7 +10,7 @@ type propsType = {
     loteVaciando: predioType | undefined
     seleccionarLote: (item: predioType) => void
     setNumeroContenedor: (data: number) => void;
-
+    cerrarContenendor: () => void
 }
 
 export default function Header(props: propsType): React.JSX.Element {
@@ -35,6 +35,22 @@ export default function Header(props: propsType): React.JSX.Element {
     const obtenerLoteInfo = () => {
         if (props.loteVaciando) { props.seleccionarLote(props.loteVaciando); }
     };
+    const handleCerrarContenedor = () => {
+        Alert.alert('Cerrar contenedor', `¿Desea cerrar el contenedor ${numeroContenedor}?`, [
+            {
+                text: 'Cancelar',
+                onPress: () => console.log("cancelar"),
+                style: 'cancel',
+            },
+            {
+                text: 'Aceptar',
+                onPress: () => {
+                        props.cerrarContenendor();
+                },
+                style: 'default',
+            },
+        ]);
+    };
     return (
         <SafeAreaView style={isTablet ? stylesTablet.container : styleCel.container}>
             <TouchableOpacity onPress={backMainMenu}>
@@ -44,12 +60,12 @@ export default function Header(props: propsType): React.JSX.Element {
                 />
             </TouchableOpacity>
             <View style={isTablet ? null : styleCel.viewButtonCerrarContenedor}>
-                <Button title="Cerrar Contenedor" />
+                <Button title="Cerrar Contenedor" onPress={handleCerrarContenedor} />
             </View>
 
             <View style={isTablet ? null : styleCel.containerPredio}>
-                <Text>Predio Vaciando:</Text>
-                <Text>
+                <Text style={isTablet ? null : styleCel.predioText}>Predio Vaciando:</Text>
+                <Text style={isTablet ? null : styleCel.predioText}>
                     {props.loteVaciando && props.loteVaciando.enf + "-" + props.loteVaciando.nombrePredio}
                 </Text>
             </View>
@@ -65,8 +81,8 @@ export default function Header(props: propsType): React.JSX.Element {
                 />
             </View>
             <View style={isTablet ? null : styleCel.containerPredio}>
-                <Text>Predio Actual:</Text>
-                <Text>{loteSeleccionado.enf + "-" + loteSeleccionado.nombrePredio}</Text>
+                <Text style={isTablet ? null : styleCel.predioText}>Predio Actual:</Text>
+                <Text style={isTablet ? null : styleCel.predioText}>{loteSeleccionado.enf + "-" + loteSeleccionado.nombrePredio}</Text>
             </View>
 
             <View>
@@ -83,8 +99,8 @@ export default function Header(props: propsType): React.JSX.Element {
 
             {
                 <View>
-                    <Text>Cajas Total:</Text>
-                    <Text>
+                    <Text style={isTablet ? null : styleCel.predioText}>Cajas Total:</Text>
+                    <Text style={isTablet ? null : styleCel.predioText}>
                         {contenedor &&
                             contenedor.pallets.reduce(
                                 (acu, pallet) => acu + pallet.EF1.reduce((acu2, lote) => acu2 + lote.cajas, 0),
@@ -96,7 +112,7 @@ export default function Header(props: propsType): React.JSX.Element {
 
 
             <TouchableOpacity
-                style={stylesTablet.buttonContenedores}
+                style={isTablet ? stylesTablet.buttonContenedores : styleCel.buttonContenedores}
                 onPress={obtenerLoteInfo}>
                 <Text>Obtener Lote</Text>
             </TouchableOpacity>
@@ -231,17 +247,18 @@ const styleCel = StyleSheet.create({
         padding: 8,
         margin: 4,
         borderColor: '#7D9F3A',
-
     },
+    predioText:{fontSize:12},
     buttonContenedores: {
         backgroundColor: 'white',
-        width: 150,
-        height: 50,
+        width: 95,
+        height: 40,
         borderRadius: 15,
         borderWidth: 1,
         borderColor: '#7D9F3A',
         justifyContent: 'center',
         alignItems: 'center',
+        fontSize:12,
     },
     centerModal: {
         flex: 1,
@@ -271,6 +288,6 @@ const styleCel = StyleSheet.create({
         marginLeft: 'auto',
         marginRight: 'auto',
         marginTop: 10,
-        fontSize: 20,
+        fontSize: 10,
     },
 });

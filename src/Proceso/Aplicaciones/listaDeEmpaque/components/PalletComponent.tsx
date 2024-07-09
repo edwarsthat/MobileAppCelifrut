@@ -5,7 +5,7 @@ import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoC
 
 type propsType = {
     pallet: number;
-    setPalletSeleccionado: (data: number) => void;
+    handleClickPallet: (data: number) => void;
     openPalletSettings: () => void;
 };
 
@@ -17,7 +17,7 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
     );
 
     const longPressHandle = () => {
-        props.setPalletSeleccionado(Number(props.pallet));
+        props.handleClickPallet(Number(props.pallet));
         props.openPalletSettings();
     };
     const palletFree = () => {
@@ -38,7 +38,7 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
                         ? styles.palletsPress
                         : (palletFree() ? styles.palletsButonsLiberado : styles.palletsButons)
                 }
-                onPress={() => props.setPalletSeleccionado(Number(props.pallet))}
+                onPress={() => props.handleClickPallet(Number(props.pallet))}
                 onLongPress={longPressHandle}>
                 <View
                     style={styles.viwImagen}>

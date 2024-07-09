@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
 import { validarActualizarPallet, validarEliminar, validarMoverItem, validarResta, validarSumarDato } from "../controller/valiadations";
 import { contenedorSeleccionadoContext, contenedoresContext, itemSeleccionContext, loteSeleccionadoContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import { itemType } from "../types/types";
+import { deviceWidth } from "../../../../../App";
 
 type propsType = {
   agregarItem: (item: itemType) => void;
@@ -15,6 +16,7 @@ type propsType = {
 };
 
 export default function Footer(props: propsType): React.JSX.Element {
+  const anchoDevice = useContext(deviceWidth);
   const loteActual = useContext(loteSeleccionadoContext);
   const seleccion = useContext(itemSeleccionContext);
   const pallet = useContext(palletSeleccionadoContext);
@@ -29,9 +31,13 @@ export default function Footer(props: propsType): React.JSX.Element {
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [cliente, setCliente] = useState<string>('Sin Pallet');
+  const [isTablet, setIsTablet] = useState<boolean>(false);
 
   const [cajas, setCajas] = useState<number>(0);
 
+  useEffect(() => {
+    setIsTablet(anchoDevice >= 721);
+}, [anchoDevice]);
   const clickActualizar = () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
@@ -148,8 +154,8 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
 
   return (
-    <View style={styles.container}>
-      <View>
+    <View style={isTablet ? styles.container : stylesCel.container}>
+      <View style={isTablet ? null : stylesCel.viewButtonHide}>
         <Button title="Actualizar" onPress={clickActualizar} />
       </View>
       <View style={styles.viewTextInput}>
@@ -162,10 +168,10 @@ export default function Footer(props: propsType): React.JSX.Element {
       <View>
         <Button title="Sumar" onPress={clickSumar} />
       </View>
-      <View>
+      <View style={isTablet ? null : stylesCel.viewButtonHide}>
         <Button title="Restar" onPress={clickRestar} />
       </View>
-      <View>
+      <View style={isTablet ? null : stylesCel.viewButtonHide}>
         <Button title="Mover" onPress={ClickOpenMoverCajas} />
       </View>
       {/* <View>
@@ -375,3 +381,113 @@ const styles = StyleSheet.create({
   },
 });
 
+const stylesCel = StyleSheet.create({
+  container: {
+    backgroundColor: '#8B9E39',
+    height: '180%',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 10,
+    gap:10,
+    alignItems:'center',
+  },
+  buttons: {
+    backgroundColor: '#390D52',
+    width: 120,
+    height: 60,
+    borderRadius: 15,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewButtonHide:{display:'none'},
+  text: {
+    color: 'white',
+  },
+  textInput: {
+    width: 150,
+    height: 50,
+    backgroundColor: 'white',
+    borderRadius: 12,
+  },
+  viewTextInput: {
+    display: 'flex',
+  },
+  centerModal: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '10%',
+  },
+  viewModalItem: {
+    width: 500,
+    height: 450,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    elevation: 30,
+    shadowColor: 'black',
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  viewModalItems: {
+    width: 500,
+    height: 350,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    elevation: 30,
+    shadowColor: 'black',
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalHeader: {
+    padding: 10,
+  },
+  textModalHeader: {
+    fontSize: 18,
+    fontWeight: '500',
+  },
+  modalInputView: {
+    margin: 10,
+    paddingRight: 10,
+    paddingLeft: 10,
+  },
+  modalInput: {
+    width: 350,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#7D9F3A',
+    backgroundColor: '#F5F5F5',
+  },
+  viewButtonsModal: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  buttonContenedores: {
+    width: 350,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: '#7D9F3A',
+    backgroundColor: '#F5F5F5',
+    height: 50,
+    marginHorizontal: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pressableStyle: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  textList: {
+    color: 'black',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 10,
+    fontSize: 20,
+  },
+});
