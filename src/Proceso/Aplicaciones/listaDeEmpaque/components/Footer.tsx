@@ -1,11 +1,12 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
-import { View, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
+import { View, SafeAreaView, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
 import { validarActualizarPallet, validarEliminar, validarMoverItem, validarResta, validarSumarDato } from "../controller/valiadations";
 import { contenedorSeleccionadoContext, contenedoresContext, itemSeleccionContext, loteSeleccionadoContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import { itemType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
+import ModalModificarItem from "./ModalModificarItem";
 
 type propsType = {
   agregarItem: (item: itemType) => void;
@@ -27,17 +28,18 @@ export default function Footer(props: propsType): React.JSX.Element {
   const [contenedorID, setContenedorID] = useState<number>(-1);
   const [entradaModalPallet, setEntradaModalPallet] = useState<string>('');
   const [entradaModalCajas, setEntradaModalCajas] = useState<string>('');
-  const showCajasInput = false;
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [cliente, setCliente] = useState<string>('Sin Pallet');
   const [isTablet, setIsTablet] = useState<boolean>(false);
+  const [showCajasInput, setShowcajasInput] = useState<boolean>(true);
+  const [openModalEditar, setOpenModalEditar] = useState<boolean>(false);
 
   const [cajas, setCajas] = useState<number>(0);
 
   useEffect(() => {
     setIsTablet(anchoDevice >= 721);
-}, [anchoDevice]);
+  }, [anchoDevice]);
   const clickActualizar = () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
@@ -93,9 +95,9 @@ export default function Footer(props: propsType): React.JSX.Element {
         {
           text: 'Aceptar',
           onPress: () => {
-            if(pallet === -1){
+            if (pallet === -1) {
               props.eliminarItemCajasSinPallet();
-            } else{
+            } else {
               props.eliminarItem();
             }
           },
@@ -122,9 +124,12 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
   const ClickOpenMoverCajas = () => {
     if (seleccion.length === 0) { return Alert.alert('Seleccione un item que desee mover a otro pallet'); }
-    // else if (seleccion.length > 1) { setShowcajasInput(false); }
+    else if (seleccion.length > 1) { setShowcajasInput(false); }
     // else { setShowcajasInput(true); }
     setOpenModal(true);
+  };
+  const ClickOpenEditar = () => {
+    setOpenModalEditar(true);
   };
   const clickMover = () => {
     try {
@@ -154,7 +159,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
 
   return (
-    <View style={isTablet ? styles.container : stylesCel.container}>
+    <SafeAreaView style={isTablet ? styles.container : stylesCel.container}>
       <View style={isTablet ? null : stylesCel.viewButtonHide}>
         <Button title="Actualizar" onPress={clickActualizar} />
       </View>
@@ -174,9 +179,9 @@ export default function Footer(props: propsType): React.JSX.Element {
       <View style={isTablet ? null : stylesCel.viewButtonHide}>
         <Button title="Mover" onPress={ClickOpenMoverCajas} />
       </View>
-      {/* <View>
-        <Button title="Editar" onPress={ClickEditarItem} />
-      </View> */}
+      <View style={isTablet ? null : stylesCel.viewButtonHide}>
+        <Button title="Editar" onPress={ClickOpenEditar}/>
+      </View>
       <View>
         <Button title="Eliminar" onPress={clickEliminar} />
       </View>
@@ -202,9 +207,7 @@ export default function Footer(props: propsType): React.JSX.Element {
 
             <View style={styles.modalHeader}>
               <Text style={styles.textModalHeader}>
-                Ingrese el numero del{' '}
-                {'Pallet'}
-                al que desea mover el item
+                Ingrese el numero del pallet o estiba que desea mover el item
               </Text>
             </View>
             <View style={styles.modalInputView}>
@@ -215,9 +218,7 @@ export default function Footer(props: propsType): React.JSX.Element {
             </View>
             {showCajasInput && <View style={styles.modalHeader}>
               <Text style={styles.textModalHeader}>
-                Ingrese el numero de{' '}
-                {'Sacos'}
-                que desea mover
+                Ingrese el numero de items que desea mover
               </Text>
             </View>}
             {showCajasInput && <View style={styles.modalInputView}>
@@ -233,7 +234,6 @@ export default function Footer(props: propsType): React.JSX.Element {
           </View>
         </View>
       </Modal>
-
       <Modal transparent={true} visible={modalVisible} animationType="fade">
         <View style={styles.centerModal}>
           <View style={showCajasInput ? styles.viewModalItem : styles.viewModalItems}>
@@ -269,13 +269,15 @@ export default function Footer(props: propsType): React.JSX.Element {
           </View>
         </View>
       </Modal>
-    </View>
+
+              <ModalModificarItem setOpenModalEditar={setOpenModalEditar} openModalEditar={openModalEditar} />
+    </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#8B9E39',
-    height: '180%',
+    height: 'auto',
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -388,8 +390,8 @@ const stylesCel = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     padding: 10,
-    gap:10,
-    width:'100%',
+    gap: 10,
+    width: '100%',
   },
   buttons: {
     backgroundColor: '#390D52',
@@ -400,7 +402,7 @@ const stylesCel = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  viewButtonHide:{display:'none'},
+  viewButtonHide: { display: 'none' },
   text: {
     color: 'white',
   },
@@ -409,8 +411,8 @@ const stylesCel = StyleSheet.create({
     height: 30,
     backgroundColor: 'white',
     borderRadius: 12,
-    fontSize:10,
-    padding:0,
+    fontSize: 10,
+    padding: 0,
   },
   viewTextInput: {
     display: 'flex',

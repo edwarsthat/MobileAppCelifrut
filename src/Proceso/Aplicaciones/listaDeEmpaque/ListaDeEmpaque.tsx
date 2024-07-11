@@ -429,12 +429,12 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                         </View>
                                     </View>
 
-                                    <Footer
-                                        eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
-                                        moverItem={moverItem}
-                                        restarItem={restarItem}
-                                        eliminarItem={eliminarItem}
-                                        agregarItem={agregarItem} />
+                                        <Footer
+                                            eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
+                                            moverItem={moverItem}
+                                            restarItem={restarItem}
+                                            eliminarItem={eliminarItem}
+                                            agregarItem={agregarItem} />
                                 </SafeAreaView>
 
                                 <Modal
@@ -468,7 +468,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         flex: 1,
-        minHeight: 550,
     },
     viewInformacion: {
         minWidth: 400,
