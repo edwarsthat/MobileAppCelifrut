@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {  StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
 import { cajasSinPalletContext, contenedorSeleccionadoContext, contenedoresContext, itemSeleccionContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { deviceWidth } from "../../../../../App";
 
@@ -35,8 +35,52 @@ export default function Informacion(props: propsType): React.JSX.Element {
     return (
         <>
             {pallet === -1 ?
-                (<ScrollView style={styles.scrollStyle} nestedScrollEnabled={true}>
-                    {cajasSinPallet.map((item, index) => (
+                (<View style={styles.scrollStyle}>
+                    <FlatList
+                        data={cajasSinPallet}
+                        renderItem={({ item, index }) => (
+                            <View style={styles.container} key={index + index}>
+                                <View style={styles.containerHeader}>
+                                    <View key={index + 'view2'}>
+                                        <Text style={styles.textHeaders}>{item.lote.enf}</Text>
+                                    </View>
+                                    <View key={item.lote.enf + 'view3'}>
+                                        <View style={styles.view3} key={index + 'view4'}>
+                                            <Text key={index + 'nombrPredioHeader'} style={styles.textHeaders}>
+                                                Nombre Predio:{' '}
+                                            </Text>
+                                            <Text key={index + 'nombrPredio'} style={styles.textHeaders}>
+                                                {item.lote.predio}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+                                <TouchableOpacity
+                                    style={seleccion.includes(index) ? styles.touchablePress : styles.touchable}
+                                    onPress={() => handleSeleccion(index)}>
+                                    <View style={styles.view3}>
+                                        <Text>{'No. Cajas:'} </Text>
+                                        <Text>{item.cajas}</Text>
+                                    </View>
+                                    <View style={styles.view4}>
+                                        <View style={styles.view3}>
+                                            <Text>{'Tipo Caja:'} </Text>
+                                            <Text>{item.tipoCaja}</Text>
+                                        </View>
+                                        <View style={styles.view3}>
+                                            <Text>Calibre: </Text>
+                                            <Text>{item.calibre}</Text>
+                                        </View>
+                                        <View style={styles.view3}>
+                                            <Text>Calidad: </Text>
+                                            <Text>{item.calidad}</Text>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+                        )} />
+
+                    {/* {cajasSinPallet.map((item, index) => (
                         <View style={styles.container} key={index + index}>
                             <View style={styles.containerHeader}>
                                 <View key={index + 'view2'}>
@@ -76,19 +120,20 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                 </View>
                             </TouchableOpacity>
                         </View>
-                    ))}
-                </ScrollView>)
+                    ))} */}
+                </View>)
                 : (
-                    <ScrollView style={styles.scrollStyle} nestedScrollEnabled={true}>
-                        {contenedor && (pallet !== -1)
-                            ? contenedor.pallets[pallet].EF1.map((item, index) => (
-                                typeof item.lote === 'object' &&
-                                <View style={styles.container} key={index + index}>
+                    <View style={styles.scrollStyle}>
+                        {contenedor &&
+                        <FlatList
+                            data={contenedor.pallets[pallet].EF1}
+                            renderItem={({ item, index }) => (
+                                <View style={styles.container}>
                                     <View style={styles.containerHeader}>
                                         <View key={index + 'view2'}>
                                             <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.lote.enf}</Text>
                                         </View>
-                                        <View key={item.lote.enf + 'view3'}>
+                                        <View >
                                             <View style={styles.view3} key={index + 'view4'}>
                                                 <Text key={index + 'nombrPredioHeader'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
                                                     Nombre Predio:{' '}
@@ -101,7 +146,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                     </View>
                                     <TouchableOpacity
                                         style={isTablet ? seleccion.includes(index) ? styles.touchablePress : styles.touchable
-                                                    : seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable
+                                            : seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable
                                         }
                                         onPress={() => handleSeleccion(index)}>
                                         <View style={styles.view3}>
@@ -124,9 +169,10 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                         </View>
                                     </TouchableOpacity>
                                 </View>
-                            ))
-                            : null}
-                    </ScrollView>
+                            )}
+                        />}
+
+                    </View>
                 )}
         </>
     );

@@ -13,9 +13,9 @@ export type contenedoresType = {
 export type palletType = {
     EF1:EF1Type[]
     settings:{
-        tipoCaja?: string
-        calidad?: number
-        calibre?: number
+        tipoCaja: string
+        calidad: number
+        calibre: number
     }
     cajasTotal: number
     listaLiberarPallet:{
@@ -86,10 +86,10 @@ type criteriosType = {
   }
 
   export type EF1Type = {
-    lote?: {
-      enf?:string
-      predio?:string
-      _id?:string
+    lote: {
+      enf:string
+      predio:string
+      _id:string
       ICA?: string
       GGN?: string
       VENCIMIENTO?: string

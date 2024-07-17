@@ -58,17 +58,9 @@ export default function DescarteLavado(): React.JSX.Element {
             setLoading(true);
             const data = sumarDatos(formState, datosPredio);
             const request = {
-                action:"ingresar_descarte_lavado",
-                _id:datosPredio._id,
-                inventario: data,
-                $inc:{
-                    "descarteLavado.descarteGeneral": data.descarteGeneral,
-                    "descarteLavado.pareja": data.pareja,
-                    "descarteLavado.balin": data.balin,
-                    "descarteLavado.descompuesta": data.descompuesta,
-                    "descarteLavado.hojas": data.hojas,
-                    "descarteLavado.piel": data.piel,
-                },
+                action: "ingresar_descarte_lavado",
+                _id: datosPredio._id,
+                data: data,
             };
             const credentials = await Keychain.getGenericPassword();
             if(!credentials){

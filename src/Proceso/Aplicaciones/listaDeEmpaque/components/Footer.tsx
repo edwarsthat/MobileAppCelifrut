@@ -14,6 +14,7 @@ type propsType = {
   restarItem: (item: any) => void;
   moverItem: (item: any) => void;
   eliminarItemCajasSinPallet: () => void;
+  modificarItems: (e:any) => void;
 };
 
 export default function Footer(props: propsType): React.JSX.Element {
@@ -129,6 +130,9 @@ export default function Footer(props: propsType): React.JSX.Element {
     setOpenModal(true);
   };
   const ClickOpenEditar = () => {
+    if(seleccion.length <= 0){
+      return Alert.alert("Seleccione los items que desea modificar");
+    }
     setOpenModalEditar(true);
   };
   const clickMover = () => {
@@ -270,7 +274,10 @@ export default function Footer(props: propsType): React.JSX.Element {
         </View>
       </Modal>
 
-              <ModalModificarItem setOpenModalEditar={setOpenModalEditar} openModalEditar={openModalEditar} />
+              <ModalModificarItem
+                modificarItems={props.modificarItems}
+                setOpenModalEditar={setOpenModalEditar}
+                openModalEditar={openModalEditar} />
     </SafeAreaView>
   );
 }

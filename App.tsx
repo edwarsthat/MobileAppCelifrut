@@ -33,6 +33,7 @@ import HistorialFotosCalidad from './src/Proceso/historial/fotosCalidad/Historia
 import ListaDeEmpaque from './src/Proceso/Aplicaciones/listaDeEmpaque/ListaDeEmpaque';
 import PrecioLimon from './src/comercial/precios/limon/PrecioLimon';
 import PrecioNaranja from './src/comercial/precios/naranja/PrecioNaranja';
+import IngresoClasificacionCalidad from './src/calidad/ingresos/Clasificacion descarte/IngresoClasificacionCalidad';
 
 
 
@@ -83,6 +84,9 @@ function App(): React.JSX.Element {
             <View style={styles.container}>
               {section !== 'Proceso//Aplicaciones//Lista de empaque' ? <Header seleccionWindow={seleccionWindow} /> : null}
               {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
+
+              {/* Calidad */}
+              {section === "Calidad//Ingresos//Clasificacion calidad" && <IngresoClasificacionCalidad /> }
               {/* Aplicaciones */}
               {section === 'Proceso//Aplicaciones//Fotos calidad' && <FotosCalidad />}
               {section === 'Proceso//Aplicaciones//Descarte Lavado' && <DescarteLavado />}

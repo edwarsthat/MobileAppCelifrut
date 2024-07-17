@@ -13,6 +13,7 @@ import Footer from "./components/Footer";
 import Informacion from "./components/Informacion";
 import { lotesType } from "../../../../types/lotesType";
 import { deviceWidth } from "../../../../App";
+import { CustomError } from "../../../../Error/Error";
 
 let socket: Socket;
 
@@ -400,6 +401,36 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
+    const modificarItems = async (data:any) => {
+        try{
+            setLoading(true);
+            const token = await obtenerAccessToken();
+            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const request = {
+                data: {
+                    action: 'modificar_items_lista_empaque',
+                    _id: cont?._id,
+                    pallet: palletSeleccionado,
+                    seleccion: seleccion,
+                    data:data,
+                },
+                token: token,
+            };
+            const response = await socketRequest(socket, request);
+            setContenedoresProvider(response.data);
+            if (Object.prototype.hasOwnProperty.call(response, 'cajasSinPallet')) {
+                setCajasSinPallet(response.cajasSinPallet);
+            }
+            Alert.alert("Guardado con exito");
+        } catch(err){
+            if(err instanceof CustomError){
+                Alert.alert(`Erro Code ${err.status}: ${err.message}`);
+            }
+        }finally {
+            setSeleccion([]);
+            setLoading(false);
+        }
+    };
     return (
         <contenedoresContext.Provider value={contenedoresProvider}>
             <loteSeleccionadoContext.Provider value={loteSeleccionado}>
@@ -430,6 +461,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                     </View>
 
                                         <Footer
+                                            modificarItems={modificarItems}
                                             eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
                                             moverItem={moverItem}
                                             restarItem={restarItem}

@@ -58,18 +58,9 @@ export default function DescarteEncerado(): React.JSX.Element {
             setLoading(true);
             const data = sumarDatos(formState, datosPredio);
             const request = {
-                action:"ingresar_descarte_encerado",
-                _id:datosPredio._id,
-                inventario: data,
-                $inc:{
-                    "descarteEncerado.descarteGeneral": data.descarteGeneral,
-                    "descarteEncerado.pareja": data.pareja,
-                    "descarteEncerado.balin": data.balin,
-                    "descarteEncerado.extra": data.extra,
-                    "descarteEncerado.descompuesta": data.descompuesta,
-                    "descarteEncerado.suelo": data.suelo,
-                    frutaNacional: data.frutaNacional,
-                },
+                action: "ingresar_descarte_encerado",
+                _id: datosPredio._id,
+                data: data,
             };
             const credentials = await Keychain.getGenericPassword();
             if(!credentials){

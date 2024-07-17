@@ -1,12 +1,13 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useState } from "react";
-import { Modal,Button, FlatList, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Modal,Button, FlatList, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { contenedoresContext, contenedorSeleccionadoContext } from "../ListaDeEmpaque";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 
 type propsType = {
     openModalEditar: boolean
     setOpenModalEditar: (e:boolean) => void
+    modificarItems: (item:any) => void
 }
 export default function ModalModificarItem(props: propsType): React.JSX.Element {
     const numeroContenedor = useContext(contenedorSeleccionadoContext);
@@ -14,19 +15,27 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
 
     const [modalCalidad, setModalCalidad] = useState<boolean>(false);
     const [modalCalibre, setModalCalibre] = useState<boolean>(false);
-    const [modalTipoCaja, setModalTipoCaja] = useState<boolean>(false);
 
     const [calidad, setCalidad] = useState<string>('Calidad');
     const [calibre, setCalibre] = useState<string>('Calibre');
-    const [tipoCaja, setTipoCaja] = useState<string>('Tipo de caja');
     const handleCalidad = () => {
         setModalCalidad(true);
     };
     const handleCalibre = () => {
         setModalCalibre(true);
     };
-    const handleTipoCaja = () => {
-        setModalTipoCaja(true);
+    const handleModificar = () => {
+        if(calibre === 'Calibre' || calidad === 'Calidad'){
+            return Alert.alert("Error, seleccione el calibre y la calidad");
+        }
+        const data = {
+            calidad:calidad,
+            calibre:calibre,
+        };
+        props.modificarItems(data);
+        props.setOpenModalEditar(false);
+        setCalibre('Calibre');
+        setCalidad('Calidad');
     };
     return (
         <>
@@ -49,14 +58,10 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
                                 style={styles.buttonContenedores}>
                                 <Text>{calibre}</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={handleTipoCaja}
-                                style={styles.buttonContenedores}>
-                                <Text>{tipoCaja}</Text>
-                            </TouchableOpacity>
+
                         </View>
                         <View style={styles.viewButtonsModal}>
-                            <Button title="Editar" />
+                            <Button title="Editar" onPress={handleModificar}/>
                             <Button title="Cancelar" onPress={() => props.setOpenModalEditar(false)} />
                         </View>
                     </View>
@@ -108,29 +113,6 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
                     </View>
                 </View>
             </Modal>
-            {/* opciones tipo caja */}
-            <Modal transparent={true} visible={modalTipoCaja} animationType="fade">
-                <View style={styles.centerModal}>
-                    <View style={styles.viewModalItem}>
-                        <FlatList
-                            data={contenedor?.infoContenedor.tipoCaja}
-                            style={styles.pressableStyle}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.buttonContenedores}
-                                    onPress={() => {
-                                        setModalTipoCaja(false);
-                                        setTipoCaja(item);
-                                    }}>
-                                    <Text style={styles.textList}>
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            keyExtractor={item => item}
-                        />
-                    </View>
-                </View>
-            </Modal>
         </>
     );
 }
@@ -147,7 +129,7 @@ const styles = StyleSheet.create({
     },
     viewModalItem: {
         width: 500,
-        height: 350,
+        height: 300,
         backgroundColor: 'white',
         borderRadius: 20,
         elevation: 30,
