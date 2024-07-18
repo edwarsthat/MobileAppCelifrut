@@ -52,16 +52,17 @@ export const validarMoverItem = (
     numeroContenedor: number,
     contenedorID: number,
     entradaModalPallet: string,
-    contenedor: contenedoresType
+    contenedor: contenedoresType,
+    contenedor2: contenedoresType
 ) => {
     if (numeroContenedor === -1) { throw new Error('Seleccione un contenedor'); }
     if (contenedorID !== -1) {
       if (entradaModalPallet === '') { throw new Error('Ingrese el pallet al que desea mover las cajas'); }
     }
     if (
-      contenedor &&
-      contenedor.pallets &&
-      Number(entradaModalPallet) > contenedor.pallets.length
+        contenedor2 &&
+        contenedor2.pallets &&
+      Number(entradaModalPallet) > contenedor2.pallets.length
     ) {
       throw new Error('Error en el pallet');
     }
