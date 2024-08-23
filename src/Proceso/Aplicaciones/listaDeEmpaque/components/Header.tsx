@@ -55,7 +55,7 @@ export default function Header(props: propsType): React.JSX.Element {
         <SafeAreaView style={isTablet ? stylesTablet.container : styleCel.container}>
             <TouchableOpacity onPress={backMainMenu}>
                 <Image
-                    source={require('../../../../../assets/CELIFRUT.png')}
+                    source={require('../../../../../assets/CELIFRUT.webp')}
                     style={stylesTablet.image}
                 />
             </TouchableOpacity>

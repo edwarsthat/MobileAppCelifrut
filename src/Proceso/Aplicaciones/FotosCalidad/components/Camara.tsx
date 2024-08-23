@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, Modal, Alert, ActivityIndicator, TouchableOpacity, Image, TextInput } from "react-native";
-import { Camera, useCameraDevice } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 import { AppState } from 'react-native';
 import { lotesType } from "../../../../../types/lotesType";
 import RNFS from 'react-native-fs';
@@ -14,6 +14,9 @@ export default function Camara(props: propsType): React.JSX.Element {
     const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
     const appState = useRef(AppState.currentState);
+    const format = useCameraFormat(device, [
+        { photoResolution: { width: 250, height: 250 } },
+    ]);
     const [, setAppStateVisible] = useState(appState.current);
     const [key, setKey] = useState(Math.random());
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -44,9 +47,7 @@ export default function Camara(props: propsType): React.JSX.Element {
 
     const capturarFoto = async () => {
         if (camera.current !== null) {
-            const photo = await camera.current.takeSnapshot({
-                quality: 50,
-            });
+            const photo = await camera.current.takePhoto();
             setImageSource(photo.path);
             setShowCamera(false);
         }
@@ -125,6 +126,8 @@ export default function Camara(props: propsType): React.JSX.Element {
                         isActive={showCamera}
                         ref={camera}
                         photo={true}
+                        format={format}
+                        photoQualityBalance="speed"
                         enableDepthData
                     />
 

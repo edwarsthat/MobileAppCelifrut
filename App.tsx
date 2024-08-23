@@ -14,7 +14,9 @@ import {
   StyleSheet,
   View,
   Dimensions,
+  Text,
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 
 import {
   Colors,
@@ -34,6 +36,8 @@ import ListaDeEmpaque from './src/Proceso/Aplicaciones/listaDeEmpaque/ListaDeEmp
 import PrecioLimon from './src/comercial/precios/limon/PrecioLimon';
 import PrecioNaranja from './src/comercial/precios/naranja/PrecioNaranja';
 import IngresoClasificacionCalidad from './src/calidad/ingresos/Clasificacion descarte/IngresoClasificacionCalidad';
+import { CargoType } from './types/cargosType';
+import IngresoHigienePersonal from './src/calidad/ingresos/ingresoHigienePersonal/IngresoHigienePersonal';
 
 
 
@@ -42,17 +46,17 @@ export const deviceWidth = createContext<number>(0);
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   const [isLogin, setIslogin] = useState<boolean>(false);
-  const [permisos, setPermisos] = useState<string[]>([]);
+  const [permisos, setPermisos] = useState<CargoType>();
   const [loading, setLoading] = useState<boolean>(false);
   const [section, setSection] = useState<string>('menu');
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
+  const [version, setVersion] = useState<string>('');
 
   useEffect(() => {
     const { width } = Dimensions.get('window');
     setAnchoDevice(width);
-
+    setVersion(DeviceInfo.getVersion());
   }, []);
-
   const showLoading = (): void => {
     setLoading(true);
     setTimeout(() => {
@@ -66,6 +70,9 @@ function App(): React.JSX.Element {
   const seleccionWindow = (data: string): void => {
     setSection(data);
   };
+  const obtenerPermisos = (cargo:CargoType): void => {
+    setPermisos(cargo);
+  };
   return (
     <deviceWidth.Provider value={anchoDevice}>
       <SafeAreaView style={styles.container}>
@@ -76,35 +83,40 @@ function App(): React.JSX.Element {
         {loading ? <PantallaDeCarga />
           :
           !isLogin ?
-            <Login
-              setPermisos={setPermisos}
-              showLoading={showLoading}
-              setIslogin={setIslogin} />
+            <>
+              <Text>V-{version}</Text>
+              <Login
+                obtenerPermisos={obtenerPermisos}
+                showLoading={showLoading}
+                setIslogin={setIslogin} />
+            </>
             :
             <View style={styles.container}>
-              {section !== 'Proceso//Aplicaciones//Lista de empaque' ? <Header seleccionWindow={seleccionWindow} /> : null}
+              {section !== '66b6707777549ed0672a9029' ? <Header seleccionWindow={seleccionWindow} /> : null}
               {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
 
               {/* Calidad */}
-              {section === "Calidad//Ingresos//Clasificacion calidad" && <IngresoClasificacionCalidad /> }
+              {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
+              {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
+
               {/* Aplicaciones */}
-              {section === 'Proceso//Aplicaciones//Fotos calidad' && <FotosCalidad />}
-              {section === 'Proceso//Aplicaciones//Descarte Lavado' && <DescarteLavado />}
-              {section === 'Proceso//Aplicaciones//Descarte Encerado' && <DescarteEncerado />}
-              {section === 'Proceso//Aplicaciones//Lista de empaque' && <ListaDeEmpaque setSection={setSection} />}
+              {section === '66b6705a77549ed0672a9026' && <FotosCalidad />}
+              {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
+              {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
+              {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
 
               {/* Historiales aplicaciones */}
-              {section === 'Proceso//Historial//Descarte Lavado' && <HistorialDescarteLavadoProceso />}
-              {section === 'Proceso//Historial//Descarte Encerado' && <HistorialDescarteEnceradoProceso />}
-              {section === 'Proceso//Historial//Fotos calidad' && <HistorialFotosCalidad />}
+              {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
+              {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
+              {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
 
               {/* comercial */}
-              {section === 'Comercial//Precios proveedor//Limon' && <PrecioLimon />}
-              {section === 'Comercial//Precios proveedor//Naranja' && <PrecioNaranja />}
+              {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
+              {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
             </View>
         }
 
-        {section !== 'Proceso//Aplicaciones//Fotos calidad' && section !== 'Proceso//Aplicaciones//Lista de empaque' ?
+        {section !== '66b6705a77549ed0672a9026' && section !== '66b6707777549ed0672a9029' ?
           <Footer /> : null}
 
       </SafeAreaView>

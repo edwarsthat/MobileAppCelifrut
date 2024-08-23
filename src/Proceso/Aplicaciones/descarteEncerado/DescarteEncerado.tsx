@@ -86,8 +86,8 @@ export default function DescarteEncerado(): React.JSX.Element {
             if(err instanceof Error){
                 Alert.alert(`${err.name}: ${err.message}`);
             }
-            setFormState(formInit);
         } finally {
+            setFormState(formInit);
             setLoading(false);
             setDatosPredio({
                 _id: "",

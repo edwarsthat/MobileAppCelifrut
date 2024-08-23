@@ -138,9 +138,13 @@ export default function Footer(props: propsType): React.JSX.Element {
   const clickMover = () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
-      console.log(contenedorID);
-      const contenedor2 = contenedores.find(item => item.numeroContenedor === contenedorID);
-      if(!contenedor2) { throw new Error("Error con el contenedor de destino, no existe"); }
+      let contenedor2;
+      const index = contenedores.findIndex(item => item.numeroContenedor === contenedorID);
+      if(index === -1){
+        contenedor2 = -1;
+      } else {
+        contenedor2 = contenedores[index];
+      }
       validarMoverItem(
         numeroContenedor,
         contenedorID,

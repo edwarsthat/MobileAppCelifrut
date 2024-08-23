@@ -14,7 +14,7 @@ export default function Header(props:propsType) {
             <View style={styles.buttons}>
                 <Button title="inicio" onPress={():void => props.seleccionWindow('menu')}/>
             </View>
-            <Image source={require('../../assets/CELIFRUT.png')} style={styles.image} />
+            <Image source={require('../../assets/CELIFRUT.webp')} style={styles.image} />
             <View style={styles.buttons}></View>
         </View>
     );

@@ -43,7 +43,7 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
                 <View
                     style={styles.viwImagen}>
                     <Image
-                        source={require('../../../../../assets/palletIMG.png')}
+                        source={require('../../../../../assets/palletIMG.webp')}
                         style={styles.image}
                     />
                     <Text style={styles.textPallet}>

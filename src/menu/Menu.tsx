@@ -1,43 +1,21 @@
 /* eslint-disable prettier/prettier */
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { CargoType } from '../../types/cargosType';
 
 type propsType = {
-    permisos: string[]
-    seleccionWindow: (e:string) => void
+    permisos: CargoType | undefined
+    seleccionWindow: (e: string) => void
 }
+type ValidAreaKeys = Exclude<keyof CargoType, '_id' | 'Rol' | 'Cargo' | 'createdAt'>;
 
 export default function Menu(props: propsType): React.JSX.Element {
-    const [areaState, setAreaState] = useState<string[]>([]);
-    const [elementoState, setElementoState] = useState<string[][]>([]);
-    const [permisos, setPermisos] = useState<string[][]>([]);
-    const [areaSelect, setAreaSelect] = useState<number[]>([]);
-    const [elementSelect, setElementSelect] = useState<number[]>([]);
+
+    const [areaSelect, setAreaSelect] = useState<string[]>([]);
+    const [elementSelect, setElementSelect] = useState<string[]>([]);
 
 
-    useEffect(() => {
-        const areas: string[] = [];
-        const elementos: string[] = [];
-
-        const permisosArr = props.permisos.map(item => {
-            const [area, elemento, permiso] = item.split('//');
-            areas.push(area);
-            elementos.push(area + '//' + elemento);
-            return [area, elemento, permiso];
-        });
-        const areaSet = new Set(areas);
-        const elementosSet = new Set(elementos);
-        const areaArr = [...areaSet];
-        const elementosArr = [...elementosSet];
-        const elementoArr2 = elementosArr.map(elementoArr => {
-            const [area, elemento] = elementoArr.split('//');
-            return [area, elemento];
-        });
-        setAreaState(areaArr);
-        setElementoState(elementoArr2);
-        setPermisos(permisosArr);
-    }, [props.permisos]);
-    const handleClickArea = (index: number): void => {
+    const handleClickArea = (index: string): void => {
         if (areaSelect.includes(index)) {
             const indexToRemove = areaSelect.findIndex(item => item === index);
             setAreaSelect(prevState => prevState.filter((_, indexArr) => indexArr !== indexToRemove));
@@ -45,7 +23,8 @@ export default function Menu(props: propsType): React.JSX.Element {
             setAreaSelect(prevState => [...prevState, index]);
         }
     };
-    const handleClickElement = (index: number): void => {
+
+    const handleClickElement = (index: string): void => {
         if (elementSelect.includes(index)) {
             const indexToRemove = elementSelect.findIndex(item => item === index);
             setElementSelect(prevState => prevState.filter((_, indexArr) => indexArr !== indexToRemove));
@@ -53,56 +32,65 @@ export default function Menu(props: propsType): React.JSX.Element {
             setElementSelect(prevState => [...prevState, index]);
         }
     };
+
+    if (props.permisos === undefined) {
+        return (
+            <View>
+                <Text>No hay permisos...</Text>
+            </View>
+        );
+    }
     return <View style={styles.container}>
         <ScrollView style={styles.scrollContainer}>
-            {areaState.map((area, index) => (
-                <View key={area}>
-                    <TouchableOpacity style={styles.areaButtonsStyle} onPress={(): void => handleClickArea(index)}>
-                        <Text style={styles.textAreaButtonStyle}>{area}</Text>
-                    </TouchableOpacity>
-                    {areaSelect.includes(index) ?
-                        <View>
-                            {elementoState.map((itemElemento, indexElemento) => {
-                                if (itemElemento[0] === area) {
-                                    return (
-                                        <Fragment key={indexElemento}>
+            {Object.keys(props.permisos).map((area) => {
+                if (!['_id', 'Rol', 'Cargo', 'createdAt', '__v'].includes(area)) {
+                    const validArea = area as ValidAreaKeys;
+                    return (
+                        <View key={area}>
+                            <TouchableOpacity style={styles.areaButtonsStyle} onPress={(): void => handleClickArea(area)} >
+                                <Text style={styles.textAreaButtonStyle}>{area}</Text>
+                            </TouchableOpacity>
+                            {areaSelect.includes(area) ?
+                                <View>
+                                    {props.permisos && (Object.entries(props.permisos[validArea])).map(([itemElemento, ventana]) => (
+                                        <Fragment key={itemElemento}>
                                             <View>
-                                                <TouchableOpacity onPress={(): void => handleClickElement(indexElemento)} style={styles.elementoButtonStyle}>
-                                                    <Text>{itemElemento[1]}</Text>
+                                                <TouchableOpacity onPress={(): void => handleClickElement(itemElemento)} style={styles.elementoButtonStyle}>
+                                                    <Text>{itemElemento}</Text>
                                                 </TouchableOpacity>
                                             </View>
-                                            {elementSelect.includes(indexElemento) ?
-                                            <View>
-                                                {permisos.map((permiso, indexPermiso) => {
-                                                    if( permiso[1] === itemElemento[1] && permiso[0] === area){
-                                                        return(
-                                                            <Fragment key={permiso[2] + indexPermiso}>
+                                            {elementSelect.includes(itemElemento) ?
+                                                <View>
+                                                    {Object.entries(ventana).map(([permisoKey, permisoValue]) => {
+                                                        return (
+                                                            <Fragment key={permisoKey + permisoValue}>
                                                                 <View style={styles.itemViwStyle}>
                                                                     <TouchableOpacity
-                                                                        onPress={():void => props.seleccionWindow(permiso[0] + '//' + permiso[1] + '//' + permiso[2])}
+                                                                        onPress={(): void => props.seleccionWindow(permisoValue._id)}
                                                                         style={styles.itemButtonStyle}>
                                                                         <Text style={styles.itemTextStyle}>
-                                                                        {permiso[2]}
+                                                                            {permisoKey}
                                                                         </Text>
                                                                     </TouchableOpacity>
                                                                 </View>
                                                             </Fragment>
                                                         );
-                                                    }
-                                                })}
-                                            </View>
-                                            :
-                                            null
+
+                                                    })}
+                                                </View>
+                                                :
+                                                null
                                             }
                                         </Fragment>
-                                    );
-                                }
-                            })}
+
+                                    ))}
+                                </View>
+                                : null
+                            }
                         </View>
-                        : null
-                    }
-                </View>
-            ))}
+                    );
+                } else { return null; }
+            })}
         </ScrollView>
     </View>;
 }
@@ -138,9 +126,9 @@ const styles = StyleSheet.create({
         marginTop: 8,
         backgroundColor: '#E6E6EB',
     },
-    itemViwStyle:{
-        justifyContent:'center',
-        alignItems:'center',
+    itemViwStyle: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     itemButtonStyle: {
         justifyContent: 'center',
@@ -151,7 +139,7 @@ const styles = StyleSheet.create({
         marginTop: 8,
         backgroundColor: '#5B89EB',
     },
-    itemTextStyle:{
-        color:'white',
+    itemTextStyle: {
+        color: 'white',
     },
 });
