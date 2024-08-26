@@ -38,6 +38,7 @@ import PrecioNaranja from './src/comercial/precios/naranja/PrecioNaranja';
 import IngresoClasificacionCalidad from './src/calidad/ingresos/Clasificacion descarte/IngresoClasificacionCalidad';
 import { CargoType } from './types/cargosType';
 import IngresoHigienePersonal from './src/calidad/ingresos/ingresoHigienePersonal/IngresoHigienePersonal';
+import IngresoFruta from './src/inventarioYlogistica/ingresoFruta/IngresoFruta';
 
 
 
@@ -113,6 +114,9 @@ function App(): React.JSX.Element {
               {/* comercial */}
               {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
               {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
+
+              {/* inventario y logistica */}
+              {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
             </View>
         }
 

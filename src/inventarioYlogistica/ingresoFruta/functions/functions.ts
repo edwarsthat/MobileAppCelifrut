@@ -51,15 +51,8 @@ export const crear_request_guardar = (formState:formInitType): FormState => {
   };
 };
 
-export const request_predios = {
-  action: 'getProveedores',
-};
 
-export const request_EF1 = {
-  action: 'obtenerEF1',
-};
-
-export const formInit = {
+export const formInit: formInitType = {
   nombrePredio: '',
   tipoFruta: '',
   canastillas: '',
@@ -68,7 +61,7 @@ export const formInit = {
   placa: '',
   observaciones: '',
   numeroRemision:'',
-  numeroPrecintos:0,
+  numeroPrecintos:'',
 };
 
 export const formLabels = {
@@ -83,7 +76,7 @@ export const formLabels = {
   observaciones: 'Observaciones',
 };
 
-type formInitType = {
+export type formInitType = {
   nombrePredio: string,
   tipoFruta: string,
   canastillas: string,
