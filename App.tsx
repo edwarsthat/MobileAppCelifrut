@@ -39,6 +39,7 @@ import IngresoClasificacionCalidad from './src/calidad/ingresos/Clasificacion de
 import { CargoType } from './types/cargosType';
 import IngresoHigienePersonal from './src/calidad/ingresos/ingresoHigienePersonal/IngresoHigienePersonal';
 import IngresoFruta from './src/inventarioYlogistica/ingresoFruta/IngresoFruta';
+import InventarioFrutaSinProcesar from './src/inventarioYlogistica/inventarios/frutaSinProcesar/InventarioFrutaSinProcesar';
 
 
 
@@ -117,6 +118,7 @@ function App(): React.JSX.Element {
 
               {/* inventario y logistica */}
               {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
+              {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
             </View>
         }
 
