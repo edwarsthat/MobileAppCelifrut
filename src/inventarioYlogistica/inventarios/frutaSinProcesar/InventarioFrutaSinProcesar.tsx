@@ -95,6 +95,7 @@ export default function InventarioFrutaSinProcesar(): React.JSX.Element {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
+        flex: 1,
     },
     title: {
         width: '100%',

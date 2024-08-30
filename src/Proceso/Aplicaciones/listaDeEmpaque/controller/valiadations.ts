@@ -7,7 +7,7 @@ export const validarActualizarPallet = (cajas: number, loteActual: predioType, p
     if (cajas <= 0) { throw new Error('Ingrese el numero de cajas'); }
     if (loteActual.enf === '') { throw new Error('Seleccione un lote'); }
     if (pallet === -1) { throw new Error('Pallet no permitido'); }
-    const cajasActual = cajas - Number(contenedor?.pallets[pallet].EF1.reduce((acu, item) => acu + item.cajas, 0));
+    const cajasActual = cajas - Number(contenedor?.pallets[pallet].EF1.reduce((acu, item) => (acu += item.cajas), 0));
     if (cajasActual < 1) { throw new Error('Error en el numero de cajas'); }
     if (
         contenedor?.infoContenedor.tipoFruta !== 'Mixto' &&

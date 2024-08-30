@@ -68,7 +68,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
         props.setSeleccion([]);
     };
     return (
-        <View>
+        <View style={styles.view1}>
             <View style={isTablet ? numeroContenedor === -1 ? styles.container2 : styles.container
                 : numeroContenedor === -1 ? stylesCel.container2 : stylesCel.container
             }>
@@ -114,11 +114,14 @@ export default function Pallets(props: propsType): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
+    view1:{
+        width:"75%",
+    },
     container: {
         display: 'flex',
         flexDirection: 'row',
 
-        width: 900,
+        width: "85%",
         margin: 30,
         minHeight: 155,
 

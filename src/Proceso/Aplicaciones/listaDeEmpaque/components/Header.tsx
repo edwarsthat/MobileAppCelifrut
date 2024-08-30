@@ -64,8 +64,8 @@ export default function Header(props: propsType): React.JSX.Element {
             </View>
 
             <View style={isTablet ? null : styleCel.containerPredio}>
-                <Text style={isTablet ? null : styleCel.predioText}>Predio Vaciando:</Text>
-                <Text style={isTablet ? null : styleCel.predioText}>
+                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Predio Vaciando:</Text>
+                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
                     {props.loteVaciando && props.loteVaciando.enf + "-" + props.loteVaciando.nombrePredio}
                 </Text>
             </View>
@@ -81,8 +81,8 @@ export default function Header(props: propsType): React.JSX.Element {
                 />
             </View>
             <View style={isTablet ? null : styleCel.containerPredio}>
-                <Text style={isTablet ? null : styleCel.predioText}>Predio Actual:</Text>
-                <Text style={isTablet ? null : styleCel.predioText}>{loteSeleccionado.enf + "-" + loteSeleccionado.nombrePredio}</Text>
+                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Predio Actual:</Text>
+                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>{loteSeleccionado.enf + "-" + loteSeleccionado.nombrePredio}</Text>
             </View>
 
             <View>
@@ -99,8 +99,8 @@ export default function Header(props: propsType): React.JSX.Element {
 
             {
                 <View>
-                    <Text style={isTablet ? null : styleCel.predioText}>Cajas Total:</Text>
-                    <Text style={isTablet ? null : styleCel.predioText}>
+                    <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Cajas Total:</Text>
+                    <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
                         {contenedor &&
                             contenedor.pallets.reduce(
                                 (acu, pallet) => acu + pallet.EF1.reduce((acu2, lote) => acu2 + lote.cajas, 0),
@@ -216,6 +216,9 @@ const stylesTablet = StyleSheet.create({
         marginRight: 'auto',
         marginTop: 10,
         fontSize: 20,
+    },
+    predioText:{
+        fontSize:10,
     },
 });
 

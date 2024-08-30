@@ -401,8 +401,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const modificarItems = async (data:any) => {
-        try{
+    const modificarItems = async (data: any) => {
+        try {
             setLoading(true);
             const token = await obtenerAccessToken();
             const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
@@ -412,7 +412,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                     _id: cont?._id,
                     pallet: palletSeleccionado,
                     seleccion: seleccion,
-                    data:data,
+                    data: data,
                 },
                 token: token,
             };
@@ -422,11 +422,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 setCajasSinPallet(response.cajasSinPallet);
             }
             Alert.alert("Guardado con exito");
-        } catch(err){
-            if(err instanceof CustomError){
+        } catch (err) {
+            if (err instanceof CustomError) {
                 Alert.alert(`Erro Code ${err.status}: ${err.message}`);
             }
-        }finally {
+        } finally {
             setSeleccion([]);
             setLoading(false);
         }
@@ -447,26 +447,26 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                         loteVaciando={loteVaciando}
                                         seleccionarLote={setLoteSeleccionado} />
                                     <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
-                                        <View>
-                                            <Pallets
-                                                setSeleccion={setSeleccion}
-                                                liberarPallet={liberarPallet}
-                                                agregarItemCajasSinPallet={agregarItemCajasSinPallet}
-                                                guardarPalletSettings={guardarPalletSettings}
-                                                setPalletSeleccionado={setPalletSeleccionado} />
-                                        </View>
-                                        <View style={styles.viewInformacion}>
-                                            <Informacion setSeleccion={setSeleccion} />
-                                        </View>
+
+                                        <Pallets
+                                            setSeleccion={setSeleccion}
+                                            liberarPallet={liberarPallet}
+                                            agregarItemCajasSinPallet={agregarItemCajasSinPallet}
+                                            guardarPalletSettings={guardarPalletSettings}
+                                            setPalletSeleccionado={setPalletSeleccionado} />
+
+
+                                        <Informacion setSeleccion={setSeleccion} />
+
                                     </View>
 
-                                        <Footer
-                                            modificarItems={modificarItems}
-                                            eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
-                                            moverItem={moverItem}
-                                            restarItem={restarItem}
-                                            eliminarItem={eliminarItem}
-                                            agregarItem={agregarItem} />
+                                    <Footer
+                                        modificarItems={modificarItems}
+                                        eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
+                                        moverItem={moverItem}
+                                        restarItem={restarItem}
+                                        eliminarItem={eliminarItem}
+                                        agregarItem={agregarItem} />
                                 </SafeAreaView>
 
                                 <Modal
@@ -500,9 +500,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         flex: 1,
-    },
-    viewInformacion: {
-        minWidth: 400,
+        gap:0,
+        justifyContent:'space-between',
     },
     centerModal: {
         flex: 1,

@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     palletsButons: {
-      width: 115,
-      height: 115,
+      width: 90,
+      height: 90,
       backgroundColor: 'white',
       margin: 5,
       borderRadius: 10,
@@ -45,12 +45,12 @@ const styles = StyleSheet.create({
       shadowColor: '#52006A',
     },
     image: {
-      width: 50,
-      height: 50,
+      width: 40,
+      height: 40,
     },
     palletsPress: {
-      width: 115,
-      height: 115,
+      width: 90,
+      height: 90,
       backgroundColor: '#D53B29',
       margin: 5,
       borderRadius: 10,
@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     view2:{ marginLeft: 25 },
-    text1:{ fontSize: 50, fontWeight: 'bold' },
+    text1:{ fontSize: 40, fontWeight: 'bold' },
   });
 

@@ -59,21 +59,21 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                     style={seleccion.includes(index) ? styles.touchablePress : styles.touchable}
                                     onPress={() => handleSeleccion(index)}>
                                     <View style={styles.view3}>
-                                        <Text>{'No. Cajas:'} </Text>
-                                        <Text>{item.cajas}</Text>
+                                        <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
+                                        <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.cajas}</Text>
                                     </View>
                                     <View style={styles.view4}>
                                         <View style={styles.view3}>
-                                            <Text>{'Tipo Caja:'} </Text>
-                                            <Text>{item.tipoCaja}</Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.tipoCaja}</Text>
                                         </View>
                                         <View style={styles.view3}>
-                                            <Text>Calibre: </Text>
-                                            <Text>{item.calibre}</Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>Calibre: </Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.calibre}</Text>
                                         </View>
                                         <View style={styles.view3}>
-                                            <Text>Calidad: </Text>
-                                            <Text>{item.calidad}</Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>Calidad: </Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.calidad}</Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
@@ -150,21 +150,21 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                         }
                                         onPress={() => handleSeleccion(index)}>
                                         <View style={styles.view3}>
-                                            <Text style={isTablet ? null : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
-                                            <Text style={isTablet ? null : stylesCel.textHeaders}>{item.cajas}</Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
+                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.cajas}</Text>
                                         </View>
                                         <View style={isTablet ? styles.view4 : stylesCel.view4}>
                                             <View style={styles.view3}>
-                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
-                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{item.tipoCaja}</Text>
+                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
+                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.tipoCaja}</Text>
                                             </View>
                                             <View style={styles.view3}>
-                                                <Text style={isTablet ? null : stylesCel.textHeaders}>Calibre: </Text>
-                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{item.calibre}</Text>
+                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calibre: </Text>
+                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.calibre}</Text>
                                             </View>
                                             <View style={styles.view3}>
-                                                <Text style={isTablet ? null : stylesCel.textHeaders}>Calidad: </Text>
-                                                <Text style={isTablet ? null : stylesCel.textHeaders}>{item.calidad}</Text>
+                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calidad: </Text>
+                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.calidad}</Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
         elevation: 10,
         shadowColor: '#52006A',
         flex: 1,
+        width:"100%",
     },
     container: {
         margin: 5,
@@ -197,8 +198,11 @@ const styles = StyleSheet.create({
         overflow: 'scroll',
     },
     textHeaders: {
-        fontSize: 17,
+        fontSize: 10,
         fontWeight: 'bold',
+    },
+    textHeaders2: {
+        fontSize: 8,
     },
     view3: { display: 'flex', flexDirection: 'row' },
     touchablePress: {
@@ -216,10 +220,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         display: 'flex',
         flexDirection: 'row',
-        flexWrap: 'wrap', width: '75%',
+        flexWrap: 'wrap',
 
 
     },
+
     view4: { display: 'flex', flexDirection: 'row', gap: 20, width: '100%' },
 });
 
