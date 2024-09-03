@@ -11,6 +11,8 @@ type propsType = {
     seleccionarLote: (item: predioType) => void
     setNumeroContenedor: (data: number) => void;
     cerrarContenendor: () => void
+    handleShowResumen: () => void
+    showResumen: boolean
 }
 
 export default function Header(props: propsType): React.JSX.Element {
@@ -18,7 +20,6 @@ export default function Header(props: propsType): React.JSX.Element {
     const loteSeleccionado = useContext(loteSeleccionadoContext);
     const contenedores = useContext(contenedoresContext);
     const numeroContenedor = useContext(contenedorSeleccionadoContext);
-    const contenedor = contenedores.find(item => item.numeroContenedor === numeroContenedor);
 
 
     const [isTablet, setIsTablet] = useState<boolean>(false);
@@ -63,6 +64,8 @@ export default function Header(props: propsType): React.JSX.Element {
                 <Button title="Cerrar Contenedor" onPress={handleCerrarContenedor} />
             </View>
 
+            <Button title={props.showResumen ? 'Lista Empaque' : "Resumen"} onPress={props.handleShowResumen} />
+
             <View style={isTablet ? null : styleCel.containerPredio}>
                 <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Predio Vaciando:</Text>
                 <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
@@ -97,20 +100,6 @@ export default function Header(props: propsType): React.JSX.Element {
                 />
             </View>
 
-            {
-                <View>
-                    <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Cajas Total:</Text>
-                    <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
-                        {contenedor &&
-                            contenedor.pallets.reduce(
-                                (acu, pallet) => acu + pallet.EF1.reduce((acu2, lote) => acu2 + lote.cajas, 0),
-                                0,
-                            )}
-                    </Text>
-                </View>
-            }
-
-
             <TouchableOpacity
                 style={isTablet ? stylesTablet.buttonContenedores : styleCel.buttonContenedores}
                 onPress={obtenerLoteInfo}>
@@ -127,6 +116,7 @@ export default function Header(props: propsType): React.JSX.Element {
             >
                 <Text>{cliente}</Text>
             </TouchableOpacity>
+
 
             <Modal transparent={true} visible={modalVisible} animationType="fade">
                 <View style={isTablet ? stylesTablet.centerModal : styleCel.centerModal}>

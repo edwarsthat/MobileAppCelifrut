@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View, Modal } from "react-native";
 import { Socket, io } from "socket.io-client";
 import Header from "./components/Header";
@@ -14,6 +14,7 @@ import Informacion from "./components/Informacion";
 import { lotesType } from "../../../../types/lotesType";
 import { deviceWidth } from "../../../../App";
 import { CustomError } from "../../../../Error/Error";
+import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
 
 let socket: Socket;
 
@@ -73,19 +74,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const [loading, setLoading] = useState(true);
     const [isTablet, setIsTablet] = useState<boolean>(false);
 
-    useEffect(() => {
-        setIsTablet(anchoDevice >= 721);
-        createSocketConnection();
-        obtenerPredioProcesando();
-        obtenerContenedores();
-        obtenerCajasSinPallet();
-        return () => {
-            if (socket) {
-                socket.disconnect();
-            }
-        };
-    }, [anchoDevice]);
-    const createSocketConnection = async () => {
+    const [showResumen, setShowResumen] = useState<boolean>(false);
+
+
+
+    const createSocketConnection = useCallback(async () => {
         try {
             const credentials = await Keychain.getGenericPassword();
             if (!credentials) {
@@ -115,12 +108,30 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                     nombrePredio: data.predio.PREDIO,
                 });
             });
+            socket.on("listaempaque_update", () =>{
+                console.log("asdasd");
+                obtenerContenedores();
+            });
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(`${err.message}`);
             }
         }
-    };
+      }, []);
+
+    useEffect(() => {
+        setIsTablet(anchoDevice >= 721);
+        createSocketConnection();
+        obtenerPredioProcesando();
+        obtenerContenedores();
+        obtenerCajasSinPallet();
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
+    }, [anchoDevice, createSocketConnection]);
+
     const obtenerPredioProcesando = async () => {
         try {
             setLoading(true);
@@ -172,9 +183,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             const token = await obtenerAccessToken();
             const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
             const request = { data: { action: 'add_settings_pallet', _id: cont?._id, pallet: palletSeleccionado, settings: settings }, token: token };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
-            Alert.alert("Guardado con exito");
+            await socketRequest(socket, request);
+            Alert.alert("Guardado con exito ");
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -197,9 +207,9 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
-            Alert.alert("Guardado con exito");
+            socketRequest(socket, request);
+            // setContenedoresProvider(response.data);
+            Alert.alert("Guardado con exito ");
             // console.log(response);
         } catch (err) {
             if (err instanceof Error) {
@@ -223,8 +233,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
+            await socketRequest(socket, request);
             Alert.alert("Eliminado con exito");
             // console.log(response);
         } catch (err) {
@@ -251,8 +260,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
+            await socketRequest(socket, request);
             Alert.alert("Restado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -288,7 +296,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
+            // setContenedoresProvider(response.data);
             if (Object.prototype.hasOwnProperty.call(response, 'cajasSinPallet')) {
                 setCajasSinPallet(response.cajasSinPallet);
             }
@@ -364,8 +372,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
+            await socketRequest(socket, request);
             Alert.alert("Guardado con exito");
             // console.log(response);
         } catch (err) {
@@ -389,8 +396,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
+            await socketRequest(socket, request);
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -431,6 +437,9 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
+    const handleShowResumen = () => {
+        setShowResumen(!showResumen);
+    };
     return (
         <contenedoresContext.Provider value={contenedoresProvider}>
             <loteSeleccionadoContext.Provider value={loteSeleccionado}>
@@ -441,25 +450,33 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                             <cajasSinPalletContext.Provider value={cajasSinPallet}>
                                 <SafeAreaView style={styles.container}>
                                     <Header
+                                        showResumen={showResumen}
+                                        handleShowResumen={handleShowResumen}
                                         cerrarContenendor={cerrarContenedor}
                                         setSection={props.setSection}
                                         setNumeroContenedor={setNumeroContenedor}
                                         loteVaciando={loteVaciando}
                                         seleccionarLote={setLoteSeleccionado} />
-                                    <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
 
-                                        <Pallets
-                                            setSeleccion={setSeleccion}
-                                            liberarPallet={liberarPallet}
-                                            agregarItemCajasSinPallet={agregarItemCajasSinPallet}
-                                            guardarPalletSettings={guardarPalletSettings}
-                                            setPalletSeleccionado={setPalletSeleccionado} />
+                                    {showResumen ?
+                                        <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
+                                            <ResumenListaEmpaque />
+                                        </View>
+                                        :
+                                        <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
+
+                                            <Pallets
+                                                setSeleccion={setSeleccion}
+                                                liberarPallet={liberarPallet}
+                                                agregarItemCajasSinPallet={agregarItemCajasSinPallet}
+                                                guardarPalletSettings={guardarPalletSettings}
+                                                setPalletSeleccionado={setPalletSeleccionado} />
 
 
-                                        <Informacion setSeleccion={setSeleccion} />
+                                            <Informacion setSeleccion={setSeleccion} />
 
-                                    </View>
-
+                                        </View>
+                                    }
                                     <Footer
                                         modificarItems={modificarItems}
                                         eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
@@ -468,7 +485,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                         eliminarItem={eliminarItem}
                                         agregarItem={agregarItem} />
                                 </SafeAreaView>
-
                                 <Modal
                                     animationType="slide"
                                     transparent={true}
@@ -500,8 +516,8 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         flex: 1,
-        gap:0,
-        justifyContent:'space-between',
+        gap: 0,
+        justifyContent: 'space-between',
     },
     centerModal: {
         flex: 1,

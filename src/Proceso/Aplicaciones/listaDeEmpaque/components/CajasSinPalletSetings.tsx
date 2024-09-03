@@ -1,29 +1,29 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
-import { Modal, Button, View, StyleSheet, Text, TextInputChangeEventData, TouchableOpacity, TextInput, NativeSyntheticEvent, Alert } from "react-native";
-import { contenedorSeleccionadoContext, contenedoresContext, loteSeleccionadoContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
+import {
+    Modal, Button, View, StyleSheet, Text, TextInputChangeEventData, TextInput, NativeSyntheticEvent, Alert,
+} from "react-native";
+import { loteSeleccionadoContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { itemType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
 
 type propsType = {
     openModalSinPallet: boolean;
     setOpenModalSinPallet: (data: boolean) => void;
-    agregarItemCajasSinPallet: (data:itemType) => void;
+    agregarItemCajasSinPallet: (data: itemType) => void;
 };
 
 export default function CajasSinPalletSetings(props: propsType): React.JSX.Element {
     const loteSeleccionado = useContext(loteSeleccionadoContext);
     const pallet = useContext(palletSeleccionadoContext);
-    const contenedorSeleccionado = useContext(contenedorSeleccionadoContext);
-    const contenedor = useContext(contenedoresContext).find(cont => cont.numeroContenedor === contenedorSeleccionado);
     const anchoDevice = useContext(deviceWidth);
     const [isTablet, setIsTablet] = useState<boolean>(false);
-    const [radioButtonTipoCaja, setRadioButtonTipoCaja] = useState<string>('');
-    const [radioButtonCalidad, setRadioButtonCalidad] = useState<string>('');
-    const [radioButtonCalibre, setRadioButtonCalibre] = useState<string>('');
+    const [tipoCaja, setTipocCaja] = useState<string>('');
+    const [calidad, setCalidad] = useState<string>('');
+    const [calibre, setCalibre] = useState<string>('');
     const [cajas, setCajas] = useState<string>('');
 
-    useEffect(()=>{setIsTablet(anchoDevice >= 721);},[anchoDevice]);
+    useEffect(() => { setIsTablet(anchoDevice >= 721); }, [anchoDevice]);
     const getInput = (
         e: NativeSyntheticEvent<TextInputChangeEventData>,
     ): void => {
@@ -33,27 +33,27 @@ export default function CajasSinPalletSetings(props: propsType): React.JSX.Eleme
     const clickGuardar = () => {
         if (loteSeleccionado.enf === '') { return Alert.alert('No ha seleccionado predio'); }
         if (cajas === '') { Alert.alert('Ingrese las cajas'); }
-        if ((radioButtonTipoCaja === '' ||
-            radioButtonCalidad === '' ||
-            radioButtonCalibre === '' ||
+        if ((tipoCaja === '' ||
+            calidad === '' ||
+            calibre === '' ||
             loteSeleccionado.enf === '')) {
             Alert.alert('No ha seleccionado ninguna configuracion');
         }
         const item: itemType = {
             lote: loteSeleccionado._id,
             cajas: Number(cajas),
-            tipoCaja: radioButtonTipoCaja,
-            calibre: radioButtonCalibre,
-            calidad: radioButtonCalidad,
+            tipoCaja: tipoCaja,
+            calibre: calibre,
+            calidad: calidad,
             fecha: new Date(),
             tipoFruta: loteSeleccionado.tipoFruta,
         };
         props.agregarItemCajasSinPallet(item);
 
         setCajas('');
-        setRadioButtonTipoCaja('');
-        setRadioButtonCalidad('');
-        setRadioButtonCalibre('');
+        setTipocCaja('');
+        setCalidad('');
+        setCalibre('');
     };
     return (
         <Modal transparent={true}
@@ -63,51 +63,28 @@ export default function CajasSinPalletSetings(props: propsType): React.JSX.Eleme
                 <View style={isTablet ? styles.viewModal : stylesCel.viewModal}>
                     <View style={styles.modal}>
                         <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
-                        <View style={styles.containerConfigurarPallet}>
-                            {contenedor?.infoContenedor.tipoCaja?.map((caja, index) => (
-                                <TouchableOpacity onPress={() => setRadioButtonTipoCaja(caja)} key={caja + index}>
-                                    <View style={styles.radioButton}>
-                                        <View style={styles.radio}>
-                                            {radioButtonTipoCaja === caja ? (
-                                                <View style={styles.radioBg}>{ }</View>
-                                            ) : null}
-                                        </View>
-                                        <Text>{caja} Kg</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
+                        <Text>Tipo de la caja</Text>
+                        <View style={styles.viewTextInput}>
+                            <TextInput
+                                style={styles.inputCajas}
+                                onChangeText={setTipocCaja}
+                                value={tipoCaja} />
                         </View>
                         <View style={styles.containerConfigurarPallet}>
                             <Text>Calidad</Text>
-                            <View style={styles.viewCalidad}>
-                                {contenedor?.infoContenedor.calidad.map((calidad, index) => (
-                                    <TouchableOpacity onPress={() => setRadioButtonCalidad(calidad)} key={index}>
-                                        <View style={styles.radioButton}>
-                                            <View style={styles.radio}>
-                                                {radioButtonCalidad === calidad ? (
-                                                    <View style={styles.radioBg}>{ }</View>
-                                                ) : null}
-                                            </View>
-                                            <Text>{calidad}</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
+                            <View style={styles.viewTextInput}>
+                            <TextInput
+                                style={styles.inputCajas}
+                                onChangeText={setCalidad}
+                                value={calidad} />
+                        </View>
                             <View style={styles.containerConfigurarPallet}>
                                 <Text>Calibre</Text>
-                                <View style={styles.viewCalidad}>
-                                    {contenedor?.infoContenedor.calibres.map((calibre, index) => (
-                                        <TouchableOpacity onPress={() => setRadioButtonCalibre(calibre)} key={index}>
-                                            <View style={styles.radioButton}>
-                                                <View style={styles.radio}>
-                                                    {radioButtonCalibre === calibre ? (
-                                                        <View style={styles.radioBg}>{ }</View>
-                                                    ) : null}
-                                                </View>
-                                                <Text>{calibre}</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ))}
+                                <View style={styles.viewTextInput}>
+                                    <TextInput
+                                        style={styles.inputCajas}
+                                        onChangeText={setTipocCaja}
+                                        value={calibre} />
                                 </View>
                             </View>
                         </View>
@@ -239,6 +216,12 @@ const styles = StyleSheet.create({
         marginTop: 40,
         justifyContent: 'center',
         marginRight: 45,
+    },
+    textInput: {
+        width: 150,
+        height: 50,
+        backgroundColor: 'white',
+        borderRadius: 12,
     },
 });
 

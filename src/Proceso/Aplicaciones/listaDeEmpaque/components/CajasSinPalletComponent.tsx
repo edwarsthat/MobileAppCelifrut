@@ -68,6 +68,6 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     view2:{ marginLeft: 25 },
-    text1:{ fontSize: 40, fontWeight: 'bold' },
+    text1:{ fontSize: 30, fontWeight: 'bold' },
   });
 
