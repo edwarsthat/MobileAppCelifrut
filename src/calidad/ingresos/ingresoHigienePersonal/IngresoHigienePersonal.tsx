@@ -108,7 +108,9 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
                                 onValueChange={(itemValue) => setOperario(itemValue)}
                             >
                                 <Picker.Item label="" value="" />
-                                {operarios && operarios.map(operarioItem => (
+                                {operarios && operarios.sort(
+                                    (a, b) => a.nombre.localeCompare(b.nombre)
+                                ).map(operarioItem => (
                                     <Picker.Item
                                         label={`${operarioItem.nombre} ${operarioItem.apellido}`}
                                         value={operarioItem._id}
@@ -150,6 +152,7 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
 const styles = StyleSheet.create({
     componentContainer: {
         flex: 1,
+        marginBottom:15,
     },
 
     title: {

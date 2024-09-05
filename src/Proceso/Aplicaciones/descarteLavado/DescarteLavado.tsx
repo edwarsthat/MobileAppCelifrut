@@ -53,8 +53,10 @@ export default function DescarteLavado(): React.JSX.Element {
         }));
     };
     const guardarDatos = async ():Promise<any> => {
-        if (datosPredio.enf === "") { return Alert.alert("Recargue el predio que se está vaciando"); }
         try{
+            if (datosPredio.enf === "") {
+                throw new Error("Recargue el predio que se está vaciando");
+            }
             setLoading(true);
             const data = sumarDatos(formState, datosPredio);
             const request = {

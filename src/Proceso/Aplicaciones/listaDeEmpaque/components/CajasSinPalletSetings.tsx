@@ -83,7 +83,7 @@ export default function CajasSinPalletSetings(props: propsType): React.JSX.Eleme
                                 <View style={styles.viewTextInput}>
                                     <TextInput
                                         style={styles.inputCajas}
-                                        onChangeText={setTipocCaja}
+                                        onChangeText={setCalibre}
                                         value={calibre} />
                                 </View>
                             </View>

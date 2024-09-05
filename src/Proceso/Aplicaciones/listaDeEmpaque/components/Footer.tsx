@@ -146,12 +146,16 @@ export default function Footer(props: propsType): React.JSX.Element {
         contenedor2 = contenedores[index];
       }
       validarMoverItem(
+        Number(entradaModalCajas),
+        seleccion,
+        pallet,
         numeroContenedor,
         contenedorID,
         entradaModalPallet,
         contenedor,
         contenedor2
       );
+
       const item = {
         contenedor: contenedorID,
         pallet: Number(entradaModalPallet) - 1,

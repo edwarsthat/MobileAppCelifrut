@@ -49,6 +49,9 @@ export const validarResta = (contenedor: contenedoresType, cajas: number, selecc
     }
 };
 export const validarMoverItem = (
+    cajasModal: number,
+    seleccion:number[],
+    pallet: number,
     numeroContenedor: number,
     contenedorID: number,
     entradaModalPallet: string,
@@ -66,6 +69,13 @@ export const validarMoverItem = (
           Number(entradaModalPallet) > contenedor2.pallets.length
         ) {
           throw new Error('Error en el pallet');
+        }
+    }
+    if(seleccion.length === 1){
+        const validarNcajas =
+            contenedor.pallets[pallet].EF1[seleccion[0]].cajas >= cajasModal;
+        if(!validarNcajas){
+            throw new Error("Error en el numero de cajas que desea pasar");
         }
     }
 

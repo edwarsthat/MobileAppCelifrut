@@ -6,7 +6,7 @@ export type userType = {
     password: string
     cargo: cargosUsuariosType
     email?: string
-    nombre?: string
+    nombre: string
     apellido?: string
     genero?: string
     fechaNacimiento?: string
