@@ -145,6 +145,7 @@ export default function Footer(props: propsType): React.JSX.Element {
       } else {
         contenedor2 = contenedores[index];
       }
+      console.log(pallet)
       validarMoverItem(
         Number(entradaModalCajas),
         seleccion,

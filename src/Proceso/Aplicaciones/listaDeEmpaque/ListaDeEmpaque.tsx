@@ -295,8 +295,10 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
+            console.log(request);
             const response = await socketRequest(socket, request);
             // setContenedoresProvider(response.data);
+
             if (Object.prototype.hasOwnProperty.call(response, 'cajasSinPallet')) {
                 setCajasSinPallet(response.cajasSinPallet);
             }

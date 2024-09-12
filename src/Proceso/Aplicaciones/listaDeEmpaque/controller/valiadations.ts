@@ -71,7 +71,7 @@ export const validarMoverItem = (
           throw new Error('Error en el pallet');
         }
     }
-    if(seleccion.length === 1){
+    if(seleccion.length === 1 && pallet !== -1){
         const validarNcajas =
             contenedor.pallets[pallet].EF1[seleccion[0]].cajas >= cajasModal;
         if(!validarNcajas){

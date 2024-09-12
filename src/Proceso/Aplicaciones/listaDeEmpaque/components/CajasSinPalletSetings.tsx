@@ -42,9 +42,9 @@ export default function CajasSinPalletSetings(props: propsType): React.JSX.Eleme
         const item: itemType = {
             lote: loteSeleccionado._id,
             cajas: Number(cajas),
-            tipoCaja: tipoCaja,
-            calibre: calibre,
-            calidad: calidad,
+            tipoCaja: tipoCaja.trim(),
+            calibre: calibre.trim(),
+            calidad: calidad.trim().toLowerCase().charAt(0).toLocaleUpperCase() + calidad.trim().toLowerCase().slice(1),
             fecha: new Date(),
             tipoFruta: loteSeleccionado.tipoFruta,
         };
