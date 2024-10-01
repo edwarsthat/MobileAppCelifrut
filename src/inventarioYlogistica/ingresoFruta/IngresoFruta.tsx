@@ -6,88 +6,81 @@ import { proveedoresType } from '../../../types/proveedoresType';
 import { Alert, Text, View, StyleSheet, ScrollView, ActivityIndicator, Button, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getCredentials } from '../../../utils/auth';
-const URL = "http://192.168.0.172:3010";
+import useEnvContext from '../../hooks/useEnvContext';
+import { fetchWithTimeout } from '../../../utils/connection';
 
 
 //recordar despues cambiar para que inventario quede en un item aparte, pues canastilla en inventario va a caqmbiar a un solo json
 export default function IngresoFruta(): React.JSX.Element {
+  const { url } = useEnvContext();
   const [prediosDatos, setPrediosData] = useState<proveedoresType[]>([]);
   const [formState, setFormState] = useState<formInitType>(formInit);
   const [enf, setEnf] = useState('');
   const [loading, setLoading] = useState<boolean>(false);
   const [nombrePredio, setNombrePredio] = useState<string>();
 
-  const fetchWithTimeout = (url: string, options: object, timeout = 5000): any => {
-    return Promise.race([
-      fetch(url, options),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), timeout)
-      ),
-    ]);
-  };
-  const obtenerEF1 = async (): Promise<void> => {
-    try {
-      setLoading(true);
-      const token = await getCredentials();
-      const requesOperariosJSON = await fetch(`${URL}/proceso/obtenerEF1`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          "Authorization": `${token}`,
-        },
-      });
-      const response = await requesOperariosJSON.json();
-      if (response.status !== 200) {
-        throw new Error(`Cose ${response.status}: ${response.message}`);
-
-      }
-      setEnf(response.data);
-    } catch (err) {
-      if (err instanceof Error) {
-        Alert.alert("error", `${err.message}`);
-
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  const obtenerPredios = async (): Promise<void> => {
-    try {
-      setLoading(true);
-      const token = await getCredentials();
-      const requesOperariosJSON = await fetch(`${URL}/comercial/get_proveedores_proceso`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          "Authorization": `${token}`,
-        },
-      });
-      const response = await requesOperariosJSON.json();
-      if (response.status !== 200) {
-        throw new Error(`Cose ${response.status}: ${response.message}`);
-
-      }
-      const arr = response.data;
-      arr.sort((a: proveedoresType, b: proveedoresType) => a.PREDIO.localeCompare(b.PREDIO));
-      setPrediosData(arr);
-    } catch (err) {
-      if (err instanceof Error) {
-        Alert.alert("error", `${err.message}`);
-
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
   useEffect(() => {
+    const obtenerPredios = async (): Promise<void> => {
+      try {
+        setLoading(true);
+        const token = await getCredentials();
+        const requesOperariosJSON = await fetch(`${url}/comercial/get_proveedores_proceso`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `${token}`,
+          },
+        });
+        const response = await requesOperariosJSON.json();
+        if (response.status !== 200) {
+          throw new Error(`Cose ${response.status}: ${response.message}`);
+
+        }
+        const arr = response.data;
+        arr.sort((a: proveedoresType, b: proveedoresType) => a.PREDIO.localeCompare(b.PREDIO));
+        setPrediosData(arr);
+      } catch (err) {
+        if (err instanceof Error) {
+          Alert.alert("error", `${err.message}`);
+
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
     obtenerPredios();
     obtenerEF1();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
   const handlePredio = (predioID: string): void => {
     setFormState({
       ...formState,
       nombrePredio: predioID,
     });
+  };
+  const obtenerEF1 = async (): Promise<void> => {
+    try {
+      setLoading(true);
+      const token = await getCredentials();
+      const requesOperariosJSON = await fetch(`${url}/proceso/obtenerEF1`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": `${token}`,
+        },
+      });
+      const response = await requesOperariosJSON.json();
+      if (response.status !== 200) {
+        throw new Error(`Cose ${response.status}: ${response.message}`);
+      }
+      setEnf(response.data);
+    } catch (err) {
+      if (err instanceof Error) {
+        Alert.alert("error", `${err.message}`);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const guardarLote = async () => {
@@ -108,7 +101,7 @@ export default function IngresoFruta(): React.JSX.Element {
       };
       const token = await getCredentials();
 
-      const responseJSON = await fetchWithTimeout(`${URL}/proceso/guardarLote`, {
+      const responseJSON = await fetchWithTimeout(`${url}/proceso/guardarLote`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

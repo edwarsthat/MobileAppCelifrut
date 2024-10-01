@@ -4,7 +4,9 @@ import { Text, View, ScrollView, StyleSheet, TextInput, Button, Alert } from "re
 import { lotesType } from "../../../../../types/lotesType";
 import { forminit, formType, labels } from "../functions/forms";
 import * as Keychain from "react-native-keychain";
-const URL = "http://192.168.0.172:3010";
+import useEnvContext from "../../../../hooks/useEnvContext";
+import { fetchWithTimeout } from "../../../../../utils/connection";
+
 
 type propsType = {
     lote: lotesType | undefined
@@ -12,62 +14,55 @@ type propsType = {
 }
 
 export default function FrutaSinProcesarDirectoNacional(props: propsType): React.JSX.Element {
+    const { url } = useEnvContext();
     const [formState, setFormState] = useState<formType>(forminit);
 
-    const fetchWithTimeout = (url:string, options:object, timeout = 5000):any => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timed out")), timeout)
-            ),
-        ]);
-    };
     const directoNacional = async () => {
-        try{
-            if(props.lote === undefined){
+        try {
+            if (props.lote === undefined) {
                 throw new Error("Error lote indefinido");
             }
             const propsCanastillasInt = props.lote.inventario ? props.lote.inventario : 0;
-            if(Number(formState.canastillas) > propsCanastillasInt){
+            if (Number(formState.canastillas) > propsCanastillasInt) {
                 throw new Error("Error en el numero de canastillas!");
             }
             const request = {
                 _id: props.lote._id,
                 infoSalidaDirectoNacional: {
-                  placa: formState.placa,
-                  nombreConductor: formState.nombreConductor,
-                  telefono: formState.telefono,
-                  cedula: formState.cedula,
-                  remision: formState.remision,
+                    placa: formState.placa,
+                    nombreConductor: formState.nombreConductor,
+                    telefono: formState.telefono,
+                    cedula: formState.cedula,
+                    remision: formState.remision,
                 },
                 directoNacional: props.lote.promedio ? (Number(formState.canastillas) * props.lote.promedio) : 0,
                 inventario: Number(formState.canastillas),
                 __v: props.lote.__v,
                 action: 'directoNacional',
-              };
-              const credentials = await Keychain.getGenericPassword();
-              if(!credentials){
-                  throw new Error("Error no hay token de validadcion");
-              }
-              const { password } = credentials;
-              const token = password;
-              const responseJSON = await fetchWithTimeout(`${URL}/proceso/directoNacional`, {
-                  method: "PUT",
-                  headers: {
-                      "Content-Type": "application/json",
-                      "Authorization":`${token}`,
-                  },
-                  body: JSON.stringify(request),
-              });
-              const response = await responseJSON.json();
-              if (response.status !== 200) {
-                  throw new Error(`Error guardando los datos ${response.message}`);
-              }
-              Alert.alert("Directo nacional con exito");
-              props.volverToTabla();
-              setFormState(forminit);
-        } catch(err){
-            if(err instanceof Error){
+            };
+            const credentials = await Keychain.getGenericPassword();
+            if (!credentials) {
+                throw new Error("Error no hay token de validadcion");
+            }
+            const { password } = credentials;
+            const token = password;
+            const responseJSON = await fetchWithTimeout(`${url}/proceso/directoNacional`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `${token}`,
+                },
+                body: JSON.stringify(request),
+            });
+            const response = await responseJSON.json();
+            if (response.status !== 200) {
+                throw new Error(`Error guardando los datos ${response.message}`);
+            }
+            Alert.alert("Directo nacional con exito");
+            props.volverToTabla();
+            setFormState(forminit);
+        } catch (err) {
+            if (err instanceof Error) {
                 Alert.alert(err.message);
             }
         }
@@ -144,6 +139,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         gap: 10,
         marginTop: 20,
-        marginBottom:180,
+        marginBottom: 180,
     },
 });

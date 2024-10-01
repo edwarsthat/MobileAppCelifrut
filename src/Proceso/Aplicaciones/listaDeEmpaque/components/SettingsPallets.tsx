@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
-import { View, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert } from "react-native";
+import { View,ScrollView, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { settingsType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
@@ -78,7 +78,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
             animationType="fade">
             <View style={isTablet ? styles.centerModal : stylesCel.centerModal}>
                 <View style={isTablet ? styles.viewModal : stylesCel.viewModal}>
-                    <View style={styles.modal}>
+                    <ScrollView style={styles.modal}>
                         <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
                         <View style={styles.containerConfigurarPallet}>
                             {contenedor?.infoContenedor.tipoCaja?.map((caja, index) => (
@@ -132,7 +132,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             <Button title="Guardar" onPress={clickGuardar} />
                             <Button title="Cancelar" onPress={props.closeModal} />
                         </View>
-                    </View>
+                    </ScrollView>
                     <View>
                         <View style={styles.modal}>
                             <Text style={styles.tituloModal}>Liberacion pallets</Text>
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         gap: 10,
         marginTop: 10,
+
     },
     radioButton: {
         display: 'flex',
@@ -250,7 +251,12 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         backgroundColor: '#0074D9',
     },
-    viewCalidad: { display: 'flex', flexDirection: 'row', gap: 20 },
+    viewCalidad: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap:'wrap',
+        gap: 20,
+    },
     containerButtonsModal: {
         display: 'flex',
         flexDirection: 'row',

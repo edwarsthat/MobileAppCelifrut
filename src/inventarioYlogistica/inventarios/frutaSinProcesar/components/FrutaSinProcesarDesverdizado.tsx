@@ -3,7 +3,8 @@ import React, { useState } from "react";
 import { View, StyleSheet, ScrollView, Text, TextInput, Button, Alert } from "react-native";
 import { lotesType } from "../../../../../types/lotesType";
 import * as Keychain from "react-native-keychain";
-const URL = "http://192.168.0.172:3010";
+import useEnvContext from "../../../../hooks/useEnvContext";
+import { fetchWithTimeout } from "../../../../../utils/connection";
 
 type propsType = {
     lote: lotesType | undefined
@@ -12,17 +13,11 @@ type propsType = {
 }
 
 export default function FrutaSinProcesarDesverdizado(props: propsType): React.JSX.Element {
+    const {url} = useEnvContext();
     const [canastillas, setCanastillas] = useState<string>();
     const [cuartodesverdizado, setCuartoDesverdizado] = useState<string>();
 
-    const fetchWithTimeout = (url:string, options:object, timeout = 5000):any => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timed out")), timeout)
-            ),
-        ]);
-    };
+
     const desverdizado = async () => {
         try {
             if (props.lote === undefined) {
@@ -36,35 +31,35 @@ export default function FrutaSinProcesarDesverdizado(props: propsType): React.JS
                 inventario: Number(canastillas),
                 _id: props.lote._id,
                 desverdizado: {
-                  canastillasIngreso: canastillas,
-                  kilosIngreso:props.lote.promedio ? (Number(canastillas) * props.lote.promedio) : 0,
-                  cuartoDesverdizado: cuartodesverdizado,
+                    canastillasIngreso: canastillas,
+                    kilosIngreso: props.lote.promedio ? (Number(canastillas) * props.lote.promedio) : 0,
+                    cuartoDesverdizado: cuartodesverdizado,
                 },
-                __v:props.lote.__v,
+                __v: props.lote.__v,
                 action: 'desverdizado',
-              };
-              const credentials = await Keychain.getGenericPassword();
-              if(!credentials){
-                  throw new Error("Error no hay token de validadcion");
-              }
-              const { password } = credentials;
-              const token = password;
-              const responseJSON = await fetchWithTimeout(`${URL}/proceso/desverdizado`, {
-                  method: "PUT",
-                  headers: {
-                      "Content-Type": "application/json",
-                      "Authorization":`${token}`,
-                  },
-                  body: JSON.stringify(request),
-              });
-              const response = await responseJSON.json();
-              if (response.status !== 200) {
-                  throw new Error(`Error guardando los datos ${response.message}`);
-              }
-              Alert.alert("Directo nacional con exito");
-              props.volverToTabla();
-              setCanastillas('');
-              setCuartoDesverdizado('');
+            };
+            const credentials = await Keychain.getGenericPassword();
+            if (!credentials) {
+                throw new Error("Error no hay token de validadcion");
+            }
+            const { password } = credentials;
+            const token = password;
+            const responseJSON = await fetchWithTimeout(`${url}/proceso/desverdizado`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `${token}`,
+                },
+                body: JSON.stringify(request),
+            });
+            const response = await responseJSON.json();
+            if (response.status !== 200) {
+                throw new Error(`Error guardando los datos ${response.message}`);
+            }
+            Alert.alert("Directo nacional con exito");
+            props.volverToTabla();
+            setCanastillas('');
+            setCuartoDesverdizado('');
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);

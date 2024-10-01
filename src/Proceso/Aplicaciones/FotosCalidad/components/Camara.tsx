@@ -6,11 +6,13 @@ import { AppState } from 'react-native';
 import { lotesType } from "../../../../../types/lotesType";
 import RNFS from 'react-native-fs';
 import * as Keychain from "react-native-keychain";
+import useEnvContext from "../../../../hooks/useEnvContext";
 
 type propsType = {
     lote: lotesType | null
 }
 export default function Camara(props: propsType): React.JSX.Element {
+    const {url} = useEnvContext();
     const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
     const appState = useRef(AppState.currentState);
@@ -77,7 +79,7 @@ export default function Camara(props: propsType): React.JSX.Element {
                 fotoName: nomnbreFoto,
                 foto: data,
             };
-            const responseJSON = await fetch('http://192.168.0.172:3010/proceso/add-fotos-calidad', {
+            const responseJSON = await fetch(`${url}/proceso/add-fotos-calidad`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

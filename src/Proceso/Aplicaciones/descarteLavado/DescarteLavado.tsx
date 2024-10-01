@@ -4,9 +4,10 @@ import { ScrollView, Text, TextInput, View, StyleSheet, Button, Alert, ActivityI
 import { formInit, labels, sumarDatos } from "./func/functions";
 import { FormCategory, FormState, datosPredioType } from "./types/types";
 import * as Keychain from "react-native-keychain";
-const URL = "http://192.168.0.172:3010";
+import useEnvContext from "../../../hooks/useEnvContext";
 
 export default function DescarteLavado(): React.JSX.Element {
+    const { url } = useEnvContext();
     const [formState, setFormState] = useState<FormState>(formInit);
     const [loading, setLoading] = useState<boolean>(false);
     const [datosPredio, setDatosPredio] = useState<datosPredioType>({
@@ -15,9 +16,9 @@ export default function DescarteLavado(): React.JSX.Element {
         tipoFruta: "",
         nombrePredio: "",
     });
-    const fetchWithTimeout = (url:string, options:object, timeout = 5000):any => {
+    const fetchWithTimeout = (direccion:string, options:object, timeout = 5000):any => {
         return Promise.race([
-            fetch(url, options),
+            fetch(direccion, options),
             new Promise((_, reject) =>
                 setTimeout(() => reject(new Error("Request timed out")), timeout)
             ),
@@ -26,7 +27,7 @@ export default function DescarteLavado(): React.JSX.Element {
     const obtenerLote = async () => {
         try {
             setLoading(true);
-            const requestENF = await fetch(`${URL}/variablesDeProceso/predioProcesoDescarte`);
+            const requestENF = await fetch(`${url}/variablesDeProceso/predioProcesoDescarte`);
             const responseServerPromise = await requestENF.json();
             const response: datosPredioType = responseServerPromise.response;
             setDatosPredio({
@@ -70,7 +71,7 @@ export default function DescarteLavado(): React.JSX.Element {
             }
             const { password } = credentials;
             const token = password;
-            const responseJSON = await fetchWithTimeout(`${URL}/proceso/ingresar_descarte_lavado`, {
+            const responseJSON = await fetchWithTimeout(`${url}/proceso/ingresar_descarte_lavado`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

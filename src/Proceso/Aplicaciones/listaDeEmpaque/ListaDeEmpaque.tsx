@@ -86,7 +86,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             }
             const { password } = credentials;
             const token = password;
-            socket = io('ws://192.168.0.172:3011/', {
+            socket = io(`ws://192.168.0.172:3011/`, {
                 auth: {
                     token: token,
                 },
@@ -108,7 +108,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                     nombrePredio: data.predio.PREDIO,
                 });
             });
-            socket.on("listaempaque_update", () =>{
+            socket.on("listaempaque_update", () => {
                 console.log("asdasd");
                 obtenerContenedores();
             });
@@ -117,7 +117,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 Alert.alert(`${err.message}`);
             }
         }
-      }, []);
+    }, []);
 
     useEffect(() => {
         setIsTablet(anchoDevice >= 721);

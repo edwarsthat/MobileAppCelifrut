@@ -5,6 +5,7 @@ import * as Keychain from 'react-native-keychain';
 import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
 import { CargoType } from '../../types/cargosType';
+import useEnvContext from '../hooks/useEnvContext';
 const { ApkInstaller } = NativeModules;
 
 type propsType = {
@@ -14,6 +15,7 @@ type propsType = {
 }
 
 export default function Login(props: propsType): React.JSX.Element {
+    const { url } = useEnvContext();
     const [user, setUser] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<number>(0);
@@ -22,7 +24,7 @@ export default function Login(props: propsType): React.JSX.Element {
         const checkForUpdates = async () => {
             try {
                 const version = DeviceInfo.getVersion();
-                const responseJSON = await fetch('http://192.168.0.172:3010/sistema/check_mobile_version');
+                const responseJSON = await fetch(`${url}/sistema/check_mobile_version`);
                 const response = await responseJSON.json();
                 if (version !== response.data.version) {
                     Alert.alert(
@@ -44,7 +46,7 @@ export default function Login(props: propsType): React.JSX.Element {
     }, []);
     const handlelogin = async (): Promise<void> => {
         try {
-            const responseJSON = await fetch('http://192.168.0.172:3010/login2', {
+            const responseJSON = await fetch(`${url}/login2`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -94,7 +96,7 @@ export default function Login(props: propsType): React.JSX.Element {
             // Definir la ruta donde se guardará el archivo
             const downloadDest = `${RNFS.ExternalDirectoryPath}/${apkPath}`;
             const download = await RNFS.downloadFile({
-                fromUrl: `http://192.168.0.172:3010/sistema/download_mobilApp/${apkPath}`,
+                fromUrl: `${url}/sistema/download_mobilApp/${apkPath}`,
                 toFile: downloadDest,
                 background: true,
                 progressDivider: 1,

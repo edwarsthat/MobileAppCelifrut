@@ -40,8 +40,17 @@ import { CargoType } from './types/cargosType';
 import IngresoHigienePersonal from './src/calidad/ingresos/ingresoHigienePersonal/IngresoHigienePersonal';
 import IngresoFruta from './src/inventarioYlogistica/ingresoFruta/IngresoFruta';
 import InventarioFrutaSinProcesar from './src/inventarioYlogistica/inventarios/frutaSinProcesar/InventarioFrutaSinProcesar';
+import InventarioDesverdizado from './src/inventarioYlogistica/inventarios/frutaDesverdizando/InventarioDesverdizado';
+import OrdenVaceo from './src/inventarioYlogistica/inventarios/ordenVaceo/OrdenVaceo';
+import IngresarFormularioCalidad from './src/calidad/formularios/ingresarFormulariosCalidad/IngresarFormularioCalidad';
 
+type envContexttype = {
+  url: string
+}
 
+export const envContext = createContext<envContexttype>({
+  url: "http://192.168.0.172:3010",
+});
 
 export const deviceWidth = createContext<number>(0);
 
@@ -53,7 +62,7 @@ function App(): React.JSX.Element {
   const [section, setSection] = useState<string>('menu');
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
   const [version, setVersion] = useState<string>('');
-
+  const env = {url: "http://192.168.0.172:3010"};
   useEffect(() => {
     const { width } = Dimensions.get('window');
     setAnchoDevice(width);
@@ -72,61 +81,66 @@ function App(): React.JSX.Element {
   const seleccionWindow = (data: string): void => {
     setSection(data);
   };
-  const obtenerPermisos = (cargo:CargoType): void => {
+  const obtenerPermisos = (cargo: CargoType): void => {
     setPermisos(cargo);
   };
   return (
-    <deviceWidth.Provider value={anchoDevice}>
-      <SafeAreaView style={styles.container}>
-        <StatusBar
-          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-          backgroundColor={backgroundStyle.backgroundColor}
-        />
-        {loading ? <PantallaDeCarga />
-          :
-          !isLogin ?
-            <>
-              <Text>V-{version}</Text>
-              <Login
-                obtenerPermisos={obtenerPermisos}
-                showLoading={showLoading}
-                setIslogin={setIslogin} />
-            </>
+    <envContext.Provider value={env}>
+      <deviceWidth.Provider value={anchoDevice}>
+        <SafeAreaView style={styles.container}>
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+          />
+          {loading ? <PantallaDeCarga />
             :
-            <View style={styles.container}>
-              {section !== '66b6707777549ed0672a9029' ? <Header seleccionWindow={seleccionWindow} /> : null}
-              {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
+            !isLogin ?
+              <>
+                <Text>V-{version}</Text>
+                <Login
+                  obtenerPermisos={obtenerPermisos}
+                  showLoading={showLoading}
+                  setIslogin={setIslogin} />
+              </>
+              :
+              <View style={styles.container}>
+                {section !== '66b6707777549ed0672a9029' ? <Header seleccionWindow={seleccionWindow} /> : null}
+                {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
 
-              {/* Calidad */}
-              {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
-              {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
+                {/* Calidad */}
+                {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
+                {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
+                {section === "66f8228c2d9d7eec9ff11d51" && <IngresarFormularioCalidad />}
 
-              {/* Aplicaciones */}
-              {section === '66b6705a77549ed0672a9026' && <FotosCalidad />}
-              {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
-              {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
-              {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
+                {/* Aplicaciones */}
+                {section === '66b6705a77549ed0672a9026' && <FotosCalidad />}
+                {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
+                {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
+                {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
 
-              {/* Historiales aplicaciones */}
-              {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
-              {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
-              {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
+                {/* Historiales aplicaciones */}
+                {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
+                {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
+                {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
 
-              {/* comercial */}
-              {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
-              {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
+                {/* comercial */}
+                {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
+                {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
 
-              {/* inventario y logistica */}
-              {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
-              {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
-            </View>
-        }
+                {/* inventario y logistica */}
+                {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
+                {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
+                {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
+                {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}
+              </View>
+          }
 
-        {section !== '66b6705a77549ed0672a9026' && section !== '66b6707777549ed0672a9029' ?
-          <Footer /> : null}
+          {section !== '66b6705a77549ed0672a9026' && section !== '66b6707777549ed0672a9029' ?
+            <Footer /> : null}
 
-      </SafeAreaView>
-    </deviceWidth.Provider>
+        </SafeAreaView>
+      </deviceWidth.Provider>
+    </envContext.Provider>
   );
 }
 

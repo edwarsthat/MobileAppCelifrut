@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+
 import * as Keychain from 'react-native-keychain';
 
 export const getCredentials = async () => {

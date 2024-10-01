@@ -3,6 +3,7 @@ module.exports = {
   extends: '@react-native',
   rules: {
     // Añade esta regla para permitir tanto comillas simples como dobles sin restricciones
-    "quotes": ['off']
+    "quotes": ['off'],
+    "react-hooks/exhaustive-deps": "off"
   },
 };
