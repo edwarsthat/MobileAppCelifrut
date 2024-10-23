@@ -45,12 +45,19 @@ import OrdenVaceo from './src/inventarioYlogistica/inventarios/ordenVaceo/OrdenV
 import IngresarFormularioCalidad from './src/calidad/formularios/ingresarFormulariosCalidad/IngresarFormularioCalidad';
 
 type envContexttype = {
-  url: string
+  url: string,
+  socketURL: string
 }
 
 export const envContext = createContext<envContexttype>({
-  url: "http://192.168.0.172:3010",
+  url: "https://operativo.celifrut.com",
+  socketURL: "ws://operativo.celifrut.com",
 });
+
+// export const envContext = createContext<envContexttype>({
+//   url: "http://192.168.0.172:3010",
+//   socketURL: "ws://192.168.0.172",
+// });
 
 export const deviceWidth = createContext<number>(0);
 
@@ -62,7 +69,8 @@ function App(): React.JSX.Element {
   const [section, setSection] = useState<string>('menu');
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
   const [version, setVersion] = useState<string>('');
-  const env = {url: "http://192.168.0.172:3010"};
+  const env = {url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com"};
+  // const env = {url: "http://192.168.0.172:3010", socketURL:"ws://192.168.0.172"};
   useEffect(() => {
     const { width } = Dimensions.get('window');
     setAnchoDevice(width);

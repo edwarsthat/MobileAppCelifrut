@@ -1,26 +1,30 @@
 /* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
-import { View,ScrollView, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert } from "react-native";
+import { View, ScrollView, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert, TextInput } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { settingsType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type propsType = {
     openModal: boolean;
     closeModal: () => void;
     guardarPalletSettings: (settings: settingsType,) => Promise<void>;
-    liberarPallet: (item:any) => void
+    liberarPallet: (item: any) => void
 
 }
 export default function SettingsPallets(props: propsType): React.JSX.Element {
     const pallet = useContext(palletSeleccionadoContext);
     const contenedorSeleccionado = useContext(contenedorSeleccionadoContext);
-    const contenedor = useContext(contenedoresContext).find(cont => cont.numeroContenedor === contenedorSeleccionado);
+    const contenedor = useContext(contenedoresContext).find(cont => cont._id === contenedorSeleccionado);
     const anchoDevice = useContext(deviceWidth);
     const [isTablet, setIsTablet] = useState<boolean>(false);
+    const [cajasContadas, setCajasContadas] = useState<string>('');
+
 
     useEffect(() => {
         setIsTablet(anchoDevice >= 721);
+        getCajasContadas();
         if (pallet !== -1 && contenedor) {
             const infoLiberacion = contenedor.pallets[pallet].listaLiberarPallet;
             setRotulado(infoLiberacion.rotulado);
@@ -61,16 +65,41 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
         setRadioButtonTipoCaja('');
         setRadioButtonCalidad('');
     };
-    const liberarPallets = ():void => {
+    const liberarPallets = (): void => {
         const item = {
-            rotulado:rotulado,
-            paletizado:paletizado,
-            enzunchado:enzunchado,
-            estadoCajas:estadoCajas,
-            estiba:estiba,
+            rotulado: rotulado,
+            paletizado: paletizado,
+            enzunchado: enzunchado,
+            estadoCajas: estadoCajas,
+            estiba: estiba,
         };
         props.liberarPallet(item);
         props.closeModal();
+    };
+    const handleCajasContadas = async (e: string) => {
+        try {
+            await AsyncStorage.setItem(`${contenedor?._id}:${pallet}`, e);
+            setCajasContadas(e);
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert("Error configurando las cajas contadas");
+            }
+        }
+    };
+    const getCajasContadas = async () => {
+        try {
+            const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
+            if (value) {
+                setCajasContadas(value);
+
+            } else {
+                setCajasContadas('');
+            }
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert("Error configurando las cajas contadas");
+            }
+        }
     };
     return (
         <Modal transparent={true}
@@ -133,11 +162,11 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             <Button title="Cancelar" onPress={props.closeModal} />
                         </View>
                     </ScrollView>
-                    <View>
+                    <ScrollView>
                         <View style={styles.modal}>
                             <Text style={styles.tituloModal}>Liberacion pallets</Text>
                         </View>
-                        <View style={isTablet ? styles.contenedorLiberacionPallet :  stylesCel.contenedorLiberacionPallet}>
+                        <View style={isTablet ? styles.contenedorLiberacionPallet : stylesCel.contenedorLiberacionPallet}>
                             <TouchableOpacity onPress={() => setRotulado(!rotulado)}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
@@ -180,10 +209,21 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.viewButtonsLiberacionPallet}>
-                            <Button title="Guardar" onPress={liberarPallets}/>
+                            <Button title="Guardar" onPress={liberarPallets} />
                             <Button title="Cancelar" onPress={props.closeModal} />
                         </View>
-                    </View>
+                    </ScrollView>
+                    <ScrollView>
+                        <View style={styles.modalCajas}>
+                            <Text style={styles.tituloModal}>Cajas ya contadas</Text>
+                        </View>
+                        <TextInput
+                            onChangeText={handleCajasContadas}
+                            keyboardType="numeric"
+                            value={cajasContadas}
+                            style={styles.modalInput}
+                        />
+                    </ScrollView>
                 </View>
             </View>
         </Modal>
@@ -196,16 +236,23 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
         marginTop: '10%',
     },
+    modalInput: {
+        width: 150,
+        borderWidth: 1,
+        borderRadius: 10,
+        borderColor: '#7D9F3A',
+        backgroundColor: '#F5F5F5',
+    },
     viewModal: {
         display: 'flex',
         backgroundColor: 'white',
-        width: 850,
+        width: 1150,
         flexDirection: 'row',
         borderRadius: 20,
         alignItems: 'flex-start',
         paddingBottom: 20,
         paddingTop: 10,
-        marginLeft: '10%',
+        marginLeft: '5%',
         gap: 50,
         shadowColor: '#52006A',
         elevation: 20,
@@ -214,6 +261,14 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         width: 400,
+        padding: 20,
+        borderRightColor: '#999999',
+        borderRightWidth: 1,
+    },
+    modalCajas: {
+        display: 'flex',
+        flexDirection: 'column',
+        width: 200,
         padding: 20,
         borderRightColor: '#999999',
         borderRightWidth: 1,
@@ -254,7 +309,7 @@ const styles = StyleSheet.create({
     viewCalidad: {
         display: 'flex',
         flexDirection: 'row',
-        flexWrap:'wrap',
+        flexWrap: 'wrap',
         gap: 20,
     },
     containerButtonsModal: {
@@ -284,8 +339,8 @@ const stylesCel = StyleSheet.create({
         flex: 1,
         alignItems: 'flex-start',
 
-        justifyContent:'center',
-        alignContent:'center',
+        justifyContent: 'center',
+        alignContent: 'center',
     },
     viewModal: {
         display: 'flex',
@@ -307,7 +362,7 @@ const stylesCel = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         gap: 15,
-        padding:20,
+        padding: 20,
     },
     viewButtonsLiberacionPallet: {
         display: 'flex',

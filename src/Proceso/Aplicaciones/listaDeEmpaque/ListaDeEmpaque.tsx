@@ -3,18 +3,18 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View, Modal } from "react-native";
 import { Socket, io } from "socket.io-client";
 import Header from "./components/Header";
-import * as Keychain from "react-native-keychain";
-import { predioType } from "../../../../types/predioType";
+import { predioType, ResponseItem } from "../../../../types/predioType";
 import { contenedoresType } from "../../../../types/contenedoresType";
 import Pallets from "./components/Pallets";
 import { cajasSinPalletType, itemType, settingsType } from "./types/types";
 import { obtenerAccessToken, socketRequest } from "./controller/request";
 import Footer from "./components/Footer";
 import Informacion from "./components/Informacion";
-import { lotesType } from "../../../../types/lotesType";
 import { deviceWidth } from "../../../../App";
-import { CustomError } from "../../../../Error/Error";
 import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
+import useEnvContext from "../../../hooks/useEnvContext";
+import { getCredentials } from "../../../../utils/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 let socket: Socket;
 
@@ -49,15 +49,16 @@ export const contenedoresContext = createContext<contenedoresType[]>([
         },
     },
 ]);
-export const contenedorSeleccionadoContext = createContext<number>(-1);
+export const contenedorSeleccionadoContext = createContext<string>("");
 export const palletSeleccionadoContext = createContext<number>(-1);
 export const cajasSinPalletContext = createContext<cajasSinPalletType[]>([]);
 export const itemSeleccionContext = createContext<number[]>([]);
 
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
+    const { socketURL } = useEnvContext();
     const anchoDevice = useContext(deviceWidth);
-    const [loteVaciando, setLoteVaciando] = useState<predioType>();
+    const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
     const [contenedoresProvider, setContenedoresProvider] = useState<contenedoresType[]>([]);
     const [palletSeleccionado, setPalletSeleccionado] = useState<number>(-1);
     const [loteSeleccionado, setLoteSeleccionado] = useState<predioType>({
@@ -67,7 +68,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         _id: '',
         predio: '',
     });
-    const [numeroContenedor, setNumeroContenedor] = useState<number>(-1);
+    const [idContenedor, setIdContenedor] = useState<string>("");
     const [cajasSinPallet, setCajasSinPallet] = useState([]);
     const [seleccion, setSeleccion] = useState<number[]>([]);
 
@@ -80,36 +81,28 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
 
     const createSocketConnection = useCallback(async () => {
         try {
-            const credentials = await Keychain.getGenericPassword();
-            if (!credentials) {
-                throw new Error("Error no hay token de validadcion");
-            }
-            const { password } = credentials;
-            const token = password;
-            socket = io(`ws://192.168.0.172:3011/`, {
+            const token = await getCredentials();
+            // socket = io(`ws://operativo.celifrut.com:3011/`, {
+            socket = io(`${socketURL}:3011/`, {
                 auth: {
                     token: token,
                 },
                 rejectUnauthorized: false,
             });
             socket.on('connect', () => {
-                console.log("Conectado a ws://192.168.0.172:3011/");
+                // console.log(`Conectado a ws://operativo.celifrut.com:3011/`);
+                console.log(`Conectado a ${socketURL}:3011/`);
             });
             socket.on('connect_error', (error) => {
                 Alert.alert(`Error en la conexion del socket: ${error}`);
             });
-            socket.on('servidor', (lote: lotesType[]) => {
-                const data = lote[0];
-                setLoteVaciando({
-                    _id: data._id,
-                    enf: data.enf,
-                    tipoFruta: data.tipoFruta,
-                    predio: data.predio._id,
-                    nombrePredio: data.predio.PREDIO,
-                });
+            // socket.on('servidor', () => {
+            //     obtenerPredioProcesando();
+            // });
+            socket.on('predio_vaciado', () => {
+                obtenerPredioProcesando();
             });
             socket.on("listaempaque_update", () => {
-                console.log("asdasd");
                 obtenerContenedores();
             });
         } catch (err) {
@@ -124,7 +117,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         createSocketConnection();
         obtenerPredioProcesando();
         obtenerContenedores();
-        obtenerCajasSinPallet();
         return () => {
             if (socket) {
                 socket.disconnect();
@@ -138,7 +130,20 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             const token = await obtenerAccessToken();
             const request = { data: { action: 'obtener_predio_listaDeEmpaque' }, token: token };
             const response = await socketRequest(socket, request);
-            setLoteVaciando(response.data);
+            if (response.status !== 200) {
+                return Alert.alert(response.status + " Error obteniendo los predios");
+            }
+            const predios = response.data.map((item: ResponseItem) => {
+                return ({
+                    _id: item.documento._id,
+                    enf: item.documento.enf,
+                    nombrePredio: item.documento.predio.PREDIO,
+                    predio: item.documento.predio._id,
+                    tipoFruta: item.documento.tipoFruta,
+                });
+            });
+            console.log(predios);
+            setLoteVaciando(predios);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -162,26 +167,26 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const obtenerCajasSinPallet = async () => {
-        try {
-            setLoading(true);
-            const token = await obtenerAccessToken();
-            const request = { data: { action: 'obtener_cajas_sin_pallet' }, token: token };
-            const response = await socketRequest(socket, request);
-            setCajasSinPallet(response.data);
-        } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(err.message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    // const obtenerCajasSinPallet = async () => {
+    //     try {
+    //         setLoading(true);
+    //         const token = await obtenerAccessToken();
+    //         const request = { data: { action: 'obtener_cajas_sin_pallet' }, token: token };
+    //         const response = await socketRequest(socket, request);
+    //         setCajasSinPallet(response.data);
+    //     } catch (err) {
+    //         if (err instanceof Error) {
+    //             Alert.alert(err.message);
+    //         }
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const guardarPalletSettings = async (settings: settingsType) => {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = { data: { action: 'add_settings_pallet', _id: cont?._id, pallet: palletSeleccionado, settings: settings }, token: token };
             await socketRequest(socket, request);
             Alert.alert("Guardado con exito ");
@@ -197,7 +202,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'actualizar_pallet_contenedor',
@@ -207,7 +212,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            socketRequest(socket, request);
+            await socketRequest(socket, request);
             // setContenedoresProvider(response.data);
             Alert.alert("Guardado con exito ");
             // console.log(response);
@@ -223,7 +228,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'eliminar_item_lista_empaque',
@@ -249,7 +254,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'restar_item_lista_empaque',
@@ -275,8 +280,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
-            const cont2 = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === item.contenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
+            const cont2 = contenedoresProvider.find(contenedor => contenedor._id === item.contenedor);
             const request = {
                 data: {
                     action: 'mover_item_lista_empaque',
@@ -287,21 +292,15 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                         seleccionado: seleccion,
                     },
                     contenedor2: {
-                        _id: cont2 ? cont2._id : -1,
-                        numeroContenedor: cont2 ? cont2.numeroContenedor : -1,
+                        _id: cont2 ? cont2._id : "",
+                        numeroContenedor: cont2 ? cont2.numeroContenedor : "",
                         pallet: item.pallet,
                     },
                     cajas: item.numeroCajas,
                 },
                 token: token,
             };
-            console.log(request);
-            const response = await socketRequest(socket, request);
-            // setContenedoresProvider(response.data);
-
-            if (Object.prototype.hasOwnProperty.call(response, 'cajasSinPallet')) {
-                setCajasSinPallet(response.cajasSinPallet);
-            }
+            await socketRequest(socket, request);
             Alert.alert("Se movió con exito");
 
         } catch (err) {
@@ -364,7 +363,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'liberar_pallets_lista_empaque',
@@ -390,7 +389,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'cerrar_contenedor',
@@ -399,6 +398,15 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             await socketRequest(socket, request);
+
+            const len = cont?.pallets.length;
+            if(len){
+                for(let i = 0; i < len; i++){
+                    await AsyncStorage.removeItem(`${cont._id}:${i}`);
+                }
+            }
+
+
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -413,7 +421,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor.numeroContenedor === numeroContenedor);
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'modificar_items_lista_empaque',
@@ -424,15 +432,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
-            if (Object.prototype.hasOwnProperty.call(response, 'cajasSinPallet')) {
-                setCajasSinPallet(response.cajasSinPallet);
-            }
+            await socketRequest(socket, request);
             Alert.alert("Guardado con exito");
         } catch (err) {
-            if (err instanceof CustomError) {
-                Alert.alert(`Erro Code ${err.status}: ${err.message}`);
+            if (err instanceof Error) {
+                Alert.alert(`${err.message}`);
             }
         } finally {
             setSeleccion([]);
@@ -445,7 +449,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     return (
         <contenedoresContext.Provider value={contenedoresProvider}>
             <loteSeleccionadoContext.Provider value={loteSeleccionado}>
-                <contenedorSeleccionadoContext.Provider value={numeroContenedor}>
+                <contenedorSeleccionadoContext.Provider value={idContenedor}>
                     <palletSeleccionadoContext.Provider value={palletSeleccionado}>
                         <itemSeleccionContext.Provider value={seleccion}>
 
@@ -456,7 +460,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                         handleShowResumen={handleShowResumen}
                                         cerrarContenendor={cerrarContenedor}
                                         setSection={props.setSection}
-                                        setNumeroContenedor={setNumeroContenedor}
+                                        setIdContenedor={setIdContenedor}
                                         loteVaciando={loteVaciando}
                                         seleccionarLote={setLoteSeleccionado} />
 

@@ -12,7 +12,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
     const anchoDevice = useContext(deviceWidth);
     const pallet = useContext(palletSeleccionadoContext);
     const numeroContenedor = useContext(contenedorSeleccionadoContext);
-    const contenedor = useContext(contenedoresContext).find(item => item.numeroContenedor === numeroContenedor);
+    const contenedor = useContext(contenedoresContext).find(item => item._id === numeroContenedor);
     const seleccion = useContext(itemSeleccionContext);
     const cajasSinPallet = useContext(cajasSinPalletContext);
     const [isTablet, setIsTablet] = useState<boolean>(false);

@@ -3,13 +3,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal, Alert } from "react-native";
 import { deviceWidth } from "../../../../../App";
 import { predioType } from "../../../../../types/predioType";
-import { contenedorSeleccionadoContext, contenedoresContext, loteSeleccionadoContext } from "../ListaDeEmpaque";
+import {  contenedoresContext, loteSeleccionadoContext } from "../ListaDeEmpaque";
 
 type propsType = {
     setSection: (e: string) => void,
-    loteVaciando: predioType | undefined
+    loteVaciando: predioType[] | undefined
     seleccionarLote: (item: predioType) => void
-    setNumeroContenedor: (data: number) => void;
+    setIdContenedor: (data: string) => void;
     cerrarContenendor: () => void
     handleShowResumen: () => void
     showResumen: boolean
@@ -19,12 +19,13 @@ export default function Header(props: propsType): React.JSX.Element {
     const anchoDevice = useContext(deviceWidth);
     const loteSeleccionado = useContext(loteSeleccionadoContext);
     const contenedores = useContext(contenedoresContext);
-    const numeroContenedor = useContext(contenedorSeleccionadoContext);
 
 
     const [isTablet, setIsTablet] = useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const [modalPrediosVisible, setModalPrediosVisible] = useState<boolean>(false);
     const [cliente, setCliente] = useState<string>('Contenedores');
+    const [lote, setLote] = useState<string>("Lote");
 
 
     useEffect(() => {
@@ -33,11 +34,9 @@ export default function Header(props: propsType): React.JSX.Element {
     const backMainMenu = (): void => {
         props.setSection("menu");
     };
-    const obtenerLoteInfo = () => {
-        if (props.loteVaciando) { props.seleccionarLote(props.loteVaciando); }
-    };
+
     const handleCerrarContenedor = () => {
-        Alert.alert('Cerrar contenedor', `¿Desea cerrar el contenedor ${numeroContenedor}?`, [
+        Alert.alert('Cerrar contenedor', `¿Desea cerrar el contenedor?`, [
             {
                 text: 'Cancelar',
                 onPress: () => console.log("cancelar"),
@@ -46,7 +45,7 @@ export default function Header(props: propsType): React.JSX.Element {
             {
                 text: 'Aceptar',
                 onPress: () => {
-                        props.cerrarContenendor();
+                    props.cerrarContenendor();
                 },
                 style: 'default',
             },
@@ -66,7 +65,7 @@ export default function Header(props: propsType): React.JSX.Element {
 
             <Button title={props.showResumen ? 'Lista Empaque' : "Resumen"} onPress={props.handleShowResumen} />
 
-            <View style={isTablet ? null : styleCel.containerPredio}>
+            {/* <View style={isTablet ? null : styleCel.containerPredio}>
                 <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Predio Vaciando:</Text>
                 <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
                     {props.loteVaciando && props.loteVaciando.enf + "-" + props.loteVaciando.nombrePredio}
@@ -82,12 +81,9 @@ export default function Header(props: propsType): React.JSX.Element {
                     }
                     style={isTablet ? stylesTablet.image : styleCel.image}
                 />
-            </View>
-            <View style={isTablet ? null : styleCel.containerPredio}>
-                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Predio Actual:</Text>
-                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>{loteSeleccionado.enf + "-" + loteSeleccionado.nombrePredio}</Text>
-            </View>
+            </View> */}
 
+            {/*
             <View>
                 <Image
                     source={
@@ -98,12 +94,31 @@ export default function Header(props: propsType): React.JSX.Element {
                     style={isTablet ? stylesTablet.image : styleCel.image}
 
                 />
-            </View>
+            </View> */}
 
             <TouchableOpacity
-                style={isTablet ? stylesTablet.buttonContenedores : styleCel.buttonContenedores}
-                onPress={obtenerLoteInfo}>
-                <Text>Obtener Lote</Text>
+                style={isTablet ? stylesTablet.buttonContenedoresPredio : styleCel.buttonContenedores}
+                onPress={() => {
+                    if (props.loteVaciando && props.loteVaciando.length !== 0) {
+                        setModalPrediosVisible(true);
+                    }
+                }}
+            >
+                    <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
+                        {lote}
+                    </Text>
+
+
+                    <Image
+                        source={
+                            loteSeleccionado.tipoFruta === 'Limon'
+                                ? require('../../../../../assets/limon.jpg')
+                                : require('../../../../../assets/naranja.jpg')
+                        }
+                        style={isTablet ? stylesTablet.image : styleCel.image}
+
+                    />
+
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -132,12 +147,50 @@ export default function Header(props: propsType): React.JSX.Element {
                                                 item.numeroContenedor + '-' + item.infoContenedor.clienteInfo.CLIENTE,
                                             );
                                         setModalVisible(false);
-                                        item.numeroContenedor ?
-                                            props.setNumeroContenedor(item.numeroContenedor) :
-                                            props.setNumeroContenedor(-1);
+                                        item._id ?
+                                            props.setIdContenedor(item._id) :
+                                            props.setIdContenedor("");
                                     }}>
                                     <Text style={isTablet ? stylesTablet.textList : null}>
                                         {item.infoContenedor && item.numeroContenedor + '-' + item.infoContenedor.clienteInfo.CLIENTE}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={item => item._id}
+                        />
+                    </View>
+                </View>
+            </Modal>
+
+
+            {/* // predios */}
+
+            <Modal transparent={true} visible={modalPrediosVisible} animationType="fade">
+                <View style={isTablet ? stylesTablet.centerModal : styleCel.centerModal}>
+                    <View style={isTablet ? stylesTablet.viewModal : styleCel.viewModal}>
+                        <FlatList
+                            data={props.loteVaciando}
+                            style={isTablet ? stylesTablet.pressableStyle : null}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        item._id &&
+                                            setLote(
+                                                item.enf + '-' + item.nombrePredio,
+                                            );
+                                        setModalPrediosVisible(false);
+                                        item._id ?
+                                            props.seleccionarLote(item) :
+                                            props.seleccionarLote({
+                                                enf: '',
+                                                nombrePredio: '',
+                                                tipoFruta: '',
+                                                _id: '',
+                                                predio: '',
+                                            });
+                                    }}>
+                                    <Text style={isTablet ? stylesTablet.textList : null}>
+                                        {item.enf && item.enf + '-' + item.nombrePredio}
                                     </Text>
                                 </TouchableOpacity>
                             )}
@@ -178,6 +231,18 @@ const stylesTablet = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    buttonContenedoresPredio: {
+        flexDirection:'row',
+        backgroundColor: 'white',
+        width: 250,
+        height: 50,
+        borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#7D9F3A',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        overflow:'hidden',
+    },
     centerModal: {
         flex: 1,
         alignItems: 'center',
@@ -207,8 +272,8 @@ const stylesTablet = StyleSheet.create({
         marginTop: 10,
         fontSize: 20,
     },
-    predioText:{
-        fontSize:10,
+    predioText: {
+        fontSize: 10,
     },
 });
 
@@ -235,13 +300,14 @@ const styleCel = StyleSheet.create({
     },
     containerPredio: {
         width: '100%',
+        flexDirection:'row',
         borderWidth: 2,
         borderRadius: 8,
         padding: 8,
         margin: 4,
         borderColor: '#7D9F3A',
     },
-    predioText:{fontSize:12},
+    predioText: { fontSize: 12 },
     buttonContenedores: {
         backgroundColor: 'white',
         width: 95,
@@ -251,7 +317,7 @@ const styleCel = StyleSheet.create({
         borderColor: '#7D9F3A',
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize:12,
+        fontSize: 12,
     },
     centerModal: {
         flex: 1,

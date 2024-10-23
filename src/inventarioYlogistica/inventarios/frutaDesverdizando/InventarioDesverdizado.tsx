@@ -13,7 +13,7 @@ export default function InventarioDesverdizado(): React.JSX.Element {
     const [filtro, setFiltro] = useState<string>('');
     const [data, setData] = useState<lotesType[]>();
     const [dataOriginal, setDataOriginal] = useState<lotesType[]>();
-    const [showTable, setShowTable] = useState<string>("table");
+    const [showTable, _] = useState<string>("table");
 
     useEffect(() => {
         const obtenerFruta = async () => {

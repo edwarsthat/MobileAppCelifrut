@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from "react";
 import { Text, View, StyleSheet, ScrollView, ActivityIndicator, Button, Alert, TextInput } from "react-native";
-import * as Keychain from "react-native-keychain";
 import { formInit, labels, sumarDatos } from "./func/functions";
 import { FormCategory, FormState, datosPredioType } from "./types/types";
 import useEnvContext from "../../../hooks/useEnvContext";
+import { getCredentials } from "../../../../utils/auth";
+import { fetchWithTimeout } from "../../../../utils/connection";
 
 export default function DescarteEncerado(): React.JSX.Element {
     const { url } = useEnvContext();
@@ -16,14 +17,7 @@ export default function DescarteEncerado(): React.JSX.Element {
         tipoFruta: "",
         nombrePredio: "",
     });
-    const fetchWithTimeout = (direccion:string, options:object, timeout = 5000):any => {
-        return Promise.race([
-            fetch(direccion, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timed out")), timeout)
-            ),
-        ]);
-    };
+
     const obtenerLote = async () => {
         try {
             setLoading(true);
@@ -65,13 +59,7 @@ export default function DescarteEncerado(): React.JSX.Element {
                 _id: datosPredio._id,
                 data: data,
             };
-            const credentials = await Keychain.getGenericPassword();
-            if(!credentials){
-                throw new Error("Error no hay token de validadcion");
-            }
-            const { password } = credentials;
-            const token = password;
-
+            const token = await getCredentials();
             const responseJSON = await fetchWithTimeout(`${url}/proceso/ingresar_descarte_encerado`, {
                 method: "PUT",
                 headers: {

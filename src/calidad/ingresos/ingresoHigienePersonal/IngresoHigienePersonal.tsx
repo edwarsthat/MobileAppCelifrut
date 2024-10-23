@@ -1,29 +1,21 @@
 /* eslint-disable prettier/prettier */
 import React from "react";
 import { Alert, StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Switch } from "react-native";
-const URL = "http://192.168.0.172:3010";
 import { Picker } from '@react-native-picker/picker';
 import { useEffect, useState } from "react";
 import formato from "./formularios/formularioCalidad0.0.1.json";
 import { formatoInit, FormatoType } from "./formularios/formulario";
 import { userType } from "../../../../types/cuentas";
 import { getCredentials } from "../../../../utils/auth";
+import useEnvContext from "../../../hooks/useEnvContext";
+import { fetchWithTimeout } from "../../../../utils/connection";
 
 export default function IngresoHigienePersonal(): React.JSX.Element {
+    const {url: URL} = useEnvContext();
     const [operarios, setOperarios] = useState<userType[]>();
     const [operario, setOperario] = useState<string>();
     const [formState, setFormState] = useState<FormatoType>(formatoInit);
     const [loading, setLoading] = useState<boolean>(false);
-
-    const fetchWithTimeout = (url: string, options: object, timeout = 5000): any => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timed out")), timeout)
-            ),
-        ]);
-    };
-
 
     useEffect(() => {
         obtenerOperarios();

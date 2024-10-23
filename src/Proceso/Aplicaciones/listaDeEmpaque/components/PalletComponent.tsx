@@ -1,20 +1,27 @@
 /* eslint-disable prettier/prettier */
-import React, { useContext } from "react";
-import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Image, Text, Alert } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type propsType = {
     pallet: number;
     handleClickPallet: (data: number) => void;
     openPalletSettings: () => void;
+    render: boolean
 };
 
 export default function PalletComponent(props: propsType): React.JSX.Element {
     const palletSeleccionado = useContext(palletSeleccionadoContext);
-    const numeroContenedor = useContext(contenedorSeleccionadoContext);
+    const idContenedor = useContext(contenedorSeleccionadoContext);
     const contenedores = useContext(contenedoresContext).find(
-        cont => cont.numeroContenedor === numeroContenedor,
+        cont => cont._id === idContenedor,
     );
+    const [cajasContadas, setCajasContadas] = useState<string>('');
+
+    useEffect(() => {
+        getCajasContadas();
+    }, [props.render]);
 
     const longPressHandle = () => {
         props.handleClickPallet(Number(props.pallet));
@@ -28,6 +35,20 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
             return alltrue;
         }
         return false;
+    };
+    const getCajasContadas = async () => {
+        try {
+            const value = await AsyncStorage.getItem(`${contenedores?._id}:${props.pallet}`);
+            if (value) {
+                setCajasContadas(value);
+            } else {
+                setCajasContadas('');
+            }
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert("Error obteniendo las cajas contadas");
+            }
+        }
     };
 
     return (
@@ -52,10 +73,19 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
                     </Text>
                 </View>
                 <View style={styles.viewTextPalletCajas}>
-                    <Text style={styles.textPalletCajas}>
-                        { contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
-                            contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0)}
-                    </Text>
+                    {cajasContadas === '' ?
+                        <Text style={styles.textPalletCajas}>
+                            {contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
+                                contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0)}
+                        </Text>
+                        :
+                        <Text style={styles.textPalletCajas}>
+                            {contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
+                                contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0)}
+                            |
+                            {contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
+                                contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0) - Number(cajasContadas)}
+                        </Text>}
                 </View>
             </TouchableOpacity>
             <Text style={styles.fonts}>
@@ -73,8 +103,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     palletsButons: {
-        width: 85,
-        height: 85,
+        width: 100,
+        height: 100,
         backgroundColor: 'white',
         margin: 5,
         borderRadius: 10,
@@ -83,8 +113,8 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
     },
     palletsButonsLiberado: {
-        width: 85,
-        height: 85,
+        width: 100,
+        height: 100,
         backgroundColor: '#FF22',
         margin: 5,
         borderRadius: 10,
@@ -96,8 +126,8 @@ const styles = StyleSheet.create({
         height: 40,
     },
     palletsPress: {
-        width: 85,
-        height: 85,
+        width: 100,
+        height: 100,
         backgroundColor: '#D53B29',
         margin: 5,
         borderRadius: 10,
@@ -114,8 +144,9 @@ const styles = StyleSheet.create({
         alignContent: 'center',
         gap: 10,
     },
-    textPallet:{ fontSize: 12,
-     },
-    viewTextPalletCajas:{ marginLeft: 25 },
-    textPalletCajas:{ fontSize: 30, fontWeight: 'bold' },
+    textPallet: {
+        fontSize: 12,
+    },
+    viewTextPalletCajas: { marginLeft: 25 },
+    textPalletCajas: { fontSize: 24, fontWeight: 'bold' },
 });

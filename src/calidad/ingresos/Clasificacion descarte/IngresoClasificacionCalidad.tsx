@@ -7,9 +7,12 @@ import { FlatList, Alert, Button, ScrollView, StyleSheet, View, ActivityIndicato
 import * as Keychain from 'react-native-keychain';
 import IngresoDatos from "./components/IngresoDatos";
 import ShowData from "./components/ShowData";
-const URL = "http://192.168.0.172:3010";
+import useEnvContext from "../../../hooks/useEnvContext";
+import { getCredentials } from "../../../../utils/auth";
+import { fetchWithTimeout } from "../../../../utils/connection";
 
 export default function IngresoClasificacionCalidad(): React.JSX.Element {
+  const {url} = useEnvContext();
   const [lotesData, setLotesData] = useState<lotesType[]>([]);
   const [lote, setLote] = useState<lotesType>();
   const [dataArray, setDataArray] = useState<elementoDefectoType[]>([]);
@@ -21,25 +24,11 @@ export default function IngresoClasificacionCalidad(): React.JSX.Element {
   useEffect(() => {
     getData();
   }, []);
-  const fetchWithTimeout = (url: string, options: object, timeout = 5000): any => {
-    return Promise.race([
-      fetch(url, options),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), timeout)
-      ),
-    ]);
-  };
   const getData = async (): Promise<void> => {
     try {
       setLoading(true);
-      const credentials = await Keychain.getGenericPassword();
-      if (!credentials) {
-        throw new Error('Error no hay token de validadcion');
-      }
-      const { password } = credentials;
-      const token = password;
-
-      const requestENF = await fetch(`${URL}/calidad/get_lotes_clasificacion_descarte`, {
+      const token = await getCredentials();
+      const requestENF = await fetch(`${url}/calidad/get_lotes_clasificacion_descarte`, {
         method: 'GET',
         headers: {
           'Authorization': `${token}`,
@@ -94,7 +83,7 @@ export default function IngresoClasificacionCalidad(): React.JSX.Element {
       }
       const { password } = credentials;
       const token = password;
-      const responseJSON = await fetchWithTimeout(`${URL}/calidad/put_lotes_clasificacion_descarte`, {
+      const responseJSON = await fetchWithTimeout(`${url}/calidad/put_lotes_clasificacion_descarte`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

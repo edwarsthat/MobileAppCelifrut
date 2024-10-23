@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import { ScrollView, Text, TextInput, View, StyleSheet, Button, Alert, ActivityIndicator } from "react-native";
 import { formInit, labels, sumarDatos } from "./func/functions";
 import { FormCategory, FormState, datosPredioType } from "./types/types";
-import * as Keychain from "react-native-keychain";
 import useEnvContext from "../../../hooks/useEnvContext";
+import { getCredentials } from "../../../../utils/auth";
 
 export default function DescarteLavado(): React.JSX.Element {
     const { url } = useEnvContext();
@@ -16,7 +16,7 @@ export default function DescarteLavado(): React.JSX.Element {
         tipoFruta: "",
         nombrePredio: "",
     });
-    const fetchWithTimeout = (direccion:string, options:object, timeout = 5000):any => {
+    const fetchWithTimeout = (direccion: string, options: object, timeout = 5000): any => {
         return Promise.race([
             fetch(direccion, options),
             new Promise((_, reject) =>
@@ -46,15 +46,15 @@ export default function DescarteLavado(): React.JSX.Element {
     };
     const handleChange = (name: keyof FormState, value: number, type: keyof FormCategory): void => {
         setFormState((prevState) => ({
-          ...prevState,
-          [name]: {
-            ...prevState[name],
-            [type]: value,
-          },
+            ...prevState,
+            [name]: {
+                ...prevState[name],
+                [type]: value,
+            },
         }));
     };
-    const guardarDatos = async ():Promise<any> => {
-        try{
+    const guardarDatos = async (): Promise<any> => {
+        try {
             if (datosPredio.enf === "") {
                 throw new Error("Recargue el predio que se está vaciando");
             }
@@ -65,17 +65,12 @@ export default function DescarteLavado(): React.JSX.Element {
                 _id: datosPredio._id,
                 data: data,
             };
-            const credentials = await Keychain.getGenericPassword();
-            if(!credentials){
-                throw new Error("Error no hay token de validadcion");
-            }
-            const { password } = credentials;
-            const token = password;
+            const token = await getCredentials();
             const responseJSON = await fetchWithTimeout(`${url}/proceso/ingresar_descarte_lavado`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization":`${token}`,
+                    "Authorization": `${token}`,
                 },
                 body: JSON.stringify(request),
             });
@@ -84,8 +79,8 @@ export default function DescarteLavado(): React.JSX.Element {
                 throw new Error(`Error guardando los datos ${response.message}`);
             }
             Alert.alert("Guardado con exito");
-        } catch(err){
-            if(err instanceof Error){
+        } catch (err) {
+            if (err instanceof Error) {
                 Alert.alert(`${err.name}: ${err.message}`);
             }
         } finally {
@@ -115,25 +110,25 @@ export default function DescarteLavado(): React.JSX.Element {
                         title="Cargar predio"
                         onPress={obtenerLote}
                     />
-                    {Object.keys(labels).map(item  => (
+                    {Object.keys(labels).map(item => (
                         <View style={styles.containerForm} key={item}>
                             <Text style={styles.textInputs}>{labels[item as keyof typeof labels]}</Text>
                             <TextInput
                                 style={styles.inputs}
                                 placeholder="N. de canastillas"
                                 inputMode="numeric"
-                                onChangeText={(value):void => handleChange(item as keyof FormState, Number(value), "canastillas")}
+                                onChangeText={(value): void => handleChange(item as keyof FormState, Number(value), "canastillas")}
                             />
                             <TextInput
                                 style={styles.inputs}
                                 placeholder="Kilos"
                                 inputMode="numeric"
-                                onChangeText={(value):void => handleChange(item as keyof FormState, Number(value), "kilos")}
+                                onChangeText={(value): void => handleChange(item as keyof FormState, Number(value), "kilos")}
                             />
                         </View>
                     ))}
                     <View style={styles.viewBotones}>
-                        <Button title="Guardar" color="#49659E" onPress={guardarDatos}/>
+                        <Button title="Guardar" color="#49659E" onPress={guardarDatos} />
                     </View>
                 </View>) : (
                 <ActivityIndicator size="large" color="#00ff00" style={styles.loader} />

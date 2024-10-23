@@ -50,31 +50,31 @@ export const validarResta = (contenedor: contenedoresType, cajas: number, selecc
 };
 export const validarMoverItem = (
     cajasModal: number,
-    seleccion:number[],
+    seleccion: number[],
     pallet: number,
-    numeroContenedor: number,
-    contenedorID: number,
+    idContendor: string,
+    contenedorID: string,
     entradaModalPallet: string,
     contenedor: contenedoresType,
-    contenedor2: contenedoresType | number
+    contenedor2: contenedoresType | string
 ) => {
-    if (numeroContenedor === -1) { throw new Error('Seleccione un contenedor'); }
-    if (contenedorID !== -1) {
-      if (entradaModalPallet === '') { throw new Error('Ingrese el pallet al que desea mover las cajas'); }
+    if (idContendor === "") { throw new Error('Seleccione un contenedor'); }
+    if (contenedorID !== "") {
+        if (entradaModalPallet === '') { throw new Error('Ingrese el pallet al que desea mover las cajas'); }
     }
-    if(typeof contenedor2 === "object"){
+    if (typeof contenedor2 === "object") {
         if (
             contenedor2 &&
             contenedor2.pallets &&
-          Number(entradaModalPallet) > contenedor2.pallets.length
+            Number(entradaModalPallet) > contenedor2.pallets.length
         ) {
-          throw new Error('Error en el pallet');
+            throw new Error('Error en el pallet');
         }
     }
-    if(seleccion.length === 1 && pallet !== -1){
+    if (seleccion.length === 1 && pallet !== -1) {
         const validarNcajas =
             contenedor.pallets[pallet].EF1[seleccion[0]].cajas >= cajasModal;
-        if(!validarNcajas){
+        if (!validarNcajas) {
             throw new Error("Error en el numero de cajas que desea pasar");
         }
     }

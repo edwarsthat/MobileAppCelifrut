@@ -6,7 +6,7 @@ export const socketRequest = async (socket: Socket, request:any):Promise<{status
     return await new Promise((resolve, reject) => {
         socket.emit("Mobile", request, (serverResponse: any) => {
             if (serverResponse.status !== 200) {
-                reject(new Error(`Error obteniendo predio: ${serverResponse.message}`));
+                reject(new Error(`${serverResponse.message}`));
             }
             resolve(serverResponse);
         });

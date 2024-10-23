@@ -14,26 +14,26 @@ let socket: Socket;
 
 
 export default function OrdenVaceo(): React.JSX.Element {
-    const { url } = useEnvContext();
+    const { url, socketURL } = useEnvContext();
     const [lotes, setLotes] = useState<lotesType[]>();
     const [ordenVaceo, setOrdenVaceo] = useState<string[]>([]);
-    const [lotesOriginal, setLotesOriginal] = useState<lotesType[]>([]);
+    const [_, setLotesOriginal] = useState<lotesType[]>([]);
     const [lotesOrdenVaceo, setLotesOrdenVaceo] = useState<lotesType[]>([]);
     const [showInventario, setrShowInventario] = useState<boolean>(false);
-    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+    const [_1, setDraggedIndex] = useState<number | null>(null);
 
     useEffect(() => {
         const crear_conexion_de_eventos = async () => {
             try {
                 const token = await getCredentials();
-                socket = io(`ws://192.168.0.172:3011/`, {
+                socket = io(`${socketURL}:3011/`, {
                     auth: {
                         token: token,
                     },
                     rejectUnauthorized: false,
                 });
                 socket.on('connect', () => {
-                    console.log("Conectado a ws://192.168.0.172:3011/");
+                    console.log(`Conectado a ${socketURL}:3011/`);
                 });
                 socket.on('connect_error', (error) => {
                     Alert.alert(`Error en la conexion del socket: ${error}`);
@@ -96,7 +96,7 @@ export default function OrdenVaceo(): React.JSX.Element {
                 socket.disconnect();
             }
         };
-    }, [url]);
+    }, []);
     const handleChangeOrdenVaceo = async (index: number, newIndex: number) => {
         if (lotes !== undefined) {
             // console.log(index);

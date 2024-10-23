@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Text, View, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
-const URL = 'http://192.168.0.172:3010';
 import * as Keychain from 'react-native-keychain';
+import useEnvContext from '../../../hooks/useEnvContext';
 
 export default function HistorialDescarteEnceradoProceso(): React.JSX.Element {
+    const {url: URL} = useEnvContext();
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState();
     const [itemSeleccionado, setItemSeleccionado] = useState('');

@@ -5,13 +5,17 @@ import { envContext } from "../../App";
 
 
 type EnvContextType = {
-    url: string
+    url: string,
+    socketURL: string
 }
 
 export default function useEnvContext(): EnvContextType {
-    const env = useContext(envContext);
-    if (!env) {
+    const {url, socketURL} = useContext(envContext);
+    if (!url) {
         throw new Error("Error en env context");
     }
-    return env;
+    if (!socketURL) {
+        throw new Error("Error en env context");
+    }
+    return {url, socketURL};
 }

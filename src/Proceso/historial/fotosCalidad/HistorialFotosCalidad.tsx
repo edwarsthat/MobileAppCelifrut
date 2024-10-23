@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Keychain from 'react-native-keychain';
-const URL = 'http://192.168.0.172:3010';
+import useEnvContext from "../../../hooks/useEnvContext";
 
 
 export default function HistorialFotosCalidad(): React.JSX.Element {
+    const { url:URL } = useEnvContext();
     const [loading, setLoading] = useState(false);
     const [loading2, setLoading2] = useState(false);
     const [data, setData] = useState();

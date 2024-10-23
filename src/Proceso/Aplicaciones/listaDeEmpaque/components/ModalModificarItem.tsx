@@ -10,32 +10,40 @@ type propsType = {
     modificarItems: (item:any) => void
 }
 export default function ModalModificarItem(props: propsType): React.JSX.Element {
-    const numeroContenedor = useContext(contenedorSeleccionadoContext);
-    const contenedor: contenedoresType | undefined = useContext(contenedoresContext,).find(item => item.numeroContenedor === numeroContenedor);
+    const idContenedor = useContext(contenedorSeleccionadoContext);
+    const contenedor: contenedoresType | undefined = useContext(contenedoresContext,)
+        .find(item => item._id === idContenedor);
 
     const [modalCalidad, setModalCalidad] = useState<boolean>(false);
     const [modalCalibre, setModalCalibre] = useState<boolean>(false);
+    const [modalTipoCaja, setModalTipoCaja] = useState<boolean>(false);
 
     const [calidad, setCalidad] = useState<string>('Calidad');
     const [calibre, setCalibre] = useState<string>('Calibre');
+    const [tipoCaja, setTipoCaja] = useState<string>('Tipo de caja');
     const handleCalidad = () => {
         setModalCalidad(true);
     };
     const handleCalibre = () => {
         setModalCalibre(true);
     };
+    const handleTipoCaja = () => {
+        setModalTipoCaja(true);
+    };
     const handleModificar = () => {
-        if(calibre === 'Calibre' || calidad === 'Calidad'){
+        if(calibre === 'Calibre' || calidad === 'Calidad' || tipoCaja === 'Tipo de caja'){
             return Alert.alert("Error, seleccione el calibre y la calidad");
         }
         const data = {
             calidad:calidad,
             calibre:calibre,
+            tipoCaja: tipoCaja,
         };
         props.modificarItems(data);
         props.setOpenModalEditar(false);
         setCalibre('Calibre');
         setCalidad('Calidad');
+        setTipoCaja('Tipo de caja');
     };
     return (
         <>
@@ -57,6 +65,11 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
                                 onPress={handleCalibre}
                                 style={styles.buttonContenedores}>
                                 <Text>{calibre}</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={handleTipoCaja}
+                                style={styles.buttonContenedores}>
+                                <Text>{tipoCaja}</Text>
                             </TouchableOpacity>
 
                         </View>
@@ -113,6 +126,29 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
                     </View>
                 </View>
             </Modal>
+            {/* opciones tipo de caja */}
+            <Modal transparent={true} visible={modalTipoCaja} animationType="fade">
+                <View style={styles.centerModal}>
+                    <View style={styles.viewModalItem}>
+                        <FlatList
+                            data={contenedor?.infoContenedor.tipoCaja}
+                            style={styles.pressableStyle}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity style={styles.buttonContenedores}
+                                    onPress={() => {
+                                        setModalTipoCaja(false);
+                                        setTipoCaja(item);
+                                    }}>
+                                    <Text style={styles.textList}>
+                                        {item}
+                                    </Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={item => item}
+                        />
+                    </View>
+                </View>
+            </Modal>
         </>
     );
 }
@@ -129,7 +165,7 @@ const styles = StyleSheet.create({
     },
     viewModalItem: {
         width: 500,
-        height: 300,
+        height: 350,
         backgroundColor: 'white',
         borderRadius: 20,
         elevation: 30,

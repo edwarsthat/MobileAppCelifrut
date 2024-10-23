@@ -7,6 +7,7 @@ import { contenedoresType } from "../../../../../types/contenedoresType";
 import { itemType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
 import ModalModificarItem from "./ModalModificarItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type propsType = {
   agregarItem: (item: itemType) => void;
@@ -22,16 +23,17 @@ export default function Footer(props: propsType): React.JSX.Element {
   const loteActual = useContext(loteSeleccionadoContext);
   const seleccion = useContext(itemSeleccionContext);
   const pallet = useContext(palletSeleccionadoContext);
-  const numeroContenedor = useContext(contenedorSeleccionadoContext);
+  const idContenedor = useContext(contenedorSeleccionadoContext);
   const contenedores = useContext(contenedoresContext);
-  const contenedor: contenedoresType | undefined = useContext(contenedoresContext,).find(item => item.numeroContenedor === numeroContenedor);
+  const contenedor: contenedoresType | undefined = useContext(contenedoresContext)
+    .find(item => item._id === idContenedor);
 
-  const [contenedorID, setContenedorID] = useState<number>(-1);
+  const [contenedorID, setContenedorID] = useState<string>("");
   const [entradaModalPallet, setEntradaModalPallet] = useState<string>('');
   const [entradaModalCajas, setEntradaModalCajas] = useState<string>('');
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [cliente, setCliente] = useState<string>('Sin Pallet');
+  const [cliente, setCliente] = useState<string>('Contenedores');
   const [isTablet, setIsTablet] = useState<boolean>(false);
   const [showCajasInput, setShowcajasInput] = useState<boolean>(true);
   const [openModalEditar, setOpenModalEditar] = useState<boolean>(false);
@@ -41,10 +43,20 @@ export default function Footer(props: propsType): React.JSX.Element {
   useEffect(() => {
     setIsTablet(anchoDevice >= 721);
   }, [anchoDevice]);
-  const clickActualizar = () => {
+  const clickActualizar = async () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
-      const cajasActual = validarActualizarPallet(cajas, loteActual, pallet, contenedor);
+
+      const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
+      let cajas_input;
+
+      if(value){
+        cajas_input = cajas + Number(value);
+      } else {
+        cajas_input = cajas;
+      }
+
+      const cajasActual = validarActualizarPallet(cajas_input, loteActual, pallet, contenedor);
 
       const item = {
         lote: loteActual._id,
@@ -113,7 +125,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
   const clickRestar = () => {
     try {
-      if (!contenedor) { throw new Error("contenedor undefinide"); }
+      if (!contenedor) { throw new Error("Seleccione contenedor"); }
       validarResta(contenedor, cajas, seleccion, pallet);
       props.restarItem(cajas);
       setCajas(0);
@@ -139,18 +151,17 @@ export default function Footer(props: propsType): React.JSX.Element {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
       let contenedor2;
-      const index = contenedores.findIndex(item => item.numeroContenedor === contenedorID);
+      const index = contenedores.findIndex(item => item._id === contenedorID);
       if(index === -1){
-        contenedor2 = -1;
+        contenedor2 = "";
       } else {
         contenedor2 = contenedores[index];
       }
-      console.log(pallet)
       validarMoverItem(
         Number(entradaModalCajas),
         seleccion,
         pallet,
-        numeroContenedor,
+        idContenedor,
         contenedorID,
         entradaModalPallet,
         contenedor,
@@ -254,16 +265,6 @@ export default function Footer(props: propsType): React.JSX.Element {
       <Modal transparent={true} visible={modalVisible} animationType="fade">
         <View style={styles.centerModal}>
           <View style={showCajasInput ? styles.viewModalItem : styles.viewModalItems}>
-            <TouchableOpacity
-              onPress={() => {
-                setCliente('Sin pallet');
-                setContenedorID(-1);
-                setModalVisible(false);
-              }}>
-              <Text style={styles.textList}>
-                Sin pallet
-              </Text>
-            </TouchableOpacity>
             <FlatList
               data={contenedores}
               style={styles.pressableStyle}
@@ -273,7 +274,7 @@ export default function Footer(props: propsType): React.JSX.Element {
                     setCliente(
                       item.numeroContenedor + '-' + item.infoContenedor.clienteInfo.CLIENTE,
                     );
-                    setContenedorID(item.numeroContenedor);
+                    setContenedorID(item._id);
                     setModalVisible(false);
                   }}>
                   <Text style={styles.textList}>

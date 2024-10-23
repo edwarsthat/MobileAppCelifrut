@@ -57,7 +57,6 @@ export default function Login(props: propsType): React.JSX.Element {
                 }),
             });
             const response = await responseJSON.json();
-            console.log(response);
 
             if (response.status === 401) {
                 setError(401);

@@ -5,8 +5,8 @@ import { Camera, useCameraDevice, useCameraFormat } from 'react-native-vision-ca
 import { AppState } from 'react-native';
 import { lotesType } from "../../../../../types/lotesType";
 import RNFS from 'react-native-fs';
-import * as Keychain from "react-native-keychain";
 import useEnvContext from "../../../../hooks/useEnvContext";
+import { getCredentials } from "../../../../../utils/auth";
 
 type propsType = {
     lote: lotesType | null
@@ -64,13 +64,7 @@ export default function Camara(props: propsType): React.JSX.Element {
                 throw new Error('Ingrese una descripcion de la foto');
             }
             setModalVisible(true);
-            const credentials = await Keychain.getGenericPassword();
-            if (!credentials) {
-                throw new Error("Error no hay token de validadcion");
-            }
-            const { password } = credentials;
-            const token = password;
-
+            const token = await getCredentials();
             //leer
             const data = await RNFS.readFile(`file://'${imageSource}`, 'base64');
             const request = {

@@ -1,23 +1,18 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from "react";
 import { Text, ScrollView, StyleSheet, Alert, Button, View, ActivityIndicator, TextInput } from "react-native";
-import * as Keychain from "react-native-keychain";
 import { CustomError } from "../../../../Error/Error";
 import { formInit, labelForm } from "./function/reduce";
 import { FormInitType } from "./types/types";
-const URL = "http://192.168.0.172:3010";
+import useEnvContext from "../../../hooks/useEnvContext";
+import { getCredentials } from "../../../../utils/auth";
+import { fetchWithTimeout } from "../../../../utils/connection";
 
 export default function PrecioLimon(): React.JSX.Element {
+    const { url } = useEnvContext();
     const [loading, setLoading] = useState<boolean>(false);
     const [formState, setFormState] = useState(formInit);
-    const fetchWithTimeout = (url:string, options:object, timeout = 5000):any => {
-        return Promise.race([
-            fetch(url, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timed out")), timeout)
-            ),
-        ]);
-    };
+
     const handleChange = (name: keyof FormInitType, value: number): void => {
         setFormState((prevState) => ({
             ...prevState,
@@ -27,13 +22,8 @@ export default function PrecioLimon(): React.JSX.Element {
     const handleGuardar = async () =>{
         setLoading(true);
         try{
-            const credentials = await Keychain.getGenericPassword();
-            if(!credentials){
-                throw new Error("Error no hay token de validadcion");
-            }
-            const { password } = credentials;
-            const token = password;
-            const responseJSON = await fetchWithTimeout(`${URL}/comercial/ingresar_precio_fruta`, {
+            const token = await getCredentials();
+            const responseJSON = await fetchWithTimeout(`${url}/comercial/ingresar_precio_fruta`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

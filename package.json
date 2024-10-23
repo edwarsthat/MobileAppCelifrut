@@ -1,6 +1,6 @@
 {
   "name": "MobileAppCelifrut",
-  "version": "0.0.15",
+  "version": "0.1.6",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -12,6 +12,7 @@
     "android-release": "node ./script/syncVersion.js && cd android && gradlew assembleRelease"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-picker/picker": "^2.7.7",
     "react": "18.2.0",
     "react-native": "0.74.2",
