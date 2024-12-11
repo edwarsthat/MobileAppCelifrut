@@ -22,7 +22,6 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import Login from './src/login/Login';
-import Footer from './src/components/Footer';
 import PantallaDeCarga from './src/components/PantallaDeCarga';
 import Menu from './src/menu/Menu';
 import Header from './src/components/Header';
@@ -143,8 +142,6 @@ function App(): React.JSX.Element {
               </View>
           }
 
-          {section !== '66b6705a77549ed0672a9026' && section !== '66b6707777549ed0672a9029' ?
-            <Footer /> : null}
 
         </SafeAreaView>
       </deviceWidth.Provider>

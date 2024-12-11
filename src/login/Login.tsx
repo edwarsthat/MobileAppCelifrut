@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View, Text, TextInput, Dimensions, Button, Alert, NativeModules, ActivityIndicator } from 'react-native';
 import * as Keychain from 'react-native-keychain';
@@ -119,25 +118,39 @@ export default function Login(props: propsType): React.JSX.Element {
         }
     };
     return <View style={styles.container}>
-        <Image style={styles.imgStyle} source={require('../../assets/CELIFRUT.webp')} />
+        <Image style={styles.imgStyle} source={require('../../assets/logo_app.png')} />
         {isDownload ?
             <ActivityIndicator size="large" color="#00ff00" style={styles.loader} />
             :
             <>
-                <View>
-                    <Text style={styles.textStyle}>Usuario</Text>
-                    <TextInput style={styles.inputStyle} onChangeText={handleUser} />
-                    <Text style={styles.errorStyle}>{error === 401 && 'Error en el usuario'}</Text>
-                    <Text style={styles.textStyle}>Contraseña</Text>
+                <View style={styles.container}>
+                    <Text style={styles.title}>Iniciar Sesión</Text>
+
                     <TextInput
-                        onChangeText={setPassword}
-                        style={styles.inputStyle}
-                        textContentType="password"
-                        secureTextEntry={true}
+                        style={styles.input}
+                        placeholder="Usuario"
+                        value={user}
+                        onChangeText={handleUser}
                     />
-                    <Text style={styles.errorStyle}>{error === 402 && 'Error en la contraseña'}</Text>
+                    <Text style={styles.errorText}>
+                        {error === 401 ? "Usuario incorrecto" : ""}
+                    </Text>
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Contraseña"
+                        secureTextEntry
+                        value={password}
+                        onChangeText={(val) => {
+                            setPassword(val);
+                        }}
+                    />
+                    <Text style={styles.errorText}>
+                        {error === 402 ? "Contraseña incorrecta" : ""}
+                    </Text>
+
+                    <Button title="Ingresar" onPress={handlelogin} />
                 </View>
-                <Button title="Iniciar" color="#7D9F3A" onPress={handlelogin} />
             </>
         }
 
@@ -145,51 +158,48 @@ export default function Login(props: propsType): React.JSX.Element {
 }
 
 const windowHeight = Dimensions.get('window').height;
+const { width, height } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: windowHeight,
-        marginBottom: 150,
+        alignItems: "center",
+        padding: 16,
+        backgroundColor: "#f5f5f5",
     },
     imgStyle: {
         width: 150,
         height: 150,
+        marginBottom: 20,
+        resizeMode: "contain",
     },
-    textStyle: {
-        fontSize: 20,
-        marginTop: 10,
+    formContainer: {
+        width: "100%",
+        paddingHorizontal: 16,
     },
-    errorStyle: {
-        color: 'red',
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
+        marginBottom: 20,
+        textAlign: "center",
     },
-    inputStyle: {
-        borderWidth: 2,
-        borderColor: 'skyblue',
-        width: 250,
-        paddingTop: 5,
-        margin: 10,
-        borderRadius: 10,
-        paddingLeft: 8,
-        alignItems: 'center',
-        backgroundColor: 'white',
-    },
-    containerFooter: {
-        bottom: 0,
-        backgroundColor: '#7D9F3A',
-        height: 80,
-        width: '100%',
-        justifyContent: 'center',
-        alignContent: 'center',
-    },
-    imageFooter: {
-        width: 60,
-        height: 60,
+    input: {
+        borderWidth: 1,
+        borderColor: "#ccc",
+        padding: 8,
+        marginBottom: 12,
+        borderRadius: 5,
+        backgroundColor: "#fff",
+        width: width * 0.8
+
     },
     loader: {
-        flex:1,
+        marginTop: 20,
     },
+    errorText: {
+        color: "red",
+        marginBottom: 8,
+        textAlign: "center",
+        fontWeight: "bold",
+    }
 });

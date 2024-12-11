@@ -41,7 +41,7 @@ export default function Menu(props: propsType): React.JSX.Element {
         );
     }
     return <View style={styles.container}>
-        <ScrollView style={styles.scrollContainer}>
+        <ScrollView style={styles.scrollContent}>
             {Object.keys(props.permisos).map((area) => {
                 if (!['_id', 'Rol', 'Cargo', 'createdAt', '__v'].includes(area)) {
                     const validArea = area as ValidAreaKeys;
@@ -98,10 +98,11 @@ export default function Menu(props: propsType): React.JSX.Element {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: 'auto',
+        backgroundColor: '#f4f4f8', // Fondo claro para el menú
+        padding: 16,
     },
-    scrollContainer: {
-        width: '100%',
+    scrollContent: {
+        alignItems: 'center',
     },
     areaButtonsStyle: {
         justifyContent: 'center',

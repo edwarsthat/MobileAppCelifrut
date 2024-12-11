@@ -1,45 +1,59 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable eol-last */
 import React from 'react';
-import { Button, Image, StyleSheet, View } from 'react-native';
+import { TouchableOpacity, Image, StyleSheet, View, Text } from 'react-native';
+const logoImage = require('../../assets/logo_app.png');
 
 type propsType = {
-    seleccionWindow: (e:string) => void
+    seleccionWindow: (e: string) => void
 }
 
-export default function Header(props:propsType) {
+export default function Header(props: propsType) {
 
     return (
-        <View style={styles.container}>
-            <View style={styles.buttons}>
-                <Button title="inicio" onPress={():void => props.seleccionWindow('menu')}/>
-            </View>
-            <Image source={require('../../assets/CELIFRUT.webp')} style={styles.image} />
-            <View style={styles.buttons}></View>
+        <View style={styles.headerContainer}>
+            {/* Botón de menú */}
+            <TouchableOpacity style={styles.menuButton} onPress={():void => props.seleccionWindow('menu')}>
+                <Text style={styles.menuText}>☰</Text>
+            </TouchableOpacity>
+
+            {/* Imagen o logo */}
+            <Image source={logoImage} style={styles.logo} />
+
+            {/* Espacio vacío para balancear el diseño */}
+            <View style={styles.placeholder} />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
+    headerContainer: {
         flexDirection: 'row',
-        width: '100%',
-        backgroundColor: 'white',
-        top: 0,
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: 90,
-
-    },
-    image: {
-        top: 0,
-        width: 60,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        width: '100%', // Ocupa todo el ancho disponible
         height: 60,
+        backgroundColor: '#fff', // Fondo blanco para resaltar
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0, 0, 0, 0.1)',
     },
-    buttons: {
-        height: '100%',
-        marginTop: 60,
-        marginRight: '20%',
-        flex: 0.5,
+    menuButton: {
+        padding: 8,
+    },
+    menuText: {
+        fontSize: 24,
+    },
+    logo: {
+        width: 120,
+        height: 40,
+        resizeMode: 'contain',
+    },
+    placeholder: {
+        width: 32,
     },
 });
