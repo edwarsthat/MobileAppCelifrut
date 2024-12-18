@@ -1,37 +1,29 @@
-/* eslint-disable prettier/prettier */
-import React, { useState, Fragment } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
 import { CargoType } from '../../types/cargosType';
+import { Animated, Text, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 type propsType = {
     permisos: CargoType | undefined
     seleccionWindow: (e: string) => void
 }
-type ValidAreaKeys = Exclude<keyof CargoType, '_id' | 'Rol' | 'Cargo' | 'createdAt'>;
 
 export default function Menu(props: propsType): React.JSX.Element {
+    const inventario = useRef(new Animated.Value(1)).current;
+    const calidad = useRef(new Animated.Value(1)).current;
+    const sistema = useRef(new Animated.Value(1)).current;
+    const proceso = useRef(new Animated.Value(1)).current;
 
-    const [areaSelect, setAreaSelect] = useState<string[]>([]);
-    const [elementSelect, setElementSelect] = useState<string[]>([]);
+    const [permisos, setPermisos] = useState<string[]>();
 
 
-    const handleClickArea = (index: string): void => {
-        if (areaSelect.includes(index)) {
-            const indexToRemove = areaSelect.findIndex(item => item === index);
-            setAreaSelect(prevState => prevState.filter((_, indexArr) => indexArr !== indexToRemove));
-        } else {
-            setAreaSelect(prevState => [...prevState, index]);
+    useEffect(() => {
+        if (props.permisos) {
+            const perm = Object.keys(props.permisos);
+            setPermisos(perm);
         }
-    };
-
-    const handleClickElement = (index: string): void => {
-        if (elementSelect.includes(index)) {
-            const indexToRemove = elementSelect.findIndex(item => item === index);
-            setElementSelect(prevState => prevState.filter((_, indexArr) => indexArr !== indexToRemove));
-        } else {
-            setElementSelect(prevState => [...prevState, index]);
-        }
-    };
+    }, [props.permisos]);
 
     if (props.permisos === undefined) {
         return (
@@ -40,107 +32,153 @@ export default function Menu(props: propsType): React.JSX.Element {
             </View>
         );
     }
-    return <View style={styles.container}>
-        <ScrollView style={styles.scrollContent}>
-            {Object.keys(props.permisos).map((area) => {
-                if (!['_id', 'Rol', 'Cargo', 'createdAt', '__v'].includes(area)) {
-                    const validArea = area as ValidAreaKeys;
-                    return (
-                        <View key={area}>
-                            <TouchableOpacity style={styles.areaButtonsStyle} onPress={(): void => handleClickArea(area)} >
-                                <Text style={styles.textAreaButtonStyle}>{area}</Text>
-                            </TouchableOpacity>
-                            {areaSelect.includes(area) ?
-                                <View>
-                                    {props.permisos && (Object.entries(props.permisos[validArea])).map(([itemElemento, ventana]) => (
-                                        <Fragment key={itemElemento}>
-                                            <View>
-                                                <TouchableOpacity onPress={(): void => handleClickElement(itemElemento)} style={styles.elementoButtonStyle}>
-                                                    <Text>{itemElemento}</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                            {elementSelect.includes(itemElemento) ?
-                                                <View>
-                                                    {Object.entries(ventana).map(([permisoKey, permisoValue]) => {
-                                                        return (
-                                                            <Fragment key={permisoKey + permisoValue}>
-                                                                <View style={styles.itemViwStyle}>
-                                                                    <TouchableOpacity
-                                                                        onPress={(): void => props.seleccionWindow(permisoValue._id)}
-                                                                        style={styles.itemButtonStyle}>
-                                                                        <Text style={styles.itemTextStyle}>
-                                                                            {permisoKey}
-                                                                        </Text>
-                                                                    </TouchableOpacity>
-                                                                </View>
-                                                            </Fragment>
-                                                        );
 
-                                                    })}
-                                                </View>
-                                                :
-                                                null
-                                            }
-                                        </Fragment>
+    const handlePressIn = (scale: Animated.Value) => {
+        Animated.spring(scale, {
+            toValue: 0.9, // Reducir el tamaño al presionar
+            useNativeDriver: true,
+        }).start();
+    };
 
-                                    ))}
-                                </View>
-                                : null
-                            }
-                        </View>
-                    );
-                } else { return null; }
-            })}
-        </ScrollView>
-    </View>;
+    const handlePressOut = (scale: Animated.Value) => {
+        Animated.spring(scale, {
+            toValue: 1, // Restaurar el tamaño original
+            useNativeDriver: true,
+        }).start();
+    };
+    return (
+        <View style={styles.container}>
+            {permisos?.includes('Inventario y Logística') && (
+                <TouchableWithoutFeedback
+                    onPress={() => props.seleccionWindow("Inventario y Logística")}
+                    onPressIn={() => handlePressIn(inventario)}
+                    onPressOut={() => handlePressOut(inventario)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: inventario }] }]}>
+                        <Icon name="dropbox" size={24} color="#fff" />
+                        <Text style={styles.text}>Inventario y Logística</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+            )}
+
+            {permisos?.includes('Calidad') && (
+                <TouchableWithoutFeedback
+                    onPressIn={() => handlePressIn(calidad)}
+                    onPressOut={() => handlePressOut(calidad)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: calidad }] }]}>
+                        <Icon name="flask" size={24} color="#fff" />
+                        <Text style={styles.text}>Calidad</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+            )}
+
+            {permisos?.includes('Sistema') && (
+                <TouchableWithoutFeedback
+                    onPressIn={() => handlePressIn(sistema)}
+                    onPressOut={() => handlePressOut(sistema)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: sistema }] }]}>
+                        <Icon name="cog" size={24} color="#fff" />
+                        <Text style={styles.text}>Sistema</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+            )}
+
+            {permisos?.includes('Proceso') && (
+                <TouchableWithoutFeedback
+                    onPress={() => props.seleccionWindow("Proceso")}
+                    onPressIn={() => handlePressIn(proceso)}
+                    onPressOut={() => handlePressOut(proceso)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: proceso }] }]}>
+                        <Icon name="play-circle-o" size={24} color="#fff" />
+                        <Text style={styles.text}>Proceso</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+
+            )}
+
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f4f4f8', // Fondo claro para el menú
-        padding: 16,
+        flex: 1, // Hace que el contenedor ocupe todo el espacio disponible
+        alignItems: 'center', // Centra horizontalmente
+        backgroundColor: '#f5f5f5', // Fondo opcional para visualizar el centrado
+        width: '100%',
     },
-    scrollContent: {
+    button: {
+        flexDirection: 'row',
         alignItems: 'center',
-    },
-    areaButtonsStyle: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 250,
-        height: 50,
-        borderRadius: 10,
-        marginTop: 15,
         backgroundColor: '#7D9F3A',
+        gap: 9,
+        padding: 15,
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 3,
+        elevation: 5,
+        width: '95%',
+        marginTop: 10,
     },
-    textAreaButtonStyle: {
-        color: 'white',
+    text: {
+        color: '#fff',
+        fontSize: 16,
         fontWeight: 'bold',
-        fontSize: 18,
-    },
-    elementoButtonStyle: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 250,
-        height: 30,
-        borderRadius: 10,
-        marginTop: 8,
-        backgroundColor: '#E6E6EB',
-    },
-    itemViwStyle: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    itemButtonStyle: {
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 200,
-        height: 50,
-        borderRadius: 10,
-        marginTop: 8,
-        backgroundColor: '#5B89EB',
-    },
-    itemTextStyle: {
-        color: 'white',
     },
 });
+// const styles = StyleSheet.create({
+//     container: {
+//         flex: 1,
+//         backgroundColor: '#f4f4f8', // Fondo claro para el menú
+//         padding: 16,
+//         width: '100%',
+//         justifyContent: 'center',
+//     },
+//     container2:{
+//         alignItems:'center',
+//     },
+//     areaButtonsStyle: {
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         width: 250,
+//         height: 50,
+//         borderRadius: 10,
+//         marginTop: 15,
+//         backgroundColor: '#7D9F3A',
+//     },
+//     textAreaButtonStyle: {
+//         color: 'white',
+//         fontWeight: 'bold',
+//         fontSize: 18,
+//     },
+//     elementoButtonStyle: {
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         width: 250,
+//         height: 30,
+//         borderRadius: 10,
+//         marginTop: 8,
+//         backgroundColor: '#E6E6EB',
+//     },
+//     itemViwStyle: {
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//     },
+//     itemButtonStyle: {
+//         justifyContent: 'center',
+//         alignItems: 'center',
+//         width: 200,
+//         height: 50,
+//         borderRadius: 10,
+//         marginTop: 8,
+//         backgroundColor: '#5B89EB',
+//     },
+//     itemTextStyle: {
+//         color: 'white',
+//     },
+// });

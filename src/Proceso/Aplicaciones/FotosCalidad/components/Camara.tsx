@@ -1,18 +1,20 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Modal, Alert, ActivityIndicator, TouchableOpacity, Image, TextInput } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, Image, TextInput } from "react-native";
 import { Camera, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 import { AppState } from 'react-native';
-import { lotesType } from "../../../../../types/lotesType";
 import RNFS from 'react-native-fs';
 import useEnvContext from "../../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../../utils/auth";
+import { lotesType } from "../../../../../types/lotesType";
+import { useAppContext } from "../../../../hooks/useAppContext";
 
 type propsType = {
-    lote: lotesType | null
+    lote: lotesType | undefined
 }
-export default function Camara(props: propsType): React.JSX.Element {
-    const {url} = useEnvContext();
+
+export default function Camara(props:propsType): React.JSX.Element {
+    const { url } = useEnvContext();
+    const { setLoading } = useAppContext();
     const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
     const appState = useRef(AppState.currentState);
@@ -21,7 +23,6 @@ export default function Camara(props: propsType): React.JSX.Element {
     ]);
     const [, setAppStateVisible] = useState(appState.current);
     const [key, setKey] = useState(Math.random());
-    const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [showCamera, setShowCamera] = useState<boolean>(true);
     const [imageSource, setImageSource] = useState<string>('');
     const [nomnbreFoto, setNombreFoto] = useState<string>('');
@@ -63,13 +64,13 @@ export default function Camara(props: propsType): React.JSX.Element {
             if (nomnbreFoto === '') {
                 throw new Error('Ingrese una descripcion de la foto');
             }
-            setModalVisible(true);
+            setLoading(true);
             const token = await getCredentials();
             //leer
             const data = await RNFS.readFile(`file://'${imageSource}`, 'base64');
             const request = {
                 action: 'ingresar_foto_calidad',
-                _id: props.lote._id,
+                // _id: props.lote._id,
                 fotoName: nomnbreFoto,
                 foto: data,
             };
@@ -92,7 +93,7 @@ export default function Camara(props: propsType): React.JSX.Element {
                 Alert.alert(`${err.name}: ${err.message}`);
             }
         } finally {
-            setModalVisible(false);
+            setLoading(false);
         }
     };
 
@@ -102,30 +103,20 @@ export default function Camara(props: propsType): React.JSX.Element {
 
     return (
         <View style={styles.container}>
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <ActivityIndicator size="large" color="#00ff00" />
-                    </View>
-                </View>
-            </Modal>
             {showCamera ? (
                 <>
-                    <Camera
-                        key={key}
-                        style={StyleSheet.absoluteFill}
-                        device={device}
-                        isActive={showCamera}
-                        ref={camera}
-                        photo={true}
-                        format={format}
-                        photoQualityBalance="speed"
-                        enableDepthData
-                    />
+                        <Camera
+                            key={key}
+                            style={StyleSheet.absoluteFill}
+                            device={device}
+                            isActive={showCamera}
+                            ref={camera}
+                            photo={true}
+                            format={format}
+                            photoQualityBalance="speed"
+                            pointerEvents="none"
+                            enableDepthData
+                        />
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.camButton} onPress={capturarFoto} />
@@ -177,6 +168,8 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         paddingBottom: 50,
         height: '100%',
+        elevation: 0,
+        zIndex:0,
     },
     backButton: {
         backgroundColor: 'rgba(0,0,0,0.0)',

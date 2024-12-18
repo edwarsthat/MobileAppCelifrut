@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
 import { View, SafeAreaView, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
 import { validarActualizarPallet, validarEliminar, validarMoverItem, validarResta, validarSumarDato } from "../controller/valiadations";
@@ -14,8 +13,7 @@ type propsType = {
   eliminarItem: () => void;
   restarItem: (item: any) => void;
   moverItem: (item: any) => void;
-  eliminarItemCajasSinPallet: () => void;
-  modificarItems: (e:any) => void;
+  modificarItems: (e: any) => void;
 };
 
 export default function Footer(props: propsType): React.JSX.Element {
@@ -50,7 +48,7 @@ export default function Footer(props: propsType): React.JSX.Element {
       const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
       let cajas_input;
 
-      if(value){
+      if (value) {
         cajas_input = cajas + Number(value);
       } else {
         cajas_input = cajas;
@@ -108,11 +106,7 @@ export default function Footer(props: propsType): React.JSX.Element {
         {
           text: 'Aceptar',
           onPress: () => {
-            if (pallet === -1) {
-              props.eliminarItemCajasSinPallet();
-            } else {
-              props.eliminarItem();
-            }
+            props.eliminarItem();
           },
           style: 'default',
         },
@@ -142,7 +136,7 @@ export default function Footer(props: propsType): React.JSX.Element {
     setOpenModal(true);
   };
   const ClickOpenEditar = () => {
-    if(seleccion.length <= 0){
+    if (seleccion.length <= 0) {
       return Alert.alert("Seleccione los items que desea modificar");
     }
     setOpenModalEditar(true);
@@ -152,7 +146,7 @@ export default function Footer(props: propsType): React.JSX.Element {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
       let contenedor2;
       const index = contenedores.findIndex(item => item._id === contenedorID);
-      if(index === -1){
+      if (index === -1) {
         contenedor2 = "";
       } else {
         contenedor2 = contenedores[index];
@@ -187,28 +181,28 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
 
   return (
-    <SafeAreaView style={isTablet ? styles.container : stylesCel.container}>
-      <View style={isTablet ? null : stylesCel.viewButtonHide}>
+    <SafeAreaView style={[styles.baseContainer, isTablet ? styles.containerTablet : styles.containerMobile]}>
+      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
         <Button title="Actualizar" onPress={clickActualizar} />
       </View>
       <View style={styles.viewTextInput}>
         <TextInput
           keyboardType="numeric"
-          style={isTablet ? styles.textInput : stylesCel.textInput}
+          style={[styles.textInputBase, isTablet ? styles.textInputTablet : styles.textInputMobile]}
           value={String(cajas)}
           onChange={e => setCajas(Number(e.nativeEvent.text))} />
       </View>
       <View>
         <Button title="Sumar" onPress={clickSumar} />
       </View>
-      <View style={isTablet ? null : stylesCel.viewButtonHide}>
+      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
         <Button title="Restar" onPress={clickRestar} />
       </View>
-      <View style={isTablet ? null : stylesCel.viewButtonHide}>
+      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
         <Button title="Mover" onPress={ClickOpenMoverCajas} />
       </View>
-      <View style={isTablet ? null : stylesCel.viewButtonHide}>
-        <Button title="Editar" onPress={ClickOpenEditar}/>
+      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
+        <Button title="Editar" onPress={ClickOpenEditar} />
       </View>
       <View>
         <Button title="Eliminar" onPress={clickEliminar} />
@@ -288,49 +282,70 @@ export default function Footer(props: propsType): React.JSX.Element {
         </View>
       </Modal>
 
-              <ModalModificarItem
-                modificarItems={props.modificarItems}
-                setOpenModalEditar={setOpenModalEditar}
-                openModalEditar={openModalEditar} />
+      <ModalModificarItem
+        modificarItems={props.modificarItems}
+        setOpenModalEditar={setOpenModalEditar}
+        openModalEditar={openModalEditar} />
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
-  container: {
+  // Estilos base
+  baseContainer: {
     backgroundColor: '#8B9E39',
-    height: 'auto',
-    display: 'flex',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+
+  // Estilos para tablet
+  containerTablet: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 40,
+    paddingHorizontal: 40,
   },
-  buttons: {
-    backgroundColor: '#390D52',
-    width: 120,
-    height: 60,
-    borderRadius: 15,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+
+  // Estilos para móvil
+  containerMobile: {
+    flexDirection: 'column',
   },
-  text: {
-    color: 'white',
+
+  buttonContainer: {
+    marginVertical: 5,
+    marginHorizontal: 10,
   },
-  textInput: {
-    width: 150,
-    height: 50,
+
+  hidden: {
+    display: 'none',
+  },
+
+  viewTextInput: {
+    marginVertical: 10,
+  },
+
+  textInputBase: {
     backgroundColor: 'white',
     borderRadius: 12,
+    paddingHorizontal: 10,
+    textAlign: 'center',
   },
-  viewTextInput: {
-    display: 'flex',
+
+  textInputTablet: {
+    width: 150,
+    height: 50,
   },
+
+  textInputMobile: {
+    width: 120,
+    height: 40,
+  },
+
   centerModal: {
-    display: 'flex',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: '10%',
   },
+
   viewModalItem: {
     width: 500,
     height: 450,
@@ -338,10 +353,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     elevation: 30,
     shadowColor: 'black',
-    padding: 10,
-    justifyContent: 'center',
+    padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
   },
+
   viewModalItems: {
     width: 500,
     height: 350,
@@ -349,37 +365,43 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     elevation: 30,
     shadowColor: 'black',
-    padding: 10,
+    padding: 20,
+    alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  modalHeader: {
+    marginBottom: 10,
     alignItems: 'center',
   },
-  modalHeader: {
-    padding: 10,
-  },
+
   textModalHeader: {
     fontSize: 18,
     fontWeight: '500',
+    textAlign: 'center',
   },
+
   modalInputView: {
-    margin: 10,
-    paddingRight: 10,
-    paddingLeft: 10,
+    marginVertical: 10,
   },
+
   modalInput: {
     width: 350,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: '#7D9F3A',
     backgroundColor: '#F5F5F5',
+    height: 40,
+    paddingHorizontal: 10,
   },
+
   viewButtonsModal: {
-    display: 'flex',
     flexDirection: 'row',
-    gap: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
+    width: '100%',
     marginTop: 30,
   },
+
   buttonContenedores: {
     width: 350,
     borderWidth: 1,
@@ -387,132 +409,21 @@ const styles = StyleSheet.create({
     borderColor: '#7D9F3A',
     backgroundColor: '#F5F5F5',
     height: 50,
-    marginHorizontal: 25,
     justifyContent: 'center',
     alignItems: 'center',
+    marginVertical: 10,
   },
+
   pressableStyle: {
     marginTop: 10,
     marginBottom: 10,
   },
+
   textList: {
     color: 'black',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 10,
     fontSize: 20,
+    marginVertical: 10,
+    textAlign: 'center',
   },
 });
 
-const stylesCel = StyleSheet.create({
-  container: {
-    backgroundColor: '#8B9E39',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    padding: 10,
-    gap: 10,
-    width: '100%',
-  },
-  buttons: {
-    backgroundColor: '#390D52',
-    width: 120,
-    height: 60,
-    borderRadius: 15,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewButtonHide: { display: 'none' },
-  text: {
-    color: 'white',
-  },
-  textInput: {
-    width: 150,
-    height: 30,
-    backgroundColor: 'white',
-    borderRadius: 12,
-    fontSize: 10,
-    padding: 0,
-  },
-  viewTextInput: {
-    display: 'flex',
-  },
-  centerModal: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '10%',
-  },
-  viewModalItem: {
-    width: 500,
-    height: 450,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    elevation: 30,
-    shadowColor: 'black',
-    padding: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  viewModalItems: {
-    width: 500,
-    height: 350,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    elevation: 30,
-    shadowColor: 'black',
-    padding: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalHeader: {
-    padding: 10,
-  },
-  textModalHeader: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  modalInputView: {
-    margin: 10,
-    paddingRight: 10,
-    paddingLeft: 10,
-  },
-  modalInput: {
-    width: 350,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: '#7D9F3A',
-    backgroundColor: '#F5F5F5',
-  },
-  viewButtonsModal: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 30,
-  },
-  buttonContenedores: {
-    width: 350,
-    borderWidth: 1,
-    borderRadius: 10,
-    borderColor: '#7D9F3A',
-    backgroundColor: '#F5F5F5',
-    height: 50,
-    marginHorizontal: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  pressableStyle: {
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  textList: {
-    color: 'black',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 10,
-    fontSize: 20,
-  },
-});

@@ -1,19 +1,15 @@
-/* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext } from "../ListaDeEmpaque";
 import PalletComponent from "./PalletComponent";
 import { contenedoresType } from "../../../../../types/contenedoresType";
-// import CajasSinPalletComponent from "./CajasSinPalletComponent";
 import SettingsPallets from "./SettingsPallets";
-import { itemType, settingsType } from "../types/types";
-// import CajasSinPalletSetings from "./CajasSinPalletSetings";
+import { settingsType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
 
 type propsType = {
     setPalletSeleccionado: (data: number) => void;
     guardarPalletSettings: (settings: settingsType) => Promise<void>;
-    agregarItemCajasSinPallet: (data: itemType) => void
     liberarPallet: (item: any) => void
     setSeleccion: (e: number[]) => void
 };
@@ -23,8 +19,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
     const contenedores = useContext(contenedoresContext);
     const idContenedor = useContext(contenedorSeleccionadoContext);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    // const [openModalSinPallet, setOpenModalSinPallet] = useState<boolean>(false);
-    const [isTablet, setIsTablet] = useState<boolean>(false);
+    // const [isTablet, setIsTablet] = useState<boolean>(false);
     const [data, setData] = useState<number[]>([]);
     const [columnas, setColumnas] = useState<number>(1);
     const [render, setRender] = useState<boolean>(false);
@@ -47,9 +42,9 @@ export default function Pallets(props: propsType): React.JSX.Element {
             },
         });
     useEffect(() => {
-        setIsTablet(anchoDevice >= 721);
+        // setIsTablet(anchoDevice >= 721);
         if (anchoDevice >= 721) {
-            setColumnas(8);
+            setColumnas(6);
         }
         const item = contenedores.find(cont => cont._id === idContenedor);
 
@@ -71,9 +66,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
     };
     return (
         <View style={styles.view1}>
-            <View style={isTablet ? idContenedor === "" ? styles.container2 : styles.container
-                : idContenedor === "" ? stylesCel.container2 : stylesCel.container
-            }>
+            <View style={styles.container}>
 
                 <FlatList
                     key={columnas}
@@ -88,20 +81,14 @@ export default function Pallets(props: propsType): React.JSX.Element {
                     )}
                     numColumns={columnas}
                 />
-                {/* <CajasSinPalletComponent
-                    setPalletSeleccionado={props.setPalletSeleccionado}
-                    setOpenModalSinPallet={setOpenModalSinPallet}
-                /> */}
+
                 <SettingsPallets
                     liberarPallet={props.liberarPallet}
                     guardarPalletSettings={props.guardarPalletSettings}
                     closeModal={closeModal}
                     openModal={openModal} />
 
-                {/* <CajasSinPalletSetings
-                    agregarItemCajasSinPallet={props.agregarItemCajasSinPallet}
-                    openModalSinPallet={openModalSinPallet}
-                    setOpenModalSinPallet={setOpenModalSinPallet} /> */}
+
             </View>
         </View>
 
@@ -117,23 +104,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
 
         width: "100%",
-        margin: 30,
+        margin: 5,
         minHeight: 155,
 
     },
-    container2: { minHeight: 525, width: '100%' },
 });
 
-const stylesCel = StyleSheet.create({
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        width: 100,
-        flexWrap: 'wrap',
-        margin: 30,
-        minHeight: 155,
-    },
-    container2: { minHeight: 525, width: 90 },
 
-});
 

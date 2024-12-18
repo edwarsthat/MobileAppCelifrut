@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useContext, useState } from "react";
 import { Modal,Button, FlatList, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { contenedoresContext, contenedorSeleccionadoContext } from "../ListaDeEmpaque";

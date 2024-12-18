@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Image, Text, Alert } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
@@ -54,39 +53,52 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
     return (
         <View style={styles.palletContainer}>
             <TouchableOpacity
-                style={
+                style={[
+                    styles.palletButtonBase,
                     Number(props.pallet) === palletSeleccionado
-                        ? styles.palletsPress
-                        : (palletFree() ? styles.palletsButonsLiberado : styles.palletsButons)
-                }
+                        ? styles.palletSelected
+                        : (palletFree() ? styles.palletLiberado : styles.palletNormal),
+                ]}
                 onPress={() => props.handleClickPallet(Number(props.pallet))}
-                onLongPress={longPressHandle}>
-                <View
-                    style={styles.viwImagen}>
+                onLongPress={longPressHandle}
+            >
+                <View style={styles.headerRow}>
                     <Image
                         source={require('../../../../../assets/palletIMG.webp')}
                         style={styles.image}
                     />
-                    <Text style={styles.textPallet}>
-                        {contenedores?.pallets && contenedores?.pallets[props.pallet] &&
-                            contenedores?.pallets[props.pallet].settings.calibre}
+                    <Text style={styles.textCalibre}>
+                        {contenedores?.pallets?.[props.pallet]?.settings?.calibre ?? ''}
                     </Text>
                 </View>
-                <View style={styles.viewTextPalletCajas}>
-                    {cajasContadas === '' ?
-                        <Text style={styles.textPalletCajas}>
-                            {contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
-                                contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0)}
-                        </Text>
-                        :
-                        <Text style={styles.textPalletCajas}>
-                            {contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
-                                contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0)}
-                            |
-                            {contenedores?.pallets && contenedores?.pallets[props.pallet] && contenedores.pallets[props.pallet].EF1 &&
-                                contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0) - Number(cajasContadas)}
-                        </Text>}
+
+                <View style={styles.infoContainer}>
+                    {/* Cajas totales */}
+                    <Text style={styles.textPalletCajas}>
+                        {contenedores?.pallets?.[props.pallet]?.EF1
+                            ? contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0)
+                            : 0
+                        }
+                        {cajasContadas !== '' && (
+                            <>
+                                {" | "}
+                                {contenedores?.pallets?.[props.pallet]?.EF1
+                                    ? contenedores.pallets[props.pallet].EF1.reduce((acu, item) => acu + item.cajas, 0) - Number(cajasContadas)
+                                    : 0
+                                }
+                            </>
+                        )}
+                    </Text>
+
+                    {/* tipoCaja y calidad */}
+                    <Text style={styles.textDetalle}>
+                        Tipo Caja: {contenedores?.pallets?.[props.pallet]?.settings?.tipoCaja ?? 'N/A'}
+                    </Text>
+                    <Text style={styles.textDetalle}>
+                        Calidad: {contenedores?.pallets?.[props.pallet]?.settings?.calidad ?? 'N/A'}
+                    </Text>
                 </View>
+
             </TouchableOpacity>
             <Text style={styles.fonts}>
                 Pallet {props.pallet === -1 ? 'sin pallet' : props.pallet + 1}
@@ -101,52 +113,60 @@ const styles = StyleSheet.create({
     palletContainer: {
         display: 'flex',
         alignItems: 'center',
+        margin: 8,
     },
-    palletsButons: {
-        width: 100,
-        height: 100,
+    palletButtonBase: {
+        width: 110,
+        height: 120,
+        margin: 5,
+        borderRadius: 10,
+        elevation: 5,
+        shadowColor: '#52006A',
+        padding: 8,
+        justifyContent: 'center',
+    },
+    palletNormal: {
         backgroundColor: 'white',
-        margin: 5,
-        borderRadius: 10,
-        elevation: 20,
-        shadowColor: '#52006A',
-        overflow: 'hidden',
     },
-    palletsButonsLiberado: {
-        width: 100,
-        height: 100,
-        backgroundColor: '#FF22',
-        margin: 5,
-        borderRadius: 10,
-        elevation: 20,
-        shadowColor: '#52006A',
+    palletLiberado: {
+        backgroundColor: '#158433', // Un color suave que indique liberado
+    },
+    palletSelected: {
+        backgroundColor: '#D53B29', // Color rojo para indicar seleccionado
+    },
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
     },
     image: {
         width: 40,
         height: 40,
+        marginRight: 10,
+        resizeMode: 'contain',
     },
-    palletsPress: {
-        width: 100,
-        height: 100,
-        backgroundColor: '#D53B29',
-        margin: 5,
-        borderRadius: 10,
-        elevation: 20,
-        shadowColor: '#52006A',
+    textCalibre: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#333',
+    },
+    infoContainer: {
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+    },
+    textPalletCajas: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 5,
+    },
+    textDetalle: {
+        fontSize: 12,
+        color: '#555',
     },
     fonts: {
         color: 'white',
         fontSize: 12,
+        marginTop: 4,
     },
-    viwImagen: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignContent: 'center',
-        gap: 10,
-    },
-    textPallet: {
-        fontSize: 12,
-    },
-    viewTextPalletCajas: { marginLeft: 25 },
-    textPalletCajas: { fontSize: 24, fontWeight: 'bold' },
 });

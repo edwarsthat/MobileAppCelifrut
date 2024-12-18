@@ -1,6 +1,5 @@
-/* eslint-disable prettier/prettier */
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, View, Modal } from "react-native";
+import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
 import { Socket, io } from "socket.io-client";
 import Header from "./components/Header";
 import { predioType, ResponseItem } from "../../../../types/predioType";
@@ -15,6 +14,7 @@ import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAppContext } from "../../../hooks/useAppContext";
 
 let socket: Socket;
 
@@ -57,6 +57,7 @@ export const itemSeleccionContext = createContext<number[]>([]);
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const { socketURL } = useEnvContext();
+    const { setLoading } = useAppContext();
     const anchoDevice = useContext(deviceWidth);
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
     const [contenedoresProvider, setContenedoresProvider] = useState<contenedoresType[]>([]);
@@ -69,10 +70,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         predio: '',
     });
     const [idContenedor, setIdContenedor] = useState<string>("");
-    const [cajasSinPallet, setCajasSinPallet] = useState([]);
     const [seleccion, setSeleccion] = useState<number[]>([]);
 
-    const [loading, setLoading] = useState(true);
     const [isTablet, setIsTablet] = useState<boolean>(false);
 
     const [showResumen, setShowResumen] = useState<boolean>(false);
@@ -312,53 +311,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const agregarItemCajasSinPallet = async (item: itemType) => {
-        try {
-            setLoading(true);
-            const token = await obtenerAccessToken();
-            const request = {
-                data: {
-                    action: 'agregar_cajas_sin_pallet',
-                    item: item,
-                },
-                token: token,
-            };
-            const response = await socketRequest(socket, request);
-            setCajasSinPallet(response.data);
-            Alert.alert("Guardado con exito");
-            // console.log(response);
-        } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(err.message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-    const eliminarItemCajasSinPallet = async () => {
-        try {
-            setLoading(true);
-            const token = await obtenerAccessToken();
-            const request = {
-                data: {
-                    action: 'eliminar_item_cajas_sin_pallet',
-                    seleccion: seleccion,
-                },
-                token: token,
-            };
-            const response = await socketRequest(socket, request);
-            setCajasSinPallet(response.data);
-            Alert.alert("Eliminado con exito");
-            // console.log(response);
-        } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(err.message);
-            }
-        } finally {
-            setSeleccion([]);
-            setLoading(false);
-        }
-    };
     const liberarPallet = async (item: any) => {
         try {
             setLoading(true);
@@ -453,9 +405,9 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                     <palletSeleccionadoContext.Provider value={palletSeleccionado}>
                         <itemSeleccionContext.Provider value={seleccion}>
 
-                            <cajasSinPalletContext.Provider value={cajasSinPallet}>
                                 <SafeAreaView style={styles.container}>
                                     <Header
+                                        setPalletSeleccionado={setPalletSeleccionado}
                                         showResumen={showResumen}
                                         handleShowResumen={handleShowResumen}
                                         cerrarContenendor={cerrarContenedor}
@@ -474,7 +426,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                             <Pallets
                                                 setSeleccion={setSeleccion}
                                                 liberarPallet={liberarPallet}
-                                                agregarItemCajasSinPallet={agregarItemCajasSinPallet}
                                                 guardarPalletSettings={guardarPalletSettings}
                                                 setPalletSeleccionado={setPalletSeleccionado} />
 
@@ -485,25 +436,12 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                                     }
                                     <Footer
                                         modificarItems={modificarItems}
-                                        eliminarItemCajasSinPallet={eliminarItemCajasSinPallet}
                                         moverItem={moverItem}
                                         restarItem={restarItem}
                                         eliminarItem={eliminarItem}
                                         agregarItem={agregarItem} />
                                 </SafeAreaView>
-                                <Modal
-                                    animationType="slide"
-                                    transparent={true}
-                                    visible={loading}>
-                                    <View style={styles.centerModal}>
-                                        <View style={styles.viewModal}>
-                                            <View>
-                                                <ActivityIndicator size="large" color="#00ff00" />
-                                            </View>
-                                        </View>
-                                    </View>
-                                </Modal>
-                            </cajasSinPalletContext.Provider>
+
                         </itemSeleccionContext.Provider>
                     </palletSeleccionadoContext.Provider>
                 </contenedorSeleccionadoContext.Provider>

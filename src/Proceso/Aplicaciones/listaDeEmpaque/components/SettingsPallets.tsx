@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
 import { View, ScrollView, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert, TextInput } from "react-native";
 import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
@@ -235,9 +234,10 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'flex-start',
         marginTop: '10%',
+        width:'100%',
     },
     modalInput: {
-        width: 150,
+        width: 100,
         borderWidth: 1,
         borderRadius: 10,
         borderColor: '#7D9F3A',
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     viewModal: {
         display: 'flex',
         backgroundColor: 'white',
-        width: 1150,
+        width: '90%',
         flexDirection: 'row',
         borderRadius: 20,
         alignItems: 'flex-start',
@@ -259,8 +259,9 @@ const styles = StyleSheet.create({
     },
     modal: {
         display: 'flex',
+        flexWrap:'wrap',
         flexDirection: 'column',
-        width: 400,
+        width: 300,
         padding: 20,
         borderRightColor: '#999999',
         borderRightWidth: 1,

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 
 import { useContext } from "react";
 import { envContext } from "../../App";

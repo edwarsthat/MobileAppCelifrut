@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Socket } from 'socket.io-client';
 import * as Keychain from "react-native-keychain";
 

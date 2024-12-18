@@ -6,7 +6,7 @@
  * @format
  */
 
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, Dispatch, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -15,6 +15,8 @@ import {
   View,
   Dimensions,
   Text,
+  Alert,
+  BackHandler,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
@@ -22,7 +24,6 @@ import {
   Colors,
 } from 'react-native/Libraries/NewAppScreen';
 import Login from './src/login/Login';
-import PantallaDeCarga from './src/components/PantallaDeCarga';
 import Menu from './src/menu/Menu';
 import Header from './src/components/Header';
 import DescarteLavado from './src/Proceso/Aplicaciones/descarteLavado/DescarteLavado';
@@ -42,6 +43,10 @@ import InventarioFrutaSinProcesar from './src/inventarioYlogistica/inventarios/f
 import InventarioDesverdizado from './src/inventarioYlogistica/inventarios/frutaDesverdizando/InventarioDesverdizado';
 import OrdenVaceo from './src/inventarioYlogistica/inventarios/ordenVaceo/OrdenVaceo';
 import IngresarFormularioCalidad from './src/calidad/formularios/ingresarFormulariosCalidad/IngresarFormularioCalidad';
+import InventarioyLogistica from './src/menu/InventarioyLogistica';
+import Proceso from './src/menu/Proceso';
+import LoadingModal from './src/UI/LoadingModal';
+import { lotesType } from './types/lotesType';
 
 type envContexttype = {
   url: string,
@@ -54,11 +59,13 @@ export const envContext = createContext<envContexttype>({
 });
 
 // export const envContext = createContext<envContexttype>({
-//   url: "http://192.168.0.172:3010",
-//   socketURL: "ws://192.168.0.172",
+//   url: "http://192.168.0.18:3010",
+//   socketURL: "ws://192.168.0.18",
 // });
 
 export const deviceWidth = createContext<number>(0);
+export const stackContext = createContext<string[]>([]);
+export const loadingContext = createContext<Dispatch<React.SetStateAction<boolean>> | undefined>(undefined);
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -68,83 +75,124 @@ function App(): React.JSX.Element {
   const [section, setSection] = useState<string>('menu');
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
   const [version, setVersion] = useState<string>('');
-  const env = {url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com"};
-  // const env = {url: "http://192.168.0.172:3010", socketURL:"ws://192.168.0.172"};
+  const [stack, setStack] = useState<string[]>(['menu']);
+
+  //estado lote seleccionado para las diferentes aplicaciones
+  const [lote, setLote] = useState<lotesType>();
+
+  const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
+  // const env = { url: "http://192.168.0.18:3010", socketURL: "ws://192.168.0.18" };
+
+  useEffect(() => {
+    const handleBackPress = (): boolean | any => {
+      if (stack?.length === 1) {
+        Alert.alert('Cerrar sesion', '¿Quieres cerrar sesion?', [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Cerrar', onPress: () => closeSesion() },
+        ]);
+        return true;
+      } else if (stack?.length > 0) {
+        const newStack = stack.slice(0, -1);
+        const nStacks = newStack.length;
+
+        setStack([...newStack]);
+        setSection(newStack[nStacks - 1]);
+        return true;
+      }
+    };
+
+    BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+    return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+  }, [stack]);
+
   useEffect(() => {
     const { width } = Dimensions.get('window');
     setAnchoDevice(width);
     setVersion(DeviceInfo.getVersion());
   }, []);
-  const showLoading = (): void => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-  };
+
+
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
     flex: 1,
   };
   const seleccionWindow = (data: string): void => {
+    setStack(prev => [...prev, data]);
     setSection(data);
   };
   const obtenerPermisos = (cargo: CargoType): void => {
     setPermisos(cargo);
   };
+  const closeSesion = (): void => {
+    setIslogin(false);
+    setPermisos(undefined);
+  };
+
   return (
     <envContext.Provider value={env}>
-      <deviceWidth.Provider value={anchoDevice}>
-        <SafeAreaView style={styles.container}>
-          <StatusBar
-            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-            backgroundColor={backgroundStyle.backgroundColor}
-          />
-          {loading ? <PantallaDeCarga />
-            :
-            !isLogin ?
-              <>
-                <Text>V-{version}</Text>
-                <Login
-                  obtenerPermisos={obtenerPermisos}
-                  showLoading={showLoading}
-                  setIslogin={setIslogin} />
-              </>
-              :
-              <View style={styles.container}>
-                {section !== '66b6707777549ed0672a9029' ? <Header seleccionWindow={seleccionWindow} /> : null}
-                {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
+      <stackContext.Provider value={stack} >
+        <deviceWidth.Provider value={anchoDevice}>
+          <loadingContext.Provider value={setLoading} >
+            <SafeAreaView style={styles.container}>
+              <StatusBar
+                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+                backgroundColor={backgroundStyle.backgroundColor}
+              />
+              {
+                !isLogin ?
+                  <>
+                    <Text>V-{version}</Text>
+                    <Login
+                      obtenerPermisos={obtenerPermisos}
+                      setIslogin={setIslogin} />
+                  </>
+                  :
+                  <View style={styles.container}>
+                    {(section !== '66b6707777549ed0672a9029'  )
+                      ? <Header
+                          seleccionWindow={seleccionWindow}
+                          setLote={setLote}
+                          section={section} />
+                        : null}
+                    {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === 'Proceso' && <Proceso permisos={permisos} seleccionWindow={seleccionWindow} />}
 
-                {/* Calidad */}
-                {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
-                {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
-                {section === "66f8228c2d9d7eec9ff11d51" && <IngresarFormularioCalidad />}
+                    {/* Calidad */}
+                    {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
+                    {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
+                    {section === "66f8228c2d9d7eec9ff11d51" && <IngresarFormularioCalidad />}
 
-                {/* Aplicaciones */}
-                {section === '66b6705a77549ed0672a9026' && <FotosCalidad />}
-                {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
-                {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
-                {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
+                    {/* Aplicaciones */}
+                    {section === '66b6705a77549ed0672a9026' && <FotosCalidad lote={lote} />}
+                    {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
+                    {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
+                    {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
 
-                {/* Historiales aplicaciones */}
-                {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
-                {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
-                {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
+                    {/* Historiales aplicaciones */}
+                    {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
+                    {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
+                    {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
 
-                {/* comercial */}
-                {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
-                {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
+                    {/* comercial */}
+                    {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
+                    {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
 
-                {/* inventario y logistica */}
-                {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
-                {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
-                {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
-                {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}
-              </View>
-          }
+                    {/* inventario y logistica */}
+                    {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
+                    {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
+                    {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
+                    {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}
 
+                  </View>
+              }
+              <LoadingModal visible={loading} />
 
-        </SafeAreaView>
-      </deviceWidth.Provider>
+            </SafeAreaView>
+          </loadingContext.Provider>
+        </deviceWidth.Provider>
+      </stackContext.Provider>
     </envContext.Provider>
   );
 }
@@ -154,6 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
+    justifyContent:'center',
     width: '100%',
   },
 });

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions, Switch } from "react-native";
 import HorizontalLine from "../../../../components/HorizontalLine";
@@ -18,10 +17,10 @@ export default function ResumenListaEmpaque(): React.JSX.Element {
     const toggleSwitch = () => setSoloHoy(previousState => !previousState);
     useEffect(() => {
         let cont;
-        if (numeroContenedor === undefined || numeroContenedor === -1) {
+        if (numeroContenedor === undefined || numeroContenedor === "") {
             cont = contenedores;
         } else {
-            const contenedor = contenedores?.find(c => c.numeroContenedor === numeroContenedor);
+            const contenedor = contenedores?.find(c => c._id === numeroContenedor);
             cont = [contenedor];
         }
         const resumen = obtenerResumen(cont, soloHoy);
@@ -76,10 +75,12 @@ export default function ResumenListaEmpaque(): React.JSX.Element {
 
                         <View>
                             {cajasCalidad && Object.entries(cajasCalidad).map(([key, value]) => (
-                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} cajas // </Text>
+                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} cajas  </Text>
                             ))}
+                            <HorizontalLine />
+
                             {kilosCalidad && Object.entries(kilosCalidad).map(([key, value]) => (
-                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} Kg //</Text>
+                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} Kg </Text>
                             ))}
                         </View>
                     </View>
@@ -89,10 +90,12 @@ export default function ResumenListaEmpaque(): React.JSX.Element {
 
                         <View>
                             {cajasCalibre && Object.entries(cajasCalibre).map(([key, value]) => (
-                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} cajas //</Text>
+                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} cajas </Text>
                             ))}
+                            <HorizontalLine />
+
                             {kilosCalibre && Object.entries(kilosCalibre).map(([key, value]) => (
-                                <Text key={key}> Calidad {key + " ➜"} {value.toLocaleString('es-CO')} Kg //</Text>
+                                <Text key={key}> Calidad {key + " ➜"} {value.toLocaleString('es-CO')} Kg </Text>
                             ))}
                         </View>
                     </View>
@@ -108,42 +111,69 @@ const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
     container1: {
         flex: 1,
-        width: "100%",
-        height: windowHeight - 250, // Use the actual device height
+        width: '100%',
+        height: windowHeight,
         justifyContent: 'center',
-        alignItems: 'center', // Changed from alignContent to alignItems
+        alignItems: 'center',
+        backgroundColor: '#F2F2F2', // Leve tono gris para destacar el contenedor blanco
     },
     container2: {
         backgroundColor: 'white',
-        width: "90%",
-        height: "90%",
+        width: '90%',
+        height: '90%',
         borderRadius: 18,
         padding: 15,
+        justifyContent: 'flex-start',
     },
     header: {
-        display: 'flex',
-        justifyContent: 'space-between',
         flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10,
     },
     titulo: {
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: 'bold',
+        color: '#333',
     },
     containerSoloHoy: {
-        display: 'flex',
-        flexDirection: 'column',
-        width: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    labelSoloHoy: {
+        fontSize: 14,
+        marginBottom: 4,
+        color: '#333',
+        fontWeight: '500',
     },
     containerResumenes: {
-        display: 'flex',
         flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 15,
+        flexWrap: 'wrap',
         gap: 12,
     },
     containerItem: {
-        width: 'auto',
-        borderStyle: "solid",
+        flexGrow: 1,
+        minWidth: '28%', // Ajusta el ancho mínimo para que quepan 3 items en una fila (si el espacio lo permite)
         borderWidth: 1,
-        padding: 18,
+        borderColor: '#CCC',
         borderRadius: 15,
+        padding: 15,
+        backgroundColor: '#FAFAFA',
+    },
+    subtitulo: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 5,
+        color: '#444',
+    },
+    dataContainer: {
+        marginTop: 10,
+    },
+    dataText: {
+        fontSize: 14,
+        color: '#555',
+        marginBottom: 4,
     },
 });

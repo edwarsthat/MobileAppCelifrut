@@ -1,9 +1,8 @@
-/* eslint-disable prettier/prettier */
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal, Alert } from "react-native";
-import { deviceWidth } from "../../../../../App";
+// import { deviceWidth } from "../../../../../App";
 import { predioType } from "../../../../../types/predioType";
-import {  contenedoresContext, loteSeleccionadoContext } from "../ListaDeEmpaque";
+import { contenedoresContext, loteSeleccionadoContext } from "../ListaDeEmpaque";
 
 type propsType = {
     setSection: (e: string) => void,
@@ -12,25 +11,26 @@ type propsType = {
     setIdContenedor: (data: string) => void;
     cerrarContenendor: () => void
     handleShowResumen: () => void
-    showResumen: boolean
+    showResumen: boolean,
+    setPalletSeleccionado: (e:number) => void
 }
 
 export default function Header(props: propsType): React.JSX.Element {
-    const anchoDevice = useContext(deviceWidth);
+    // const anchoDevice = useContext(deviceWidth);
     const loteSeleccionado = useContext(loteSeleccionadoContext);
     const contenedores = useContext(contenedoresContext);
 
 
-    const [isTablet, setIsTablet] = useState<boolean>(false);
+    // const [isTablet, setIsTablet] = useState<boolean>(false);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalPrediosVisible, setModalPrediosVisible] = useState<boolean>(false);
     const [cliente, setCliente] = useState<string>('Contenedores');
     const [lote, setLote] = useState<string>("Lote");
 
 
-    useEffect(() => {
-        setIsTablet(anchoDevice >= 721);
-    }, [anchoDevice]);
+    // useEffect(() => {
+    //     setIsTablet(anchoDevice >= 721);
+    // }, [anchoDevice]);
     const backMainMenu = (): void => {
         props.setSection("menu");
     };
@@ -52,59 +52,35 @@ export default function Header(props: propsType): React.JSX.Element {
         ]);
     };
     return (
-        <SafeAreaView style={isTablet ? stylesTablet.container : styleCel.container}>
+        <SafeAreaView style={styles.container}>
             <TouchableOpacity onPress={backMainMenu}>
                 <Image
-                    source={require('../../../../../assets/CELIFRUT.webp')}
-                    style={stylesTablet.image}
+                    source={require('../../../../../assets/logo_app.png')}
+                    style={styles.logo}
                 />
             </TouchableOpacity>
-            <View style={isTablet ? null : styleCel.viewButtonCerrarContenedor}>
-                <Button title="Cerrar Contenedor" onPress={handleCerrarContenedor} />
+
+            <View style={styles.buttonContainer}>
+                <Button title="Cerrar Contenedor" onPress={handleCerrarContenedor} color="#7D9F3A" />
+                <Button
+                    title={props.showResumen ? "Lista Empaque" : "Resumen"}
+                    onPress={props.handleShowResumen}
+                    color="#7D9F3A"
+                />
             </View>
 
-            <Button title={props.showResumen ? 'Lista Empaque' : "Resumen"} onPress={props.handleShowResumen} />
 
-            {/* <View style={isTablet ? null : styleCel.containerPredio}>
-                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>Predio Vaciando:</Text>
-                <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
-                    {props.loteVaciando && props.loteVaciando.enf + "-" + props.loteVaciando.nombrePredio}
-                </Text>
-            </View>
-
-            <View>
-                <Image
-                    source={
-                        props.loteVaciando && props.loteVaciando.tipoFruta === 'Limon'
-                            ? require('../../../../../assets/limon.jpg')
-                            : require('../../../../../assets/naranja.jpg')
-                    }
-                    style={isTablet ? stylesTablet.image : styleCel.image}
-                />
-            </View> */}
-
-            {/*
-            <View>
-                <Image
-                    source={
-                        loteSeleccionado.tipoFruta === 'Limon'
-                            ? require('../../../../../assets/limon.jpg')
-                            : require('../../../../../assets/naranja.jpg')
-                    }
-                    style={isTablet ? stylesTablet.image : styleCel.image}
-
-                />
-            </View> */}
 
             <TouchableOpacity
-                style={isTablet ? stylesTablet.buttonContenedoresPredio : styleCel.buttonContenedores}
+                style={styles.selectionButton}
                 onPress={() => {
                     if (props.loteVaciando && props.loteVaciando.length !== 0) {
                         setModalPrediosVisible(true);
                     }
                 }}
             >
-                    <Text style={isTablet ? stylesTablet.predioText : styleCel.predioText}>
+                <View style={styles.buttonTextPredio}>
+                    <Text style={styles.buttonText}>
                         {lote}
                     </Text>
 
@@ -115,48 +91,44 @@ export default function Header(props: propsType): React.JSX.Element {
                                 ? require('../../../../../assets/limon.jpg')
                                 : require('../../../../../assets/naranja.jpg')
                         }
-                        style={isTablet ? stylesTablet.image : styleCel.image}
-
+                        style={styles.logo}
                     />
+                </View>
+
 
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={stylesTablet.buttonContenedores}
+                style={styles.selectionButton}
                 onPress={() => {
-                    if (contenedores.length !== 0) {
-                        setModalVisible(true);
-                    }
+                    if (contenedores.length !== 0) { setModalVisible(true); }
                 }}
             >
-                <Text>{cliente}</Text>
+                <Text style={styles.buttonText}>{cliente}</Text>
             </TouchableOpacity>
 
-
             <Modal transparent={true} visible={modalVisible} animationType="fade">
-                <View style={isTablet ? stylesTablet.centerModal : styleCel.centerModal}>
-                    <View style={isTablet ? stylesTablet.viewModal : styleCel.viewModal}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
                         <FlatList
                             data={contenedores}
-                            style={isTablet ? stylesTablet.pressableStyle : null}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     onPress={() => {
-                                        item.infoContenedor &&
-                                            setCliente(
-                                                item.numeroContenedor + '-' + item.infoContenedor.clienteInfo.CLIENTE,
-                                            );
+                                        if (item.infoContenedor) {
+                                            setCliente(`${item.numeroContenedor} - ${item.infoContenedor.clienteInfo.CLIENTE}`);
+                                            props.setIdContenedor(item._id || "");
+                                        }
+                                        props.setPalletSeleccionado(-1);
                                         setModalVisible(false);
-                                        item._id ?
-                                            props.setIdContenedor(item._id) :
-                                            props.setIdContenedor("");
-                                    }}>
-                                    <Text style={isTablet ? stylesTablet.textList : null}>
-                                        {item.infoContenedor && item.numeroContenedor + '-' + item.infoContenedor.clienteInfo.CLIENTE}
+                                    }}
+                                >
+                                    <Text style={styles.listItemText}>
+                                        {item.numeroContenedor} - {item.infoContenedor?.clienteInfo.CLIENTE}
                                     </Text>
                                 </TouchableOpacity>
                             )}
-                            keyExtractor={item => item._id}
+                            keyExtractor={(item) => item._id}
                         />
                     </View>
                 </View>
@@ -166,11 +138,10 @@ export default function Header(props: propsType): React.JSX.Element {
             {/* // predios */}
 
             <Modal transparent={true} visible={modalPrediosVisible} animationType="fade">
-                <View style={isTablet ? stylesTablet.centerModal : styleCel.centerModal}>
-                    <View style={isTablet ? stylesTablet.viewModal : styleCel.viewModal}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
                         <FlatList
                             data={props.loteVaciando}
-                            style={isTablet ? stylesTablet.pressableStyle : null}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     onPress={() => {
@@ -189,7 +160,7 @@ export default function Header(props: propsType): React.JSX.Element {
                                                 predio: '',
                                             });
                                     }}>
-                                    <Text style={isTablet ? stylesTablet.textList : null}>
+                                    <Text style={styles.listItemText}>
                                         {item.enf && item.enf + '-' + item.nombrePredio}
                                     </Text>
                                 </TouchableOpacity>
@@ -204,149 +175,72 @@ export default function Header(props: propsType): React.JSX.Element {
     );
 }
 
-const stylesTablet = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row',
-        width: '100%',
-        backgroundColor: 'white',
-        top: 0,
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        backgroundColor: "#FFF",
+        padding: 10,
+        elevation: 4,
+        shadowColor: "#000",
+        shadowOpacity: 0.2,
         height: 80,
-        paddingRight: 10,
-        elevation: 40,
-        shadowColor: '#52006A',
     },
-    image: {
-        width: 60,
-        height: 60,
+    logoContainer: {
+        justifyContent: "center",
+        alignItems: "center",
     },
-    buttonContenedores: {
-        backgroundColor: 'white',
-        width: 150,
+    logo: {
+        width: 50,
         height: 50,
-        borderRadius: 15,
-        borderWidth: 1,
-        borderColor: '#7D9F3A',
-        justifyContent: 'center',
-        alignItems: 'center',
+        resizeMode: "contain",
     },
-    buttonContenedoresPredio: {
+    buttonContainer: {
+        flexDirection: "row",
+        gap: 10,
+    },
+    selectionButton: {
+        backgroundColor: "#F1F8E9",
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: "#7D9F3A",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#4C7300",
+        fontSize: 12,
+        fontWeight: "600",
+    },
+    buttonTextPredio: {
         flexDirection:'row',
-        backgroundColor: 'white',
-        width: 250,
-        height: 50,
-        borderRadius: 15,
-        borderWidth: 1,
-        borderColor: '#7D9F3A',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        overflow:'hidden',
+        justifyContent: 'center',
+        alignItems:'center',
+        backgroundColor:'white',
+        borderRadius: 8,
+        padding:2,
     },
-    centerModal: {
+    modalContainer: {
         flex: 1,
-        alignItems: 'center',
-        marginTop: '6%',
-        backgroundColor: 'rgba(0,0,0,0.25',
+        backgroundColor: "rgba(0,0,0,0.3)",
+        justifyContent: "center",
+        alignItems: "center",
     },
-    viewModal: {
-        display: 'flex',
-        backgroundColor: 'white',
-        width: 350,
-        flexDirection: 'row',
-        borderRadius: 20,
-        alignItems: 'center',
-        paddingBottom: 20,
-        paddingTop: 10,
-        marginLeft: '65%',
-        gap: 50,
+    modalContent: {
+        width: "80%",
+        backgroundColor: "white",
+        borderRadius: 10,
+        padding: 20,
+        elevation: 5,
     },
-    pressableStyle: {
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    textList: {
-        color: 'black',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginTop: 10,
-        fontSize: 20,
-    },
-    predioText: {
-        fontSize: 10,
+    listItemText: {
+        fontSize: 14,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "#E0E0E0",
     },
 });
 
-const styleCel = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        width: '100%',
-        backgroundColor: 'white',
-        top: 0,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        height: 'auto',
-        paddingRight: 10,
-        elevation: 40,
-        shadowColor: '#52006A',
-        padding: 10,
-    },
-    image: {
-        display: 'none',
-    },
-    viewButtonCerrarContenedor: {
-        display: 'none',
-    },
-    containerPredio: {
-        width: '100%',
-        flexDirection:'row',
-        borderWidth: 2,
-        borderRadius: 8,
-        padding: 8,
-        margin: 4,
-        borderColor: '#7D9F3A',
-    },
-    predioText: { fontSize: 12 },
-    buttonContenedores: {
-        backgroundColor: 'white',
-        width: 95,
-        height: 40,
-        borderRadius: 15,
-        borderWidth: 1,
-        borderColor: '#7D9F3A',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 12,
-    },
-    centerModal: {
-        flex: 1,
-        alignItems: 'center',
-        marginTop: '6%',
-        backgroundColor: 'rgba(0,0,0,0.25',
-    },
-    viewModal: {
-        display: 'flex',
-        backgroundColor: 'white',
-        width: 250,
-        flexDirection: 'row',
-        borderRadius: 20,
-        alignItems: 'center',
-        paddingBottom: 20,
-        paddingTop: 10,
-        gap: 50,
-        top: '34%',
-        marginLeft: '40%',
-    },
-    pressableStyle: {
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    textList: {
-        color: 'black',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginTop: 10,
-        fontSize: 10,
-    },
-});

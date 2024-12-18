@@ -5,16 +5,17 @@ import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
 import { CargoType } from '../../types/cargosType';
 import useEnvContext from '../hooks/useEnvContext';
+import { useAppContext } from '../hooks/useAppContext';
 const { ApkInstaller } = NativeModules;
 
 type propsType = {
-    showLoading: () => void
     setIslogin: (e: boolean) => void
     obtenerPermisos: (e:CargoType) => void
 }
 
 export default function Login(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
+    const { setLoading }  = useAppContext();
     const [user, setUser] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<number>(0);
@@ -45,6 +46,7 @@ export default function Login(props: propsType): React.JSX.Element {
     }, []);
     const handlelogin = async (): Promise<void> => {
         try {
+            setLoading(true);
             const responseJSON = await fetch(`${url}/login2`, {
                 method: 'POST',
                 headers: {
@@ -72,7 +74,6 @@ export default function Login(props: propsType): React.JSX.Element {
             }
             else if (response.status === 200) {
 
-                props.showLoading();
                 props.setIslogin(true);
                 props.obtenerPermisos(response.permisos);
                 await Keychain.setGenericPassword('user', response.accesToken);
@@ -81,6 +82,8 @@ export default function Login(props: propsType): React.JSX.Element {
             if (err instanceof Error) {
                 Alert.alert(`Error: ${err.message}`);
             }
+        } finally {
+            setLoading(false);
         }
     };
     const handleUser = (e: string) => {
@@ -157,8 +160,7 @@ export default function Login(props: propsType): React.JSX.Element {
     </View>;
 }
 
-const windowHeight = Dimensions.get('window').height;
-const { width, height } = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
     container: {
@@ -190,7 +192,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
         borderRadius: 5,
         backgroundColor: "#fff",
-        width: width * 0.8
+        width: width * 0.8,
 
     },
     loader: {
@@ -201,5 +203,5 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         textAlign: "center",
         fontWeight: "bold",
-    }
+    },
 });

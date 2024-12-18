@@ -1,16 +1,16 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from "react";
-import { Text, View, StyleSheet, ScrollView, ActivityIndicator, Button, Alert, TextInput } from "react-native";
+import { Text, View, StyleSheet, ScrollView, Button, Alert, TextInput } from "react-native";
 import { formInit, labels, sumarDatos } from "./func/functions";
 import { FormCategory, FormState, datosPredioType } from "./types/types";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import { fetchWithTimeout } from "../../../../utils/connection";
+import { useAppContext } from "../../../hooks/useAppContext";
 
 export default function DescarteEncerado(): React.JSX.Element {
     const { url } = useEnvContext();
+    const { setLoading } = useAppContext();
     const [formState, setFormState] = useState<FormState>(formInit);
-    const [loading, setLoading] = useState<boolean>(false);
     const [datosPredio, setDatosPredio] = useState<datosPredioType>({
         _id: "",
         enf: "",
@@ -90,7 +90,6 @@ export default function DescarteEncerado(): React.JSX.Element {
     };
     return (
         <ScrollView style={styles.constainerScroll}>
-            {loading === false ? (
                 <View style={styles.container}>
                     <Text style={styles.textInputs}>
                         Descarte Encerado
@@ -125,48 +124,66 @@ export default function DescarteEncerado(): React.JSX.Element {
                     </View>
                 </View>
 
-            ) : (
-                <ActivityIndicator size="large" color="#00ff00" style={styles.loader} />
-            )}
-
         </ScrollView>
 
     );
 }
 
 const styles = StyleSheet.create({
-    constainerScroll: { width: "100%" },
+    constainerScroll: {
+        width: "100%",
+        backgroundColor: "#f5f5f5", // Fondo claro para toda la vista
+        paddingHorizontal: 16, // Espaciado lateral para el contenido
+    },
     container: {
         width: "100%",
-        justifyContent: "center",
         alignItems: "center",
-        top: 30,
-        backgroundColor: "#EEFBE5",
-        paddingTop: 10,
-        paddingBottom: 50,
+        marginTop: 30,
+        backgroundColor: "#EEFBE5", // Fondo verde suave
+        paddingVertical: 20, // Espaciado vertical
+        paddingHorizontal: 16, // Espaciado horizontal
+        borderRadius: 10, // Bordes redondeados
+        elevation: 3, // Sombra en Android
+        shadowColor: "#000", // Sombra en iOS
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
     },
     containerForm: {
         marginTop: 25,
+        width: "100%",
+        alignItems: "center",
     },
     inputs: {
-        borderWidth: 2,
-        borderColor: "skyblue",
-        width: 250,
-        paddingTop: 5,
-        margin: 10,
-        borderRadius: 10,
-        paddingLeft: 8,
-        alignItems: "center",
-        backgroundColor: "white",
+        borderWidth: 1,
+        borderColor: "#7D9F3A", // Verde suave para los bordes
+        width: "90%",
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        marginVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#fff", // Fondo blanco para contraste
+        elevation: 2, // Sombra para los inputs
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
     },
-    textInputs: { marginTop: 5, fontSize: 15, fontWeight: "bold" },
+    textInputs: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#333", // Texto más oscuro
+        marginBottom: 5,
+    },
     loader: {
         marginTop: 250,
+        alignSelf: "center",
     },
     viewBotones: {
-        flex: 1,
         flexDirection: "row",
-        gap: 10,
+        justifyContent: "space-between",
+        width: "90%",
         marginTop: 20,
     },
 });
+
