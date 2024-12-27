@@ -1,7 +1,7 @@
 import { Animated, Text, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { CargoType } from "../../types/cargosType";
 import React, { useEffect, useRef, useState } from "react";
+import { CargoType } from '../../../types/cargosType';
 
 type propsType = {
     permisos: CargoType | undefined
@@ -9,7 +9,7 @@ type propsType = {
 }
 
 
-export default function Proceso(props: propsType): React.JSX.Element {
+export default function Aplicaciones(props: propsType): React.JSX.Element {
     const lavado = useRef(new Animated.Value(1)).current;
     const encerado = useRef(new Animated.Value(1)).current;
     const fotos = useRef(new Animated.Value(1)).current;
@@ -99,9 +99,9 @@ export default function Proceso(props: propsType): React.JSX.Element {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1, // Hace que el contenedor ocupe todo el espacio disponible
-        alignItems: 'center', // Centra horizontalmente
-        backgroundColor: '#f5f5f5', // Fondo opcional para visualizar el centrado
+        flex: 1,
+        alignItems: 'center',
+        backgroundColor: '#f5f5f5',
         width: '100%',
     },
     button: {

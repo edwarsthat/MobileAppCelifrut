@@ -1,22 +1,22 @@
-/* eslint-disable prettier/prettier */
 
 import React, { useEffect, useState } from "react";
 import { lotesType } from "../../../../types/lotesType";
 import { elementoDefectoType, elementoPorcentajeType } from "./types/clasificacionTypes";
-import { FlatList, Alert, Button, ScrollView, StyleSheet, View, ActivityIndicator, Text, Modal, TouchableOpacity } from "react-native";
+import { FlatList, Alert, Button, ScrollView, StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import * as Keychain from 'react-native-keychain';
 import IngresoDatos from "./components/IngresoDatos";
 import ShowData from "./components/ShowData";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import { fetchWithTimeout } from "../../../../utils/connection";
+import { useAppContext } from "../../../hooks/useAppContext";
 
 export default function IngresoClasificacionCalidad(): React.JSX.Element {
-  const {url} = useEnvContext();
+  const { url } = useEnvContext();
+  const { setLoading } = useAppContext();
   const [lotesData, setLotesData] = useState<lotesType[]>([]);
   const [lote, setLote] = useState<lotesType>();
   const [dataArray, setDataArray] = useState<elementoDefectoType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   //modal para confirmar
@@ -107,27 +107,36 @@ export default function IngresoClasificacionCalidad(): React.JSX.Element {
   };
 
   return (
-    <ScrollView>
-      {loading ? <ActivityIndicator size="large" color="#00ff00" style={styles.loader} />
+    <ScrollView style={styles.screen}>
+      <View style={styles.container}>
+        <Text style={styles.titleText}>Ingreso clasificación descarte</Text>
 
-        :
-        <View style={styles.container}>
-          <Text style={styles.textInputs}>Ingreso clasificación descarte</Text>
-          <View>
-            <TouchableOpacity style={styles.botonLotes}
-              onPress={() => setModalVisible(true)}>
-              <Text>{lote ? lote.enf + " " + lote.predio.PREDIO : 'Seleccione predio'}</Text>
-            </TouchableOpacity>
-            <View>
-              <IngresoDatos setDataArray={setDataArray} />
-            </View>
-            <ShowData dataArray={dataArray} eliminarItem={eliminarItem} />
-          </View>
-          <Button title="Guardar" onPress={guardar} />
+        <TouchableOpacity
+          style={styles.botonLotes}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.buttonText}>
+            {lote ? `${lote.enf} ${lote.predio.PREDIO}` : 'Seleccione predio'}
+          </Text>
+        </TouchableOpacity>
 
+        {/* Componente que ingresa datos */}
+        <View style={styles.block}>
+          <IngresoDatos setDataArray={setDataArray} />
         </View>
-      }
 
+        {/* Componente para mostrar los datos ingresados */}
+        <View style={styles.block}>
+          <ShowData dataArray={dataArray} eliminarItem={eliminarItem} />
+        </View>
+
+        {/* Botón principal para guardar */}
+        <View style={styles.saveButtonContainer}>
+          <Button title="Guardar" onPress={guardar} />
+        </View>
+      </View>
+
+      {/* Modal con lista de lotes */}
       <Modal
         transparent={true}
         visible={modalVisible}
@@ -135,21 +144,26 @@ export default function IngresoClasificacionCalidad(): React.JSX.Element {
         onRequestClose={() => {
           Alert.alert('Modal has been closed.');
           setModalVisible(!modalVisible);
-        }}>
-        <View style={styles.centerModal}>
-          <View style={styles.viewModal}>
-
+        }}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
             <FlatList
               data={lotesData}
+              keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.pressableStyle}
                   onPress={() => {
                     setLote(item);
                     setModalVisible(false);
-                  }}>
-                  <Text style={styles.textList}>{item.enf} -- {item.predio.PREDIO}</Text>
-                </TouchableOpacity>)}
+                  }}
+                >
+                  <Text style={styles.textList}>
+                    {item.enf} -- {item.predio.PREDIO}
+                  </Text>
+                </TouchableOpacity>
+              )}
             />
           </View>
         </View>
@@ -159,49 +173,77 @@ export default function IngresoClasificacionCalidad(): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  loader: {
-    marginTop: 250,
+  // Contenedor principal que envuelve todo el ScrollView
+  screen: {
+    flex: 1,
+    backgroundColor: '#F8F8F8',
+    width:'100%',
   },
+
+  // Contenedor interno centrado y con separación
   container: {
-    justifyContent: 'center',
+    flex: 1,
     alignItems: 'center',
-    gap: 8,
-    width: '100%',
-    paddingBottom: 8,
+    paddingVertical: 20,
+    paddingHorizontal: 16,
   },
-  textInputs: { marginTop: 5, fontSize: 15, fontWeight: "bold" },
+
+  // Título principal
+  titleText: {
+    marginTop: 5,
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+
   botonLotes: {
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     width: 250,
     height: 50,
-    marginLeft: '5%',
     borderRadius: 15,
     borderWidth: 1,
     borderColor: '#7D9F3A',
     justifyContent: 'center',
     alignItems: 'center',
-  }, centerModal: {
+    marginVertical: 12,
+  },
+  buttonText: {
+    fontSize: 15,
+    color: '#333',
+  },
+
+  block: {
+    width: '100%',
+    marginVertical: 8,
+  },
+
+  saveButtonContainer: {
+    marginTop: 16,
+  },
+
+  modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '18%',
   },
-  viewModal: {
-    backgroundColor: 'white',
-    width: '90%',
-    flexDirection: 'row',
+  modalContainer: {
+    backgroundColor: '#FFFFFF',
+    width: '85%',
+    maxHeight: '60%',
     borderRadius: 20,
-    alignItems: 'center',
-    paddingBottom: 20,
-    paddingTop: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
   },
+
+  // Estilo para TouchableOpacity en la lista
   pressableStyle: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginVertical: 10,
   },
   textList: {
-    color: 'black',
+    color: '#000',
+    fontSize: 16,
     marginLeft: 10,
-    marginRight: 15,
-    fontSize: 18,
+    marginRight: 15
   },
 });

@@ -12,6 +12,20 @@ type propsType = {
     liberarPallet: (item: any) => void
 
 }
+
+
+const colors = [
+    '#FAD2E1',  // Rosa claro pastel
+    '#F5E1FD',  // Lila pastel
+    '#FFF1D0',  // Amarillo pastel suave
+    '#FFD7B5',  // Naranja pastel claro
+    '#FFFFFF',
+    '#E2C2FF',  // Lavanda claro
+    '#FAE3D9',  // Melocotón pastel
+    '#D7E5CA',  // Verde menta apagado
+    '#FEE4C3',  // Crema pastel
+];
+
 export default function SettingsPallets(props: propsType): React.JSX.Element {
     const pallet = useContext(palletSeleccionadoContext);
     const contenedorSeleccionado = useContext(contenedorSeleccionadoContext);
@@ -39,6 +53,8 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
             setEstiba(false);
         }
     }, [props.openModal, contenedor, pallet, anchoDevice]);
+
+    const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
     const [radioButtonTipoCaja, setRadioButtonTipoCaja] = useState<string>('');
     const [radioButtonCalidad, setRadioButtonCalidad] = useState<string>('');
@@ -77,6 +93,8 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
     };
     const handleCajasContadas = async (e: string) => {
         try {
+            console.log(`${contenedor?._id}:${pallet}`, e);
+
             await AsyncStorage.setItem(`${contenedor?._id}:${pallet}`, e);
             setCajasContadas(e);
         } catch (err) {
@@ -84,6 +102,18 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                 Alert.alert("Error configurando las cajas contadas");
             }
         }
+    };
+    const handleColorPallet = async (color: string) => {
+        try {
+            console.log(`${contenedor?._id}:${pallet}:color`, color);
+            await AsyncStorage.setItem(`${contenedor?._id}:${pallet}:color`, color);
+            setSelectedColor(color);
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert("Error configurando el color del pallet");
+            }
+        }
+
     };
     const getCajasContadas = async () => {
         try {
@@ -222,6 +252,25 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             value={cajasContadas}
                             style={styles.modalInput}
                         />
+                        <View style={styles.viewColorSelectContainer}>
+                            <Text>Selecciona un color:</Text>
+                            <View style={styles.viewColorSelectCirculos}>
+                                {colors.map((color) => (
+                                    <TouchableOpacity
+                                        key={color}
+                                        onPress={() => handleColorPallet(color)}
+                                        style={[
+                                            styles.colorCircle,
+                                            { backgroundColor: color },
+                                            selectedColor === color ? styles.selectedCircle : null,
+                                        ]}
+                                    />
+                                ))}
+                            </View>
+                            {selectedColor && (
+                                <Text style={styles.selectedText}>Color seleccionado: {selectedColor}</Text>
+                            )}
+                        </View>
                     </ScrollView>
                 </View>
             </View>
@@ -234,7 +283,7 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'flex-start',
         marginTop: '10%',
-        width:'100%',
+        width: '100%',
     },
     modalInput: {
         width: 100,
@@ -259,7 +308,7 @@ const styles = StyleSheet.create({
     },
     modal: {
         display: 'flex',
-        flexWrap:'wrap',
+        flexWrap: 'wrap',
         flexDirection: 'column',
         width: 300,
         padding: 20,
@@ -295,8 +344,8 @@ const styles = StyleSheet.create({
         width: 30,
         height: 30,
         borderColor: '#0074D9',
-        borderRadius: 15,
         borderWidth: 3,
+        borderRadius: 15,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -332,6 +381,39 @@ const styles = StyleSheet.create({
         gap: 20,
         justifyContent: 'center',
         paddingTop: 35,
+    },
+    viewColorSelectContainer: {
+        gap: 20,
+        width: 200,
+        justifyContent: 'center',
+        alignContent: 'center',
+        borderRightColor: '#999999',
+        borderRightWidth: 1,
+
+    },
+    viewColorSelectCirculos: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 10,
+        gap: 10,
+
+    },
+
+    colorCircle: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginHorizontal: 5,
+    },
+    selectedCircle: {
+        borderWidth: 3,
+        borderColor: 'black',
+    },
+    selectedText: {
+        marginTop: 20,
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

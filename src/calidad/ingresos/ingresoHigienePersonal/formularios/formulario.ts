@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 
 export type FormatoType = {
     botas: boolean;

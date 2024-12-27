@@ -1,21 +1,38 @@
-/* eslint-disable prettier/prettier */
-import React from "react";
-import { Alert, StyleSheet, Text, View, ScrollView, ActivityIndicator, TouchableOpacity, Switch } from "react-native";
-import { Picker } from '@react-native-picker/picker';
-import { useEffect, useState } from "react";
-import formato from "./formularios/formularioCalidad0.0.1.json";
+import React, { useEffect, useState } from "react";
+import {
+    Switch,
+    Alert,
+    FlatList,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
+    TouchableOpacity,
+    ScrollView,
+} from "react-native";
 import { formatoInit, FormatoType } from "./formularios/formulario";
 import { userType } from "../../../../types/cuentas";
 import { getCredentials } from "../../../../utils/auth";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { fetchWithTimeout } from "../../../../utils/connection";
+import { useAppContext } from "../../../hooks/useAppContext";
+import HorizontalLine from "../../../components/HorizontalLine";
+import formato from "./formularios/formularioCalidad0.0.1.json";
 
 export default function IngresoHigienePersonal(): React.JSX.Element {
-    const {url: URL} = useEnvContext();
+    const { url: URL } = useEnvContext();
+    const { setLoading } = useAppContext();
+
+
+    const [operariosOri, setOperariosOri] = useState<userType[]>();
     const [operarios, setOperarios] = useState<userType[]>();
-    const [operario, setOperario] = useState<string>();
+
+    const [query, setQuery] = useState('');
+    const [selectedOperario, setSelectedOperario] = useState<userType | null>(null);
+
+
+    const [showOperarios, setShowOperarios] = useState<boolean>(true);
     const [formState, setFormState] = useState<FormatoType>(formatoInit);
-    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         obtenerOperarios();
@@ -26,10 +43,10 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
             setLoading(true);
             const token = await getCredentials();
             const requesOperariosJSON = await fetch(`${URL}/sistema/obtener_operarios_higiene`, {
-                method: 'GET',
+                method: "GET",
                 headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                    Authorization: `${token}`,
                 },
             });
             const response = await requesOperariosJSON.json();
@@ -37,6 +54,7 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
                 throw new Error(`Code ${response.status}: ${response.message}`);
             }
             setOperarios(response.data);
+            setOperariosOri(response.data);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert("error", err.message);
@@ -45,13 +63,14 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
             setLoading(false);
         }
     };
+
     const handleGuardar = async (): Promise<void> => {
         try {
             const request = {
                 action: "add_higiene_personal",
                 data: {
                     ...formState,
-                    operario: operario,
+                    operario: selectedOperario?._id,
                 },
             };
             const token = await getCredentials();
@@ -59,7 +78,7 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `${token}`,
+                    Authorization: `${token}`,
                 },
                 body: JSON.stringify(request),
             });
@@ -68,136 +87,222 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
             if (response.status !== 200) {
                 throw new Error(`Code: ${response.status}: ${response.message}`);
             }
-            Alert.alert('success', 'Datos guardado con exito!');
+            Alert.alert("success", "Datos guardado con éxito!");
         } catch (err) {
             if (err instanceof Error) {
-                Alert.alert('error', err.message);
+                Alert.alert("error", err.message);
             }
         } finally {
             setFormState(formatoInit);
-            setOperario('');
+            setSelectedOperario(null);
+            setShowOperarios(true);
         }
     };
-    const handleChange = (event:boolean, key:string): void => {
+
+    const handleChange = (event: boolean, key: string): void => {
         setFormState({
             ...formState,
             [key]: event,
-          });
+        });
     };
-    return (
 
+
+    useEffect(() => {
+        if (query === '') {
+            setOperarios(operariosOri);
+        } else {
+            if (operarios === undefined) { return; }
+            const results = operarios.filter(op =>
+                `${op.nombre} ${op.apellido}`.toLowerCase().includes(query.toLowerCase())
+            );
+            setOperarios(results);
+        }
+    }, [query]);
+
+    const handleSelectOperario = (op: userType) => {
+        setSelectedOperario(op);
+        setQuery(`${op.nombre} ${op.apellido}`);
+        setOperarios([]);
+        setShowOperarios(false);
+    };
+
+    return (
         <View style={styles.componentContainer}>
             <Text style={styles.title}>Ingreso Higiene Personal</Text>
-            <ScrollView style={styles.formContainer}>
-                {loading ? <ActivityIndicator size="large" color="#00ff00" style={styles.loader} />
-                    :
-                    <>
-                        <View style={styles.pickerContainer}>
-                            <Text>{formato.responsable}</Text>
-                            <Picker
-                                selectedValue={operario}
-                                style={styles.picker}
-                                onValueChange={(itemValue) => setOperario(itemValue)}
-                            >
-                                <Picker.Item label="" value="" />
-                                {operarios && operarios.sort(
-                                    (a, b) => a.nombre.localeCompare(b.nombre)
-                                ).map(operarioItem => (
-                                    <Picker.Item
-                                        label={`${operarioItem.nombre} ${operarioItem.apellido}`}
-                                        value={operarioItem._id}
-                                        key={operarioItem._id}
-                                    />
-                                ))}
-                            </Picker>
-                        </View>
-                        <View style={styles.formulariosContainer}>
-                            {Object.entries(formato).map(([key, value]) => {
-                                if (key !== "version" && key !== 'responsable') {
-                                    return (
-                                        <View key={key} style={styles.formulariosCheckbox}>
-                                            <Text style={styles.checkboxText}>{value}</Text>
-                                            <Switch
-                                                value={formState[key] as boolean}
-                                                onValueChange={(e) => handleChange(e, key)}
-                                                style={styles.switch}
-                                            />
-                                        </View>
-                                    );
-                                } else { return null; }
-                            })}
-                        </View>
-                    </>
-                }
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={handleGuardar}
-                >
-                    <Text style={styles.buttonText}>Guardar</Text>
-                </TouchableOpacity>
-            </ScrollView>
-        </View>
+            <HorizontalLine />
 
+            <View style={styles.operarioInputContainer}>
+                <TextInput
+                    onChangeText={(text) => setQuery(text)}
+                    style={styles.inputs}
+                    value={query}
+                    placeholder="Escribe nombre del operario"
+                    inputMode="text"
+                />
+            </View>
+
+            {showOperarios &&
+
+                <View style={styles.centerListOperarios}>
+                    <FlatList
+                        data={operarios}
+                        renderItem={({ item }) => (
+                            <TouchableOpacity
+                                onPress={() => handleSelectOperario(item)}
+                            >
+                                <Text style={styles.listItemText}>
+                                    {item.nombre} - {item.apellido}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                    />
+                </View>
+            }
+
+            {!showOperarios &&
+
+                <ScrollView style={styles.formulariosContainer}>
+                    {Object.entries(formato).map(([key, value]) => {
+                        if (key !== "version" && key !== "responsable") {
+                            return (
+                                <View key={key} style={styles.formulariosCheckbox}>
+                                    <Text style={styles.checkboxText}>{value}</Text>
+                                    <Switch
+                                        value={formState[key as keyof FormatoType]}
+                                        onValueChange={(e) => handleChange(e, key)}
+                                        trackColor={{ false: "#ccc", true: "#4CAF50" }}
+                                        thumbColor={formState[key as keyof FormatoType] ? "#FFFFFF" : "#f4f3f4"}
+                                        style={styles.switch}
+                                    />
+
+                                </View>
+                            );
+                        } else {
+                            return null;
+                        }
+                    })}
+                    <TouchableOpacity style={styles.button} onPress={handleGuardar}>
+                        <Text style={styles.buttonText}>Guardar</Text>
+                    </TouchableOpacity>
+                </ScrollView>}
+
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     componentContainer: {
         flex: 1,
-        marginBottom:15,
-    },
-
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginVertical: 10,
-    },
-    formContainer: {
-        padding: 10,
-    },
-    pickerContainer: {
-        marginBottom: 20,
-    },
-    picker: {
-        height: 50,
+        backgroundColor: "#FAFAFA",
+        paddingTop: 20,
         width: '100%',
+        paddingBottom: 15,
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: "bold",
+        textAlign: "center",
+        marginVertical: 10,
+        color: "#333",
+    },
+    operarioInputContainer: {
+        width: '100%',
+        alignItems: 'center',
+    },
+    inputs: {
+        borderWidth: 1,
+        borderColor: "#7D9F3A", // Verde suave para los bordes
+        width: "90%",
+        paddingVertical: 10,
+        paddingHorizontal: 15,
+        marginVertical: 10,
+        borderRadius: 8,
+        backgroundColor: "#fff", // Fondo blanco para contraste
+        elevation: 2, // Sombra para los inputs
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    centerListOperarios: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+    },
+    listItemText: {
+        fontSize: 14,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: "#E0E0E0",
     },
     formulariosContainer: {
-        justifyContent: 'space-between',
+        marginBottom: 15,
+        width: '100%',
     },
     formulariosCheckbox: {
-        borderWidth: 1,
-        borderColor: 'black',
-        borderRadius: 15,
-        padding: 7,
-        width: '100%',
-        marginBottom: 10,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        width: "100%",
+        flexDirection: "row",
+        alignItems: "center",
+        marginVertical: 5,
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        backgroundColor: "#F7F7F7",
+        borderRadius: 10,
+        // Sombra suave
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 2,
     },
     checkboxText: {
-        fontSize: 15,
         flex: 1,
-        marginRight: 10,
+        fontSize: 16,
+        color: "#333",
     },
     switch: {
-        transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
+        transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }],
     },
     button: {
-        backgroundColor: '#007AFF',
-        padding: 15,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 20,
+        backgroundColor: "#4CAF50",
+        paddingVertical: 15,
+        borderRadius: 8,
+        alignItems: "center",
+        marginTop: 10,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     buttonText: {
-        color: 'white',
+        color: "#FFFFFF",
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: "600",
     },
-    loader: {
-        marginTop: 250,
+    autocompleteInput: {
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingLeft: 10,
+        height: 40,
+        marginVertical: 5,
+    },
+    itemText: {
+        padding: 10,
+        borderBottomColor: '#eee',
+        borderBottomWidth: 1,
+    },
+    selected: {
+        marginTop: 10,
+        fontWeight: 'bold',
     },
 });

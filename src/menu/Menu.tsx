@@ -63,6 +63,7 @@ export default function Menu(props: propsType): React.JSX.Element {
 
             {permisos?.includes('Calidad') && (
                 <TouchableWithoutFeedback
+                    onPress={() => props.seleccionWindow("Calidad")}
                     onPressIn={() => handlePressIn(calidad)}
                     onPressOut={() => handlePressOut(calidad)}
                 >

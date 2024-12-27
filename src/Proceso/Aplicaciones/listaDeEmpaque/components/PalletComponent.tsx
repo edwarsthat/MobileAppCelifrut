@@ -17,10 +17,13 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
         cont => cont._id === idContenedor,
     );
     const [cajasContadas, setCajasContadas] = useState<string>('');
+    const [selectedColor, setSelectedColor] = useState<string>("white");
+
 
     useEffect(() => {
         getCajasContadas();
-    }, [props.render]);
+    }, [contenedores, props.render]);
+
 
     const longPressHandle = () => {
         props.handleClickPallet(Number(props.pallet));
@@ -38,10 +41,20 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
     const getCajasContadas = async () => {
         try {
             const value = await AsyncStorage.getItem(`${contenedores?._id}:${props.pallet}`);
-            if (value) {
+            const color = await AsyncStorage.getItem(`${contenedores?._id}:${props.pallet}:color`);
+
+
+
+            if (value !== null) {
                 setCajasContadas(value);
             } else {
                 setCajasContadas('');
+            }
+
+            if (color !== null) {
+                setSelectedColor(color);
+            } else {
+                setSelectedColor('#FFFFFF');
             }
         } catch (err) {
             if (err instanceof Error) {
@@ -56,8 +69,11 @@ export default function PalletComponent(props: propsType): React.JSX.Element {
                 style={[
                     styles.palletButtonBase,
                     Number(props.pallet) === palletSeleccionado
-                        ? styles.palletSelected
-                        : (palletFree() ? styles.palletLiberado : styles.palletNormal),
+                        ? styles.palletSelected  // Rojo si está seleccionado
+                        : (palletFree()
+                            ? styles.palletLiberado  // Verde si está liberado
+                            : { backgroundColor: selectedColor || 'white' } // Usa el color guardado o blanco por defecto
+                        ),
                 ]}
                 onPress={() => props.handleClickPallet(Number(props.pallet))}
                 onLongPress={longPressHandle}

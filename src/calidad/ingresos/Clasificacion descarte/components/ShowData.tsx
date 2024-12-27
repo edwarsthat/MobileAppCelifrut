@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import React, { useEffect, useState } from "react";
 import { elementoDefectoType, elementoPorcentajeType, LabelsTypes } from "../types/clasificacionTypes";
 import { dataDefectos } from "../functions/data";
@@ -7,7 +5,7 @@ import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 
 type propsType = {
     dataArray: elementoDefectoType[]
-    eliminarItem: (index:number) => void
+    eliminarItem: (index: number) => void
 }
 export default function ShowData(props: propsType): React.JSX.Element {
     const [data, setData] = useState<elementoPorcentajeType[]>([]);
@@ -33,7 +31,7 @@ export default function ShowData(props: propsType): React.JSX.Element {
                         <Text>{dataDefectos[item.defecto as keyof LabelsTypes]}: </Text>
                         <Text>{item.porcentage.toFixed(2)}%</Text>
                     </View>
-                    <TouchableOpacity onPress={():void => props.eliminarItem(index)} style={styles.buttonEliminar}>
+                    <TouchableOpacity onPress={(): void => props.eliminarItem(index)} style={styles.buttonEliminar}>
                         <Text style={styles.textButtonEliminar}>X</Text>
                     </TouchableOpacity>
                 </View>
@@ -43,31 +41,61 @@ export default function ShowData(props: propsType): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-    container:{
-        backgroundColor:'#DFE0AE',
-        borderRadius:15,
-        marginTop:15,
-        padding:8,
+    /* Contenedor principal (fondo con tono claro y algo de sombra) */
+    container: {
+        backgroundColor: '#DFE0AE',
+        borderRadius: 12,
+        marginVertical: 15,
+        marginHorizontal: 12,
+        padding: 10,
+        // Sombra (iOS)
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 2,
+        // Sombra (Android)
+        elevation: 2,
     },
-    containerDefecto:{
-        flexDirection:'row',
-        justifyContent:'space-between',
-        padding:8,
-        alignItems:'center',
+    /* Contenedor de cada defecto */
+    containerDefecto: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+        // Borde inferior para separar items (opcional)
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(0,0,0,0.08)',
     },
-    containerDefectoTexto:{
-        flexDirection:'row',
+    /* Contenedor de los textos de defecto y porcentaje */
+    containerDefectoTexto: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
     },
-    buttonEliminar:{
-        borderWidth:1,
-        borderColor:'red',
-        padding:6,
-        borderRadius:7,
-        backgroundColor:'red',
+    defectoText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
     },
-    textButtonEliminar:{
-        fontSize:18,
-        color:'white',
-        fontWeight:'bold',
+    porcentajeText: {
+        fontSize: 16,
+        color: '#555',
+    },
+    /* Botón para eliminar */
+    buttonEliminar: {
+        backgroundColor: 'red',
+        borderRadius: 50,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        // Sombra leve (opcional)
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 1,
+    },
+    textButtonEliminar: {
+        fontSize: 16,
+        color: '#FFF',
+        fontWeight: 'bold',
     },
 });

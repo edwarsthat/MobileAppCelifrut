@@ -44,9 +44,14 @@ import InventarioDesverdizado from './src/inventarioYlogistica/inventarios/fruta
 import OrdenVaceo from './src/inventarioYlogistica/inventarios/ordenVaceo/OrdenVaceo';
 import IngresarFormularioCalidad from './src/calidad/formularios/ingresarFormulariosCalidad/IngresarFormularioCalidad';
 import InventarioyLogistica from './src/menu/InventarioyLogistica';
-import Proceso from './src/menu/Proceso';
 import LoadingModal from './src/UI/LoadingModal';
 import { lotesType } from './types/lotesType';
+import Calidad from './src/menu/Calidad';
+import IngresosFormulariosCalidad from './src/menu/calidad/IngresosFormulariosCalidad';
+import IngresosCalidad from './src/menu/calidad/IngresosCalidad';
+import Aplicaciones from './src/menu/proceso/Aplicaciones';
+import ProcesoMenu from './src/menu/ProcesoMenu';
+import HistorialAplicaciones from './src/menu/proceso/HistorialAplicaciones';
 
 type envContexttype = {
   url: string,
@@ -157,14 +162,23 @@ function App(): React.JSX.Element {
                         : null}
                     {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
                     {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === 'Proceso' && <Proceso permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === 'Proceso' && <ProcesoMenu permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === 'Calidad' && <Calidad permisos={permisos} seleccionWindow={seleccionWindow} />}
 
                     {/* Calidad */}
+                    {/* ingresos formularios */}
+                    {section === "Calidad/ingresos_formularios" && <IngresosFormulariosCalidad permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === "Calidad/ingresos_calidad" && <IngresosCalidad permisos={permisos} seleccionWindow={seleccionWindow} />}
+
                     {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
                     {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
                     {section === "66f8228c2d9d7eec9ff11d51" && <IngresarFormularioCalidad />}
 
                     {/* Aplicaciones */}
+
+                    {section === "Proceso/Aplicaciones" && <Aplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === "Proceso/historiales_aplicaciones" && <HistorialAplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
+
                     {section === '66b6705a77549ed0672a9026' && <FotosCalidad lote={lote} />}
                     {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
                     {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
