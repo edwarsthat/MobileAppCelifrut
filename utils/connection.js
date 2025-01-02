@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 
 export const fetchWithTimeout = (url, options, timeout = 5000) => {
     return Promise.race([

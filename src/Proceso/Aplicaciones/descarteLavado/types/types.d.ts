@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 export type datosPredioType = {
     _id: string
     enf: string;

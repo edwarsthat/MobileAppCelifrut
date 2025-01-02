@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { FormState, datosPredioType } from '../types/types';
 
 export const formInit: FormState = {
@@ -37,7 +36,7 @@ export const labels = {
     hojas: 'Hojas',
 };
 
-const datosSalida = {
+const datosSalida: { [key: string]: number }  = {
     descarteGeneral:0,
     pareja:0,
     balin:0,
@@ -47,7 +46,7 @@ const datosSalida = {
 };
 
 export const sumarDatos = (datos: FormState, lote: datosPredioType) => {
-    let mult;
+    let mult: number;
     switch (lote.tipoFruta) {
         case 'Naranja':
             mult = 19;
@@ -56,8 +55,9 @@ export const sumarDatos = (datos: FormState, lote: datosPredioType) => {
             mult = 20;
             break;
     }
-    Object.keys(datosSalida).map(item => {
-        datosSalida[item] = (Number(datos[item ].canastillas) * mult) + Number(datos[item].kilos);
+    Object.keys(datosSalida).forEach(item => {
+        const key = item as keyof FormState;
+        datosSalida[item] = (Number(datos[key].canastillas) * mult) + Number(datos[key].kilos);
     });
     return datosSalida;
 };

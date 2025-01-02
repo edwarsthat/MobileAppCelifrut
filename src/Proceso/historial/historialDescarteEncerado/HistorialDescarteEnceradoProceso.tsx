@@ -1,12 +1,12 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Text, View, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
-import * as Keychain from 'react-native-keychain';
+import { Alert, Text, View, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import useEnvContext from '../../../hooks/useEnvContext';
+import { useAppContext } from '../../../hooks/useAppContext';
+import { getCredentials } from '../../../../utils/auth';
 
 export default function HistorialDescarteEnceradoProceso(): React.JSX.Element {
-    const {url: URL} = useEnvContext();
-    const [loading, setLoading] = useState(false);
+    const { url: URL } = useEnvContext();
+    const { setLoading } = useAppContext();
     const [data, setData] = useState();
     const [itemSeleccionado, setItemSeleccionado] = useState('');
     useEffect(() => {
@@ -17,11 +17,7 @@ export default function HistorialDescarteEnceradoProceso(): React.JSX.Element {
         try {
             setLoading(true);
             //se obtiene el token de acceso
-            const credentials = await Keychain.getGenericPassword();
-            if (!credentials) {
-                throw new Error('Error no hay token de validadcion');
-            }
-            const { password } = credentials;
+            const password = await getCredentials();
             const token = password;
 
             const dataHistorialJSON = await fetch(`${URL}/proceso/data_historial_descarte_encerado_proceso`, {
@@ -47,100 +43,99 @@ export default function HistorialDescarteEnceradoProceso(): React.JSX.Element {
     };
     return (
         <View style={styles.container}>
-            {!loading
-                ?
-                <SafeAreaView>
-                    <Text style={styles.title}>Historial Descarte Encerado</Text>
-                    <FlatList
-                        data={data}
-                        renderItem={({ item }) => (
-                            <View>
-                                <TouchableOpacity style={styles.itemStyle} onPress={(): void => setItemSeleccionado(item._id)}>
-                                    <Text style={styles.textStyle}>{item.documento.enf}</Text>
-                                    <Text style={styles.textStyle}>{item.documento.predio.PREDIO}</Text>
-                                    <Text style={styles.textStyle}>{item.user}</Text>
-                                    <Text style={styles.textStyle}>{item.documento.tipoFruta}</Text>
-                                    <Text style={styles.textStyle}>{new Date(item.createdAt).toLocaleString('es-ES', { timeZone: 'America/Bogota' })}</Text>
-                                </TouchableOpacity>
-                                {itemSeleccionado === item._id ?
-                                    <View style={styles.descarteContainer}>
-                                        {Object.keys(item.documento.descartes).map(key => {
+            <SafeAreaView>
+                <Text style={styles.title}>Historial Descarte Encerado</Text>
+                <FlatList
+                    data={data}
+                    renderItem={({ item }) => (
+                        <View>
+                            <TouchableOpacity style={styles.itemStyle} onPress={(): void => setItemSeleccionado(item._id)}>
+                                <Text style={styles.textStyle}>{item.documento.enf}</Text>
+                                <Text style={styles.textStyle}>{item.documento.predio.PREDIO}</Text>
+                                <Text style={styles.textStyle}>{item.user}</Text>
+                                <Text style={styles.textStyle}>{item.documento.tipoFruta}</Text>
+                                <Text style={styles.textStyle}>{new Date(item.createdAt).toLocaleString('es-ES', { timeZone: 'America/Bogota' })}</Text>
+                            </TouchableOpacity>
+                            {itemSeleccionado === item._id ?
+                                <View style={styles.descarteContainer}>
+                                    {Object.keys(item.documento.descartes).map(key => {
+                                        if (key === 'frutaNacional') {
+                                            return (
+                                                <Text key={key + item._id}>
+                                                    {" Fruta nacional : " + item.documento.descartes[key]} Kg
+                                                </Text>);
+                                        } else if (key === '__v') {
+                                            return null;
+                                        } else {
                                             const descarte = key.split(".");
                                             return (
                                                 <Text key={key + item._id}>
                                                     {descarte[1] + " : " + item.documento.descartes[key]} Kg
                                                 </Text>
                                             );
-                                        })}
-                                    </View>
-                                    : null
-                                }
-                            </View>
-                        )}
-                        keyExtractor={item => item._id}
-                    />
-                </SafeAreaView>
-                :
-                <ActivityIndicator size="large" color="#00ff00" style={styles.loader} />}
+                                        }
+                                    })}
+                                </View>
+                                : null
+                            }
+                        </View>
+                    )}
+                    keyExtractor={item => item._id}
+                />
+            </SafeAreaView>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    loader: {
-        marginTop: 250,
-    },
     container: {
+        flex: 1,
         width: '100%',
         padding: 10,
-        backgroundColor: "#EEFBE5",
-        height: '100%',
+        backgroundColor: '#EEFBE5',
     },
     title: {
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
+        marginBottom: 10,
+        textAlign: 'center',
+        color: '#2F4F4F',
     },
     itemStyle: {
-        margin: 2,
-        display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        height: 65,
         justifyContent: 'space-around',
-        alignContent: 'center',
-        borderColor: 'black',
+        alignItems: 'center',
+        marginVertical: 8,
+        padding: 10,
         borderRadius: 14,
-        marginTop: 15,
-        padding: 8,
-        gap: 15,
+        backgroundColor: '#FFFFFF',
+        borderColor: 'black',
+        // Sombra
         shadowColor: '#32325D',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0.5, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 5,
         elevation: 5,
-        backgroundColor: '#FFFFFF',
     },
     textStyle: {
-        width: 'auto',
+        fontSize: 14,
+        color: '#333',
     },
-    descarteContainer:{
-        backgroundColor:'white',
+    descarteContainer: {
+        backgroundColor: 'white',
         padding: 8,
+        margin: 2,
+        borderTopWidth: 1,
+        borderTopColor: '#ccc',
+        borderBottomEndRadius: 12,
+        borderBottomStartRadius: 12,
+        // Sombra
         shadowColor: '#32325D',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 5,
         elevation: 5,
-        borderBottomEndRadius: 12,
-        borderBottomStartRadius: 12,
-        marginTop:-10,
-        margin: 2,
-
+        marginTop: -5,
     },
 });
