@@ -1,21 +1,21 @@
-/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Dimensions, StyleSheet, Text, TextInput, View } from "react-native";
 import HorizontalLine from "../../../components/HorizontalLine";
 import { getCredentials } from "../../../../utils/auth";
 import { lotesType } from "../../../../types/lotesType";
 import TablaFruta from "./components/TablaFruta";
-import FrutaSinProcesarDirectoNacional from "./components/FrutaSinProcesarDirectoNacional";
-import FrutaSinProcesarDesverdizado from "./components/FrutaSinProcesarDesverdizado";
 import useEnvContext from "../../../hooks/useEnvContext";
+import { sumatoriasInventario } from "./functions/sum";
 
 export default function InventarioFrutaSinProcesar(): React.JSX.Element {
-    const {url} = useEnvContext();
+    const { url } = useEnvContext();
     const [filtro, setFiltro] = useState<string>('');
     const [data, setData] = useState<lotesType[]>();
     const [dataOriginal, setDataOriginal] = useState<lotesType[]>();
-    const [showTable, setShowTable] = useState<string>("table");
-    const [loteSeleccionado, setLoteSeleccionado] = useState<lotesType>();
+    const [total, setTotal] = useState<number>(0);
+    const [limon, setLimon] = useState<number>(0);
+    const [naranja, setNaranja] = useState<number>(0);
+
     useEffect(() => {
         const obtenerFruta = async () => {
             try {
@@ -33,94 +33,158 @@ export default function InventarioFrutaSinProcesar(): React.JSX.Element {
                 }
                 setData(response.data);
                 setDataOriginal(response.data);
+                const [to, li, na] = sumatoriasInventario(response.data);
+                setTotal(to);
+                setLimon(li);
+                setNaranja(na);
             } catch (err) {
                 if (err instanceof Error) {
                     Alert.alert(err.message);
                 }
             }
         };
-        obtenerFruta(); }, [url]);
+        obtenerFruta();
+    }, [url]);
     useEffect(() => {
         if (dataOriginal !== undefined && filtro !== '') {
             const datos = dataOriginal.filter(lote =>
             (lote.predio.PREDIO.toLowerCase().startsWith(filtro.toLowerCase()) ||
                 lote.tipoFruta.toLowerCase().startsWith(filtro.toLowerCase()) ||
-                lote.enf.toLowerCase().startsWith(filtro.toLowerCase())));
-
+                (
+                    lote.enf &&
+                    lote.enf.toLowerCase().startsWith(filtro.toLowerCase())
+                )));
+            const [to, na, li] = sumatoriasInventario(datos);
+            setTotal(to);
+            setLimon(li);
+            setNaranja(na);
             setData(datos);
 
         } else if (filtro === '') {
             setData(dataOriginal);
+            const [to, li, na] = sumatoriasInventario(dataOriginal ?? []);
+            setTotal(to);
+            setLimon(li);
+            setNaranja(na);
         }
+
     }, [filtro, dataOriginal]);
 
-    const handleDirectoNacional = (lote: lotesType) => {
-        setShowTable('directoNacional');
-        setLoteSeleccionado(lote);
-    };
-    const handleDesverdizado = (lote:lotesType) => {
-        setShowTable('desverdizado');
-        setLoteSeleccionado(lote);
-    };
-    const volverToTabla = () => {
-        setShowTable("table");
-    };
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Fruta sin procesar</Text>
             <HorizontalLine />
-            {showTable === "table" && <View style={styles.containerForm}>
-                <Text style={styles.textInputs}>Busqueda</Text>
+
+            <View style={styles.containerForm}>
+                <Text style={styles.textInputs}>Búsqueda</Text>
                 <TextInput
                     style={styles.inputs}
-                    placeholder=""
+                    placeholder="Ingrese lote o predio"
                     inputMode="text"
-                    onChangeText={(value): void => setFiltro(value)}
+                    onChangeText={(value) => setFiltro(value)}
+                    value={filtro}
                 />
-            </View>}
-            {showTable === "table" &&
-                <TablaFruta
-                    handleDesverdizado={handleDesverdizado}
-                    handleDirectoNacional={handleDirectoNacional}
-                    data={data}
-                />}
-            {showTable === "directoNacional" &&
-                <FrutaSinProcesarDirectoNacional volverToTabla={volverToTabla} lote={loteSeleccionado} />}
-            {showTable === "desverdizado" &&
-                <FrutaSinProcesarDesverdizado
-                    volverToTabla={volverToTabla}
-                    lote={loteSeleccionado} />}
+            </View>
+
+            <View style={styles.totalsContainer}>
+                <View style={styles.cardStyle}>
+                    <Text style={styles.totalLabel}>Total</Text>
+                    <Text style={styles.totalValue}>{total.toFixed(2)} Kg</Text>
+                </View>
+                <View style={[styles.cardStyle, { backgroundColor: '#E8F5E9' }]}>
+                    <Text style={styles.totalLabel}>Total Limón</Text>
+                    <Text style={[styles.totalValue, { color: '#388E3C' }]}>{limon.toFixed(2)} Kg</Text>
+                </View>
+                <View style={[styles.cardStyle, { backgroundColor: '#FFF3E0' }]}>
+                    <Text style={styles.totalLabel}>Total Naranja</Text>
+                    <Text style={[styles.totalValue, { color: '#F57C00' }]}>{naranja.toFixed(2)} Kg</Text>
+                </View>
+            </View>
+
+            <TablaFruta data={data} />
         </View>
     );
 }
+
+const { width } = Dimensions.get('window');
+
 
 const styles = StyleSheet.create({
     container: {
         width: '100%',
         flex: 1,
+        backgroundColor: '#F4F4F4',
+        paddingTop: 10,
     },
     title: {
         width: '100%',
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: 'bold',
         textAlign: 'center',
+        marginBottom: 10,
+        color: '#333',
     },
     containerForm: {
-        marginTop: 25,
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        marginTop: 10,
+        marginBottom: 10,
+        alignItems: 'center',
     },
     inputs: {
-        borderWidth: 2,
-        borderColor: "skyblue",
-        width: 260,
-        paddingTop: 5,
-        margin: 10,
-        borderRadius: 10,
-        paddingLeft: 8,
-        alignItems: "center",
-        backgroundColor: "white",
+        borderWidth: 1.5,
+        borderColor: '#4CAF50',
+        width: width * 0.85,
+        paddingVertical: 5,
+        marginTop: 12,
+        borderRadius: 12,
+        paddingLeft: 12,
+        fontSize: 16,
+        backgroundColor: '#FFFFFF',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 2,
     },
-    textInputs: { marginTop: 5, fontSize: 15, fontWeight: "bold" },
-
+    textInputs: {
+        marginTop: 5,
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#555',
+    },
+    totalsContainer: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    cardStyle: {
+        width: width * 0.85,
+        paddingVertical: 5,
+        paddingHorizontal: 16,
+        marginVertical: 8,
+        borderRadius: 12,
+        backgroundColor: '#FFF',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 3,
+    },
+    totalLabel: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#666',
+    },
+    totalValue: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#333',
+        marginTop: 4,
+    },
 });

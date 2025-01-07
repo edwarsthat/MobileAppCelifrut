@@ -38,7 +38,6 @@ import PrecioNaranja from './src/comercial/precios/naranja/PrecioNaranja';
 import IngresoClasificacionCalidad from './src/calidad/ingresos/Clasificacion descarte/IngresoClasificacionCalidad';
 import { CargoType } from './types/cargosType';
 import IngresoHigienePersonal from './src/calidad/ingresos/ingresoHigienePersonal/IngresoHigienePersonal';
-import IngresoFruta from './src/inventarioYlogistica/ingresoFruta/IngresoFruta';
 import InventarioFrutaSinProcesar from './src/inventarioYlogistica/inventarios/frutaSinProcesar/InventarioFrutaSinProcesar';
 import InventarioDesverdizado from './src/inventarioYlogistica/inventarios/frutaDesverdizando/InventarioDesverdizado';
 import OrdenVaceo from './src/inventarioYlogistica/inventarios/ordenVaceo/OrdenVaceo';
@@ -52,6 +51,7 @@ import IngresosCalidad from './src/menu/calidad/IngresosCalidad';
 import Aplicaciones from './src/menu/proceso/Aplicaciones';
 import ProcesoMenu from './src/menu/ProcesoMenu';
 import HistorialAplicaciones from './src/menu/proceso/HistorialAplicaciones';
+import Inventarios from './src/menu/Invetarios/Inventarios';
 
 type envContexttype = {
   url: string,
@@ -194,7 +194,8 @@ function App(): React.JSX.Element {
                     {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
 
                     {/* inventario y logistica */}
-                    {section === "66b66fe277549ed0672a901e" && <IngresoFruta />}
+                    {section === "Inventario y Logística/inventarios" && <Inventarios permisos={permisos} seleccionWindow={seleccionWindow} />}
+
                     {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
                     {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
                     {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}

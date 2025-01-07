@@ -19,7 +19,7 @@ export default function Aplicaciones(props: propsType): React.JSX.Element {
 
     useEffect(() => {
         if (props.permisos) {
-            const perm = Object.keys(props.permisos.Proceso);
+            const perm = Object.keys(props.permisos.Proceso.Aplicaciones);
             setPermisos(perm);
         }
     }, [props.permisos]);
@@ -40,7 +40,7 @@ export default function Aplicaciones(props: propsType): React.JSX.Element {
     return (
         <View style={styles.container}>
 
-            {permisos?.includes('Aplicaciones') && (
+            {permisos?.includes('Descarte lavado') && (
                 <TouchableWithoutFeedback
                     onPress={() => props.seleccionWindow("66b6706477549ed0672a9027")}
                     onPressIn={() => handlePressIn(lavado)}
@@ -54,7 +54,7 @@ export default function Aplicaciones(props: propsType): React.JSX.Element {
             )}
 
 
-            {permisos?.includes('Aplicaciones') && (
+            {permisos?.includes('Descarte Encerado') && (
                 <TouchableWithoutFeedback
                     onPress={() => props.seleccionWindow("66b6706e77549ed0672a9028")}
                     onPressIn={() => handlePressIn(encerado)}
@@ -67,7 +67,7 @@ export default function Aplicaciones(props: propsType): React.JSX.Element {
                 </TouchableWithoutFeedback>
             )}
 
-            {permisos?.includes('Aplicaciones') && (
+            {permisos?.includes('Fotos calidad') && (
                 <TouchableWithoutFeedback
                     onPress={() => props.seleccionWindow("66b6705a77549ed0672a9026")}
                     onPressIn={() => handlePressIn(fotos)}
@@ -80,7 +80,7 @@ export default function Aplicaciones(props: propsType): React.JSX.Element {
                 </TouchableWithoutFeedback>
             )}
 
-            {permisos?.includes('Aplicaciones') && (
+            {permisos?.includes('Lista de empaque') && (
                 <TouchableWithoutFeedback
                     onPress={() => props.seleccionWindow("66b6707777549ed0672a9029")}
                     onPressIn={() => handlePressIn(listaEmpaque)}
