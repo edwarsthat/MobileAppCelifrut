@@ -5,17 +5,18 @@ import PalletComponent from "./PalletComponent";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import SettingsPallets from "./SettingsPallets";
 import { settingsType } from "../types/types";
-import { deviceWidth } from "../../../../../App";
 
 type propsType = {
     setPalletSeleccionado: (data: number) => void;
     guardarPalletSettings: (settings: settingsType) => Promise<void>;
     liberarPallet: (item: any) => void
     setSeleccion: (e: number[]) => void
+    isTablet: boolean
+
 };
 
 export default function Pallets(props: propsType): React.JSX.Element {
-    const anchoDevice = useContext(deviceWidth);
+
     const contenedores = useContext(contenedoresContext);
     const idContenedor = useContext(contenedorSeleccionadoContext);
     const [openModal, setOpenModal] = useState<boolean>(false);
@@ -43,8 +44,10 @@ export default function Pallets(props: propsType): React.JSX.Element {
         });
     useEffect(() => {
         // setIsTablet(anchoDevice >= 721);
-        if (anchoDevice >= 721) {
+        if (props.isTablet) {
             setColumnas(6);
+        } else {
+            setColumnas(2);
         }
         const item = contenedores.find(cont => cont._id === idContenedor);
 
@@ -52,7 +55,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
             setContenedorSeleccionado(() => item);
             setData(() => Array.from({ length: contenedorSeleccionado.pallets.length }, (_, index) => index));
         }
-    }, [idContenedor, contenedores, anchoDevice, contenedorSeleccionado]);
+    }, [idContenedor, contenedores, props.isTablet, contenedorSeleccionado]);
     const openPalletSettings = () => {
         setOpenModal(true);
     };
@@ -84,6 +87,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
 
                 <SettingsPallets
                     liberarPallet={props.liberarPallet}
+                    isTablet={props.isTablet}
                     guardarPalletSettings={props.guardarPalletSettings}
                     closeModal={closeModal}
                     openModal={openModal} />

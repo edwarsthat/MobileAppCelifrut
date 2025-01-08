@@ -189,7 +189,7 @@ export default function Footer(props: propsType): React.JSX.Element {
         <TextInput
           keyboardType="numeric"
           style={[styles.textInputBase, isTablet ? styles.textInputTablet : styles.textInputMobile]}
-          value={String(cajas)}
+          value={String(cajas || '')}
           onChange={e => setCajas(Number(e.nativeEvent.text))} />
       </View>
       <View>

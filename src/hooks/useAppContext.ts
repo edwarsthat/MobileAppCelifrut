@@ -1,16 +1,18 @@
 import { Dispatch, useContext } from "react";
-import { loadingContext, stackContext } from "../../App";
+import { deviceWidth, loadingContext, stackContext } from "../../App";
 
 
 
 type EnvContextType = {
     stack: string[]
     setLoading: Dispatch<React.SetStateAction<boolean>>
+    anchoDevice: number
 }
 
 export function useAppContext(): EnvContextType {
     const stack = useContext(stackContext);
     const setLoading = useContext(loadingContext);
+    const anchoDevice = useContext(deviceWidth);
 
     if (!stack) {
         throw new Error("Error en useAppcontext");
@@ -19,5 +21,5 @@ export function useAppContext(): EnvContextType {
     if (!setLoading) {
         throw new Error("Error en env useAppcontext");
     }
-    return { stack, setLoading };
+    return { stack, setLoading, anchoDevice };
 }

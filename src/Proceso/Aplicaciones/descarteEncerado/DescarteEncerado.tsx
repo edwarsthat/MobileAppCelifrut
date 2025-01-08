@@ -78,6 +78,7 @@ export default function DescarteEncerado(): React.JSX.Element {
                 Alert.alert(`${err.name}: ${err.message}`);
             }
         } finally {
+            console.log(formInit);
             setFormState(formInit);
             setLoading(false);
             setDatosPredio({
@@ -109,12 +110,14 @@ export default function DescarteEncerado(): React.JSX.Element {
                                 style={styles.inputs}
                                 placeholder="N. de canastillas"
                                 inputMode="numeric"
+                                value={String(formState[item as keyof FormState].canastillas || '')}
                                 onChangeText={(value): void => handleChange(item as keyof FormState, Number(value), "canastillas")}
                             />
                             <TextInput
                                 style={styles.inputs}
                                 placeholder="Kilos"
                                 inputMode="numeric"
+                                value={String(formState[item as keyof FormState].kilos || '')}
                                 onChangeText={(value): void => handleChange(item as keyof FormState, Number(value), "kilos")}
                             />
                         </View>

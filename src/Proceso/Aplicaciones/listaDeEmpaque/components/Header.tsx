@@ -12,7 +12,8 @@ type propsType = {
     cerrarContenendor: () => void
     handleShowResumen: () => void
     showResumen: boolean,
-    setPalletSeleccionado: (e:number) => void
+    setPalletSeleccionado: (e: number) => void
+    isTablet: boolean
 }
 
 export default function Header(props: propsType): React.JSX.Element {
@@ -62,42 +63,46 @@ export default function Header(props: propsType): React.JSX.Element {
 
             <View style={styles.buttonContainer}>
                 <Button title="Cerrar Contenedor" onPress={handleCerrarContenedor} color="#7D9F3A" />
-                <Button
-                    title={props.showResumen ? "Lista Empaque" : "Resumen"}
-                    onPress={props.handleShowResumen}
-                    color="#7D9F3A"
-                />
+
+                {props.isTablet &&
+                    <Button
+                        title={props.showResumen ? "Lista Empaque" : "Resumen"}
+                        onPress={props.handleShowResumen}
+                        color="#7D9F3A"
+                    />
+                }
+
             </View>
 
 
-
-            <TouchableOpacity
-                style={styles.selectionButton}
-                onPress={() => {
-                    if (props.loteVaciando && props.loteVaciando.length !== 0) {
-                        setModalPrediosVisible(true);
-                    }
-                }}
-            >
-                <View style={styles.buttonTextPredio}>
-                    <Text style={styles.buttonText}>
-                        {lote}
-                    </Text>
-
-
-                    <Image
-                        source={
-                            loteSeleccionado.tipoFruta === 'Limon'
-                                ? require('../../../../../assets/limon.jpg')
-                                : require('../../../../../assets/naranja.jpg')
+            {props.isTablet &&
+                <TouchableOpacity
+                    style={styles.selectionButton}
+                    onPress={() => {
+                        if (props.loteVaciando && props.loteVaciando.length !== 0) {
+                            setModalPrediosVisible(true);
                         }
-                        style={styles.logo}
-                    />
-                </View>
+                    }}
+                >
+                    <View style={styles.buttonTextPredio}>
+                        <Text style={styles.buttonText}>
+                            {lote}
+                        </Text>
 
 
-            </TouchableOpacity>
+                        <Image
+                            source={
+                                loteSeleccionado.tipoFruta === 'Limon'
+                                    ? require('../../../../../assets/limon.jpg')
+                                    : require('../../../../../assets/naranja.jpg')
+                            }
+                            style={styles.logo}
+                        />
+                    </View>
 
+
+                </TouchableOpacity>
+            }
             <TouchableOpacity
                 style={styles.selectionButton}
                 onPress={() => {
@@ -216,12 +221,12 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     },
     buttonTextPredio: {
-        flexDirection:'row',
+        flexDirection: 'row',
         justifyContent: 'center',
-        alignItems:'center',
-        backgroundColor:'white',
+        alignItems: 'center',
+        backgroundColor: 'white',
         borderRadius: 8,
-        padding:2,
+        padding: 2,
     },
     modalContainer: {
         flex: 1,

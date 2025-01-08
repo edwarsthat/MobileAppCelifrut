@@ -10,6 +10,7 @@ type propsType = {
     closeModal: () => void;
     guardarPalletSettings: (settings: settingsType,) => Promise<void>;
     liberarPallet: (item: any) => void
+    isTablet: boolean
 
 }
 
@@ -136,61 +137,63 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
             animationType="fade">
             <View style={isTablet ? styles.centerModal : stylesCel.centerModal}>
                 <View style={isTablet ? styles.viewModal : stylesCel.viewModal}>
-                    <ScrollView style={styles.modal}>
-                        <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
-                        <View style={styles.containerConfigurarPallet}>
-                            {contenedor?.infoContenedor.tipoCaja?.map((caja, index) => (
-                                <TouchableOpacity onPress={() => setRadioButtonTipoCaja(caja)} key={caja + index}>
-                                    <View style={styles.radioButton}>
-                                        <View style={styles.radio}>
-                                            {radioButtonTipoCaja === caja ? (
-                                                <View style={styles.radioBg}>{ }</View>
-                                            ) : null}
-                                        </View>
-                                        <Text>{caja} Kg</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-                        </View>
-                        <View style={styles.containerConfigurarPallet}>
-                            <Text>Calidad</Text>
-                            <View style={styles.viewCalidad}>
-                                {contenedor?.infoContenedor.calidad.map((calidad, index) => (
-                                    <TouchableOpacity onPress={() => setRadioButtonCalidad(calidad)} key={index}>
+                    {props.isTablet &&
+                        <ScrollView style={styles.modal}>
+                            <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
+                            <View style={styles.containerConfigurarPallet}>
+                                {contenedor?.infoContenedor.tipoCaja?.map((caja, index) => (
+                                    <TouchableOpacity onPress={() => setRadioButtonTipoCaja(caja)} key={caja + index}>
                                         <View style={styles.radioButton}>
                                             <View style={styles.radio}>
-                                                {radioButtonCalidad === calidad ? (
+                                                {radioButtonTipoCaja === caja ? (
                                                     <View style={styles.radioBg}>{ }</View>
                                                 ) : null}
                                             </View>
-                                            <Text>{calidad}</Text>
+                                            <Text>{caja} Kg</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))}
                             </View>
                             <View style={styles.containerConfigurarPallet}>
-                                <Text>Calibre</Text>
+                                <Text>Calidad</Text>
                                 <View style={styles.viewCalidad}>
-                                    {contenedor?.infoContenedor.calibres.map((calibre, index) => (
-                                        <TouchableOpacity onPress={() => setRadioButtonCalibre(calibre)} key={index}>
+                                    {contenedor?.infoContenedor.calidad.map((calidad, index) => (
+                                        <TouchableOpacity onPress={() => setRadioButtonCalidad(calidad)} key={index}>
                                             <View style={styles.radioButton}>
                                                 <View style={styles.radio}>
-                                                    {radioButtonCalibre === calibre ? (
+                                                    {radioButtonCalidad === calidad ? (
                                                         <View style={styles.radioBg}>{ }</View>
                                                     ) : null}
                                                 </View>
-                                                <Text>{calibre}</Text>
+                                                <Text>{calidad}</Text>
                                             </View>
                                         </TouchableOpacity>
                                     ))}
                                 </View>
+                                <View style={styles.containerConfigurarPallet}>
+                                    <Text>Calibre</Text>
+                                    <View style={styles.viewCalidad}>
+                                        {contenedor?.infoContenedor.calibres.map((calibre, index) => (
+                                            <TouchableOpacity onPress={() => setRadioButtonCalibre(calibre)} key={index}>
+                                                <View style={styles.radioButton}>
+                                                    <View style={styles.radio}>
+                                                        {radioButtonCalibre === calibre ? (
+                                                            <View style={styles.radioBg}>{ }</View>
+                                                        ) : null}
+                                                    </View>
+                                                    <Text>{calibre}</Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                </View>
                             </View>
-                        </View>
-                        <View style={styles.containerButtonsModal}>
-                            <Button title="Guardar" onPress={clickGuardar} />
-                            <Button title="Cancelar" onPress={props.closeModal} />
-                        </View>
-                    </ScrollView>
+                            <View style={styles.containerButtonsModal}>
+                                <Button title="Guardar" onPress={clickGuardar} />
+                                <Button title="Cancelar" onPress={props.closeModal} />
+                            </View>
+                        </ScrollView>
+                    }
                     <ScrollView>
                         <View style={styles.modal}>
                             <Text style={styles.tituloModal}>Liberacion pallets</Text>
@@ -242,37 +245,40 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             <Button title="Cancelar" onPress={props.closeModal} />
                         </View>
                     </ScrollView>
-                    <ScrollView>
-                        <View style={styles.modalCajas}>
-                            <Text style={styles.tituloModal}>Cajas ya contadas</Text>
-                        </View>
-                        <TextInput
-                            onChangeText={handleCajasContadas}
-                            keyboardType="numeric"
-                            value={cajasContadas}
-                            style={styles.modalInput}
-                        />
-                        <View style={styles.viewColorSelectContainer}>
-                            <Text>Selecciona un color:</Text>
-                            <View style={styles.viewColorSelectCirculos}>
-                                {colors.map((color) => (
-                                    <TouchableOpacity
-                                        key={color}
-                                        onPress={() => handleColorPallet(color)}
-                                        style={[
-                                            styles.colorCircle,
-                                            { backgroundColor: color },
-                                            selectedColor === color ? styles.selectedCircle : null,
-                                        ]}
-                                    />
-                                ))}
+                    {props.isTablet &&
+                        <ScrollView>
+                            <View style={styles.modalCajas}>
+                                <Text style={styles.tituloModal}>Cajas ya contadas</Text>
                             </View>
-                            {selectedColor && (
-                                <Text style={styles.selectedText}>Color seleccionado: {selectedColor}</Text>
-                            )}
-                        </View>
-                    </ScrollView>
+                            <TextInput
+                                onChangeText={handleCajasContadas}
+                                keyboardType="numeric"
+                                value={cajasContadas}
+                                style={styles.modalInput}
+                            />
+                            <View style={styles.viewColorSelectContainer}>
+                                <Text>Selecciona un color:</Text>
+                                <View style={styles.viewColorSelectCirculos}>
+                                    {colors.map((color) => (
+                                        <TouchableOpacity
+                                            key={color}
+                                            onPress={() => handleColorPallet(color)}
+                                            style={[
+                                                styles.colorCircle,
+                                                { backgroundColor: color },
+                                                selectedColor === color ? styles.selectedCircle : null,
+                                            ]}
+                                        />
+                                    ))}
+                                </View>
+                                {selectedColor && (
+                                    <Text style={styles.selectedText}>Color seleccionado: {selectedColor}</Text>
+                                )}
+                            </View>
+                        </ScrollView>
+                    }
                 </View>
+
             </View>
         </Modal>
     );
@@ -421,14 +427,14 @@ const stylesCel = StyleSheet.create({
     centerModal: {
         flex: 1,
         alignItems: 'flex-start',
-
         justifyContent: 'center',
         alignContent: 'center',
     },
     viewModal: {
-        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        width: '100%',
         backgroundColor: 'white',
-        width: 'auto',
         flexDirection: 'column',
         borderRadius: 20,
         paddingBottom: 20,
@@ -438,20 +444,20 @@ const stylesCel = StyleSheet.create({
         elevation: 20,
     },
 
-
-
-
     contenedorLiberacionPallet: {
-        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        width: '100%',
         flexDirection: 'column',
         gap: 15,
         padding: 20,
     },
     viewButtonsLiberacionPallet: {
-        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        width: '100%',
         flexDirection: 'row',
         gap: 20,
-        justifyContent: 'center',
         paddingTop: 35,
     },
 });

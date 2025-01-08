@@ -40,7 +40,7 @@ export default function Aplicaciones(props: propsType): React.JSX.Element {
     return (
         <View style={styles.container}>
 
-            {permisos?.includes('Descarte lavado') && (
+            {permisos?.includes('Descarte Lavado') && (
                 <TouchableWithoutFeedback
                     onPress={() => props.seleccionWindow("66b6706477549ed0672a9027")}
                     onPressIn={() => handlePressIn(lavado)}

@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
 import { Socket, io } from "socket.io-client";
 import Header from "./components/Header";
@@ -9,7 +9,6 @@ import { cajasSinPalletType, itemType, settingsType } from "./types/types";
 import { obtenerAccessToken, socketRequest } from "./controller/request";
 import Footer from "./components/Footer";
 import Informacion from "./components/Informacion";
-import { deviceWidth } from "../../../../App";
 import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
@@ -57,8 +56,7 @@ export const itemSeleccionContext = createContext<number[]>([]);
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const { socketURL } = useEnvContext();
-    const { setLoading } = useAppContext();
-    const anchoDevice = useContext(deviceWidth);
+    const { setLoading, anchoDevice } = useAppContext();
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
     const [contenedoresProvider, setContenedoresProvider] = useState<contenedoresType[]>([]);
     const [palletSeleccionado, setPalletSeleccionado] = useState<number>(-1);
@@ -352,8 +350,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             await socketRequest(socket, request);
 
             const len = cont?.pallets.length;
-            if(len){
-                for(let i = 0; i < len; i++){
+            if (len) {
+                for (let i = 0; i < len; i++) {
                     await AsyncStorage.removeItem(`${cont._id}:${i}`);
                 }
             }
@@ -405,42 +403,46 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                     <palletSeleccionadoContext.Provider value={palletSeleccionado}>
                         <itemSeleccionContext.Provider value={seleccion}>
 
-                                <SafeAreaView style={styles.container}>
-                                    <Header
-                                        setPalletSeleccionado={setPalletSeleccionado}
-                                        showResumen={showResumen}
-                                        handleShowResumen={handleShowResumen}
-                                        cerrarContenendor={cerrarContenedor}
-                                        setSection={props.setSection}
-                                        setIdContenedor={setIdContenedor}
-                                        loteVaciando={loteVaciando}
-                                        seleccionarLote={setLoteSeleccionado} />
+                            <SafeAreaView style={styles.container}>
+                                <Header
+                                    setPalletSeleccionado={setPalletSeleccionado}
+                                    showResumen={showResumen}
+                                    handleShowResumen={handleShowResumen}
+                                    cerrarContenendor={cerrarContenedor}
+                                    setSection={props.setSection}
+                                    setIdContenedor={setIdContenedor}
+                                    loteVaciando={loteVaciando}
+                                    isTablet={isTablet}
+                                    seleccionarLote={setLoteSeleccionado} />
 
-                                    {showResumen ?
-                                        <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
-                                            <ResumenListaEmpaque />
-                                        </View>
-                                        :
-                                        <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
+                                {showResumen ?
+                                    <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
+                                        <ResumenListaEmpaque />
+                                    </View>
+                                    :
+                                    <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
 
-                                            <Pallets
-                                                setSeleccion={setSeleccion}
-                                                liberarPallet={liberarPallet}
-                                                guardarPalletSettings={guardarPalletSettings}
-                                                setPalletSeleccionado={setPalletSeleccionado} />
+                                        <Pallets
+                                            setSeleccion={setSeleccion}
+                                            isTablet={isTablet}
+                                            liberarPallet={liberarPallet}
+                                            guardarPalletSettings={guardarPalletSettings}
+                                            setPalletSeleccionado={setPalletSeleccionado} />
 
+                                        {isTablet &&
+                                            <Informacion setSeleccion={setSeleccion} />}
 
-                                            <Informacion setSeleccion={setSeleccion} />
-
-                                        </View>
-                                    }
+                                    </View>
+                                }
+                                {isTablet &&
                                     <Footer
                                         modificarItems={modificarItems}
                                         moverItem={moverItem}
                                         restarItem={restarItem}
                                         eliminarItem={eliminarItem}
                                         agregarItem={agregarItem} />
-                                </SafeAreaView>
+                                }
+                            </SafeAreaView>
 
                         </itemSeleccionContext.Provider>
                     </palletSeleccionadoContext.Provider>

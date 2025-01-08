@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { FormState, datosPredioType } from "../types/types";
 
 export const formInit: FormState = {
