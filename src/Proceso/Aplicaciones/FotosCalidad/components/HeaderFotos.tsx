@@ -10,7 +10,7 @@ type propsType = {
 
 export default function HeaderFotos(props: propsType): React.JSX.Element {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-    if(!props.lotes) {return(<View><Text>Cargando...</Text></View>);}
+    if (!props.lotes) { return (<View><Text>Cargando...</Text></View>); }
     return (
         <View>
             <TouchableOpacity style={styles.botonLotes}
@@ -60,28 +60,28 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    centerModal:{
+    centerModal: {
         flex: 1,
         alignItems: 'center',
-        marginTop:'18%',
-      },
-      viewModal:{
+        marginTop: '18%',
+    },
+    viewModal: {
         backgroundColor: 'white',
         width: '90%',
         flexDirection: 'row',
         borderRadius: 20,
-        alignItems:'center',
+        alignItems: 'center',
         paddingBottom: 20,
-        paddingTop:10,
-      },
-      pressableStyle:{
+        paddingTop: 10,
+    },
+    pressableStyle: {
         marginTop: 10,
         marginBottom: 10,
-      },
-      textList:{
+    },
+    textList: {
         color: 'black',
-        marginLeft:10,
+        marginLeft: 10,
         marginRight: 15,
         fontSize: 18,
-      },
+    },
 });

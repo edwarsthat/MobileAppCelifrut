@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CargoType } from '../../types/cargosType';
 import { Animated, Text, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/FontAwesome5';
 
 
 type propsType = {
@@ -14,6 +15,7 @@ export default function Menu(props: propsType): React.JSX.Element {
     const calidad = useRef(new Animated.Value(1)).current;
     const sistema = useRef(new Animated.Value(1)).current;
     const proceso = useRef(new Animated.Value(1)).current;
+    const comercial = useRef(new Animated.Value(1)).current;
 
     const [permisos, setPermisos] = useState<string[]>();
 
@@ -95,6 +97,20 @@ export default function Menu(props: propsType): React.JSX.Element {
                     <Animated.View style={[styles.button, { transform: [{ scale: proceso }] }]}>
                         <Icon name="play-circle-o" size={24} color="#fff" />
                         <Text style={styles.text}>Proceso</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+
+            )}
+
+            {permisos?.includes('Comercial') && (
+                <TouchableWithoutFeedback
+                    onPress={() => props.seleccionWindow("Comercial")}
+                    onPressIn={() => handlePressIn(comercial)}
+                    onPressOut={() => handlePressOut(comercial)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: comercial }] }]}>
+                        <Icon2 name="store-alt" size={24} color="#fff" />
+                        <Text style={styles.text}>Comercial</Text>
                     </Animated.View>
                 </TouchableWithoutFeedback>
 

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from "react";
 import { Text, ScrollView, StyleSheet, Alert, Button, View, ActivityIndicator, TextInput } from "react-native";
 import { CustomError } from "../../../../Error/Error";

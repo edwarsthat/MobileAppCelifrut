@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, TouchableOpacity, StyleSheet, Text, View, ActivityIndicator, Switch, TextInput } from "react-native";

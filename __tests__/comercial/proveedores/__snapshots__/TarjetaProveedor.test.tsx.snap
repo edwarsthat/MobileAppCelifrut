@@ -1,0 +1,826 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TarjetaProveedor Component Debe renderizar correctamente con datos válidos 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": 8,
+      "elevation": 2,
+      "marginHorizontal": 16,
+      "marginVertical": 8,
+      "padding": 16,
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.1,
+      "shadowRadius": 4,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#333333",
+        "fontSize": 18,
+        "fontWeight": "bold",
+        "marginBottom": 8,
+      }
+    }
+  >
+    Codigo 
+    12345
+  </Text>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "marginBottom": 4,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#555555",
+          "fontWeight": "600",
+          "marginRight": 4,
+        }
+      }
+    >
+      Predio:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#777777",
+        }
+      }
+    >
+      Finca La Esperanza
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginTop": 12,
+        "paddingTop": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#333333",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "marginBottom": 8,
+        }
+      }
+    >
+      ICA
+    </Text>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Código:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      >
+        ICA-6789
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Tipo de Fruta:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      >
+        Banana, Mango, 
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Vencimiento:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      >
+        2025-12-31
+      </Text>
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginTop": 12,
+        "paddingTop": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#333333",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "marginBottom": 8,
+        }
+      }
+    >
+      GGN
+    </Text>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Código:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      >
+        GGN-9876
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Tipo de Fruta:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      >
+        Banana, Papaya, 
+      </Text>
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Vencimiento:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      >
+        2026-06-15
+      </Text>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`TarjetaProveedor Component Debe renderizar correctamente cuando faltan datos 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": 8,
+      "elevation": 2,
+      "marginHorizontal": 16,
+      "marginVertical": 8,
+      "padding": 16,
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.1,
+      "shadowRadius": 4,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#333333",
+        "fontSize": 18,
+        "fontWeight": "bold",
+        "marginBottom": 8,
+      }
+    }
+  >
+    Codigo 
+  </Text>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "marginBottom": 4,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#555555",
+          "fontWeight": "600",
+          "marginRight": 4,
+        }
+      }
+    >
+      Predio:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#777777",
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginTop": 12,
+        "paddingTop": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#333333",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "marginBottom": 8,
+        }
+      }
+    >
+      ICA
+    </Text>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Código:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Tipo de Fruta:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Vencimiento:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginTop": 12,
+        "paddingTop": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#333333",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "marginBottom": 8,
+        }
+      }
+    >
+      GGN
+    </Text>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Código:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Tipo de Fruta:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Vencimiento:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`TarjetaProveedor Component Debe renderizar correctamente cuando faltan datos 2 1`] = `
+<View
+  style={
+    {
+      "backgroundColor": "#FFFFFF",
+      "borderRadius": 8,
+      "elevation": 2,
+      "marginHorizontal": 16,
+      "marginVertical": 8,
+      "padding": 16,
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "height": 2,
+        "width": 0,
+      },
+      "shadowOpacity": 0.1,
+      "shadowRadius": 4,
+    }
+  }
+>
+  <Text
+    style={
+      {
+        "color": "#333333",
+        "fontSize": 18,
+        "fontWeight": "bold",
+        "marginBottom": 8,
+      }
+    }
+  >
+    Codigo 
+  </Text>
+  <View
+    style={
+      {
+        "flexDirection": "row",
+        "marginBottom": 4,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#555555",
+          "fontWeight": "600",
+          "marginRight": 4,
+        }
+      }
+    >
+      Predio:
+    </Text>
+    <Text
+      style={
+        {
+          "color": "#777777",
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginTop": 12,
+        "paddingTop": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#333333",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "marginBottom": 8,
+        }
+      }
+    >
+      ICA
+    </Text>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Código:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Tipo de Fruta:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Vencimiento:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "borderTopColor": "#EEEEEE",
+        "borderTopWidth": 1,
+        "marginTop": 12,
+        "paddingTop": 8,
+      }
+    }
+  >
+    <Text
+      style={
+        {
+          "color": "#333333",
+          "fontSize": 16,
+          "fontWeight": "bold",
+          "marginBottom": 8,
+        }
+      }
+    >
+      GGN
+    </Text>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Código:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Tipo de Fruta:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+    <View
+      style={
+        {
+          "flexDirection": "row",
+          "marginBottom": 4,
+        }
+      }
+    >
+      <Text
+        style={
+          {
+            "color": "#555555",
+            "fontWeight": "600",
+            "marginRight": 4,
+          }
+        }
+      >
+        Vencimiento:
+      </Text>
+      <Text
+        style={
+          {
+            "color": "#777777",
+          }
+        }
+      />
+    </View>
+  </View>
+</View>
+`;

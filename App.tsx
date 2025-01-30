@@ -52,21 +52,24 @@ import Aplicaciones from './src/menu/proceso/Aplicaciones';
 import ProcesoMenu from './src/menu/ProcesoMenu';
 import HistorialAplicaciones from './src/menu/proceso/HistorialAplicaciones';
 import Inventarios from './src/menu/Invetarios/Inventarios';
+import Comercial from './src/menu/Comercial';
+import Proveedores from './src/menu/comercial/Proveedores';
+import InfoProveedores from './src/comercial/proveedores/InfoProveedores';
 
 type envContexttype = {
   url: string,
   socketURL: string
 }
 
-export const envContext = createContext<envContexttype>({
-  url: "https://operativo.celifrut.com",
-  socketURL: "ws://operativo.celifrut.com",
-});
-
 // export const envContext = createContext<envContexttype>({
-//   url: "http://192.168.0.18:3010",
-//   socketURL: "ws://192.168.0.18",
+//   url: "https://operativo.celifrut.com",
+//   socketURL: "ws://operativo.celifrut.com",
 // });
+
+export const envContext = createContext<envContexttype>({
+  url: "http://192.168.0.18:3010",
+  socketURL: "ws://192.168.0.18",
+});
 
 export const deviceWidth = createContext<number>(0);
 export const stackContext = createContext<string[]>([]);
@@ -85,8 +88,8 @@ function App(): React.JSX.Element {
   //estado lote seleccionado para las diferentes aplicaciones
   const [lote, setLote] = useState<lotesType>();
 
-  const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
-  // const env = { url: "http://192.168.0.18:3010", socketURL: "ws://192.168.0.18" };
+  // const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
+  const env = { url: "http://192.168.0.18:3010", socketURL: "ws://192.168.0.18" };
 
   useEffect(() => {
     const handleBackPress = (): boolean | any => {
@@ -164,6 +167,8 @@ function App(): React.JSX.Element {
                     {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
                     {section === 'Proceso' && <ProcesoMenu permisos={permisos} seleccionWindow={seleccionWindow} />}
                     {section === 'Calidad' && <Calidad permisos={permisos} seleccionWindow={seleccionWindow} />}
+                    {section === 'Comercial' && <Comercial permisos={permisos} seleccionWindow={seleccionWindow} />}
+
 
                     {/* Calidad */}
                     {/* ingresos formularios */}
@@ -190,8 +195,11 @@ function App(): React.JSX.Element {
                     {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
 
                     {/* comercial */}
+                    {section === "Comercial/Proveedores" && <Proveedores permisos={permisos} seleccionWindow={seleccionWindow} />}
+
                     {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
                     {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
+                    {section === '66b670ca77549ed0672a9030' && <InfoProveedores />}
 
                     {/* inventario y logistica */}
                     {section === "Inventario y Logística/inventarios" && <Inventarios permisos={permisos} seleccionWindow={seleccionWindow} />}

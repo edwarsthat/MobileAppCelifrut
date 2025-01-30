@@ -70,7 +70,7 @@ export default function Camara(props:propsType): React.JSX.Element {
             const data = await RNFS.readFile(`file://'${imageSource}`, 'base64');
             const request = {
                 action: 'ingresar_foto_calidad',
-                // _id: props.lote._id,
+                _id: props.lote._id,
                 fotoName: nomnbreFoto,
                 foto: data,
             };
