@@ -26,7 +26,6 @@ export default function InfoProveedores(): React.JSX.Element {
                     },
                 });
                 const response = await requesOperariosJSON.json();
-                console.log(data);
                 if (response.status !== 200) {
                     throw new Error(`Cose ${response.status}: ${response.message}`);
                 }
@@ -71,6 +70,7 @@ export default function InfoProveedores(): React.JSX.Element {
             <View style={styles.containerForm}>
                 <Text style={styles.textInputs}>Búsqueda</Text>
                 <TextInput
+                    testID="proveedores_buscar_text_input"
                     style={styles.inputs}
                     placeholder="Ingrese Codigo o predio"
                     inputMode="text"

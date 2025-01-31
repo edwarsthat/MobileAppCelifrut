@@ -1,0 +1,227 @@
+[
+  {
+  "_id": "6797954c69cd807a37a69331",
+  "PREDIO": "predio de prueba precios 2",
+  "ICA": {
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ],
+    "code": "888888",
+    "fechaVencimiento":"2025-05-26T00:00:00.000Z"
+  },
+  "CODIGO INTERNO": 12347,
+  "tipo_fruta": {
+    "Limon": {
+      "Arboles": 1500,
+      "Hectareas": 5
+    }
+  },
+  "urlArchivos": [],
+  "activo": true,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "frutaNacional": 0,
+      "descarte": 0,
+      "zumex": 0
+    },
+    "fecha": "2025-01-16T21:51:57.488Z",
+    "_id": {
+      "$oid": "67897f7d8bd9866100450188"
+    }
+  },
+  "SISPAP": true,
+  "telefono_predio": "4455555",
+  "contacto_finca": "aasdasd",
+  "correo_informes": "asdasds@asdasd.com",
+  "telefono_propietario": "4444444",
+  "propietario": "popopo",
+  "razon_social": "SAS",
+  "nit_facturar": "555555",
+  "__v": 0
+},
+{
+  "_id": "67979240479af806760c84fb",
+  "PREDIO": "predio de prueba de preciosa",
+  "ICA": {
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ],
+    "code": "999999",
+    "fechaVencimiento": "2025-05-25T00:00:00.000Z"
+  },
+  "CODIGO INTERNO": 12346,
+  "GGN": {
+    "paises": [],
+    "tipo_fruta": [],
+    "code": ""
+  },
+  "tipo_fruta": {
+    "Limon": {
+      "Arboles": 1500,
+      "Hectareas": 5
+    }
+  },
+  "urlArchivos": [],
+  "activo": true,
+  "SISPAP": true,
+  "telefono_predio": "45211",
+  "contacto_finca": "asdasdasd",
+  "correo_informes": "asdas@sasdds.com",
+  "telefono_propietario": "785555",
+  "propietario": "alberrto",
+  "razon_social": "sas",
+  "nit_facturar": "888888",
+  "__v": 0
+},
+{
+  "_id":"678e6c8f229e845ac3776033",
+  "PREDIO": "Predio de pruebas unitarias",
+  "ICA": {
+    "code": "ICA-TEST-123",
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ],
+    "fechaVencimiento": "2025-01-20T15:32:31.940Z"
+  },
+  "CODIGO INTERNO": 12345,
+  "GGN": {
+    "code": "GGN-TEST-ABC",
+    "fechaVencimiento": "2025-01-20T15:32:31.940Z",
+    "paises": [
+      "Colombia",
+      "Brasil"
+    ],
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ]
+  },
+  "tipo_fruta": {
+    "Naranja Valencia": {
+      "arboles": 50,
+      "hectareas": 10
+    },
+    "Limon Tahití": {
+      "arboles": 100,
+      "hectareas": 20
+    }
+  },
+  "PROVEEDORES": "Proveedor de prueba",
+  "DEPARTAMENTO": "ACTUALIZADO",
+  "urlArchivos": [
+    "http://ejemplo.com/archivo1.jpg"
+  ],
+  "activo": true,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250
+    },
+    "Naranja": {
+      "1": 700,
+      "2": 900,
+      "15": 800,
+      "frutaNacional": 1000,
+      "descarte": 1100,
+      "zumex": 1200
+    },
+    "fecha":"2025-01-20T15:32:31.940Z"
+  },
+  "SISPAP": false,
+  "telefono_predio": "3000000000",
+  "contacto_finca": "Juan Pérez",
+  "correo_informes": "informes@predio.com",
+  "telefono_propietario": "3000001111",
+  "propietario": "Propietario de prueba",
+  "razon_social": "Empresa ABC",
+  "nit_facturar": "900123456-7",
+  "__v": 0
+},
+{
+  "_id": "679903eef8bc86beedc8babc",
+  "PREDIO": "Predio de pruebas unitarias",
+  "ICA": {
+    "code": "ICA-TEST-123",
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ],
+    "fechaVencimiento": "2025-01-28T16:21:02.033Z"
+  },
+  "CODIGO INTERNO": 12345,
+  "GGN": {
+    "code": "GGN-TEST-ABC",
+    "fechaVencimiento": "2025-01-28T16:21:02.033Z",
+    "paises": [
+      "Colombia",
+      "Brasil"
+    ],
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ]
+  },
+  "tipo_fruta": {
+    "Naranja Valencia": {
+      "arboles": 50,
+      "hectareas": 10
+    },
+    "Limon Tahití": {
+      "arboles": 100,
+      "hectareas": 20
+    }
+  },
+  "PROVEEDORES": "Proveedor de prueba",
+  "DEPARTAMENTO": "ACTUALIZADO",
+  "urlArchivos": [
+    "http://ejemplo.com/archivo1.jpg"
+  ],
+  "activo": true,
+  "precio": {
+    "Limon": {
+      "1": 100,
+      "2": 300,
+      "15": 200,
+      "frutaNacional": 400,
+      "descarte": 500,
+      "combinado": 600
+    },
+    "Naranja": {
+      "1": 700,
+      "2": 900,
+      "15": 800,
+      "frutaNacional": 1000,
+      "descarte": 1100,
+      "zumex": 1200
+    },
+    "fecha": "2025-01-28T16:21:02.033Z"
+  },
+  "SISPAP": false,
+  "telefono_predio": "3000000000",
+  "contacto_finca": "Juan Pérez",
+  "correo_informes": "informes@predio.com",
+  "telefono_propietario": "3000001111",
+  "propietario": "Propietario de prueba",
+  "razon_social": "Empresa ABC",
+  "nit_facturar": "900123456-7",
+  "__v": 0
+}
+]

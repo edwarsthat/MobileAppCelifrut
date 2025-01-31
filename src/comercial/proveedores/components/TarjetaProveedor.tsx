@@ -8,7 +8,7 @@ type propsType = {
 
 export default function TarjetaProveedor(props: propsType): React.JSX.Element {
     return (
-        <View style={styles.cardContainer}>
+        <View style={styles.cardContainer} testID="tarjeta_proveedor_id">
             {/* Encabezado principal */}
             <Text style={styles.headerText}>
                 Codigo {props.proveedor['CODIGO INTERNO'] ?? ''}

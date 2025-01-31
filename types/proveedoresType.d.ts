@@ -43,8 +43,8 @@ type ICAtype = {
 }
 
 export type proveedoresType = {
-  _id?: string
-  PREDIO?: string
+  _id: string
+  PREDIO: string
   ICA?: ICAtype
   'CODIGO INTERNO'?: number
   GGN?: GGNtype

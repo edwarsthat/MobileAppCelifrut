@@ -19,6 +19,7 @@ exports[`TarjetaProveedor Component Debe renderizar correctamente con datos vál
       "shadowRadius": 4,
     }
   }
+  testID="tarjeta_proveedor_id"
 >
   <Text
     style={
@@ -304,6 +305,7 @@ exports[`TarjetaProveedor Component Debe renderizar correctamente cuando faltan 
       "shadowRadius": 4,
     }
   }
+  testID="tarjeta_proveedor_id"
 >
   <Text
     style={
@@ -574,6 +576,7 @@ exports[`TarjetaProveedor Component Debe renderizar correctamente cuando faltan 
       "shadowRadius": 4,
     }
   }
+  testID="tarjeta_proveedor_id"
 >
   <Text
     style={

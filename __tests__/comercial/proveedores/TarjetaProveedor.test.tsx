@@ -63,14 +63,10 @@ describe('TarjetaProveedor Component', () => {
         expect(getByText(/2025-12-31/i)).toBeTruthy();
     });
 
-    // test('Debe renderizar los datos de GGN correctamente', () => {
-    //     const { getByText } = render(<TarjetaProveedor proveedor={mockProveedor} />);
-    //     expect(getByText(/GGN/i)).toBeTruthy();
-    //     expect(getByText(/Código:/i)).toBeTruthy();
-    //     expect(getByText(/GGN-9876/i)).toBeTruthy();
-    //     expect(getByText(/Tipo de Fruta:/i)).toBeTruthy();
-    //     expect(getByText(/Banana, Papaya/i)).toBeTruthy();
-    //     expect(getByText(/Vencimiento:/i)).toBeTruthy();
-    //     expect(getByText(/2026-06-15/i)).toBeTruthy();
-    // });
+    test('Debe renderizar los datos de GGN correctamente', () => {
+        const { getByText } = render(<TarjetaProveedor proveedor={mockProveedor} />);
+        expect(getByText(/GGN-9876/i)).toBeTruthy();
+        expect(getByText(/Banana, Papaya,/i)).toBeTruthy();
+        expect(getByText(/2026-06-15/i)).toBeTruthy();
+    });
 });
