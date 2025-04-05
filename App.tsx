@@ -67,8 +67,8 @@ type envContexttype = {
 // });
 
 export const envContext = createContext<envContexttype>({
-  url: "http://192.168.0.18:3010",
-  socketURL: "ws://192.168.0.18",
+  url: "http://172.31.176.1:3010",
+  socketURL: "ws://172.31.176.1",
 });
 
 export const deviceWidth = createContext<number>(0);
@@ -89,7 +89,7 @@ function App(): React.JSX.Element {
   const [lote, setLote] = useState<lotesType>();
 
   // const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
-  const env = { url: "http://192.168.0.18:3010", socketURL: "ws://192.168.0.18" };
+  const env = { url: "http://172.31.176.1:3010", socketURL: "ws://172.31.176.1" };
 
   useEffect(() => {
     const handleBackPress = (): boolean | any => {

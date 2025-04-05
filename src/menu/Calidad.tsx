@@ -9,7 +9,6 @@ type propsType = {
 }
 
 export default function Calidad(props: propsType): React.JSX.Element {
-    const ingreso_formularios = useRef(new Animated.Value(1)).current;
     const ingreso_calidad = useRef(new Animated.Value(1)).current;
 
     const [permisos, setPermisos] = useState<string[]>();
@@ -35,19 +34,6 @@ export default function Calidad(props: propsType): React.JSX.Element {
     };
     return (
         <View style={styles.container}>
-
-            {permisos?.includes('Ingresos Formularios') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("Calidad/ingresos_formularios")}
-                    onPressIn={() => handlePressIn(ingreso_formularios)}
-                    onPressOut={() => handlePressOut(ingreso_formularios)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: ingreso_formularios }] }]}>
-                        <Icon name="flask" size={24} color="#fff" />
-                        <Text style={styles.text}>Ingresos formularios</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
 
             {permisos?.includes('Ingresos Calidad') && (
                 <TouchableWithoutFeedback

@@ -46,7 +46,7 @@ export default function TaejetaLote(props: propsType): React.JSX.Element {
             {moreInfo &&
                 <Animated.View style={[styles.descarteContainer, { height: animationHeight }]}>
                     <View>
-                        <Text style={styles.textStyle}>ICA: {props.data.predio.ICA.code}</Text>
+                        <Text style={styles.textStyle}>ICA: {props.data.predio.ICA && props.data.predio.ICA.code}</Text>
                     </View>
                     <View>
                         <Text style={styles.textStyle}>

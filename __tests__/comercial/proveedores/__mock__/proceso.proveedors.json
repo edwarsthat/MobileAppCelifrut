@@ -1,6 +1,7 @@
-[
-  {
-  "_id": "6797954c69cd807a37a69331",
+[{
+  "_id": {
+    "$oid": "6797954c69cd807a37a69331"
+  },
   "PREDIO": "predio de prueba precios 2",
   "ICA": {
     "tipo_fruta": [
@@ -8,7 +9,9 @@
       "Limon"
     ],
     "code": "888888",
-    "fechaVencimiento":"2025-05-26T00:00:00.000Z"
+    "fechaVencimiento": {
+      "$date": "2025-05-26T00:00:00.000Z"
+    }
   },
   "CODIGO INTERNO": 12347,
   "tipo_fruta": {
@@ -26,7 +29,10 @@
       "15": 800,
       "frutaNacional": 400,
       "descarte": 350,
-      "combinado": 250
+      "combinado": 250,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450186"
+      }
     },
     "Naranja": {
       "1": 0,
@@ -34,9 +40,14 @@
       "15": 0,
       "frutaNacional": 0,
       "descarte": 0,
-      "zumex": 0
+      "zumex": 0,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450187"
+      }
     },
-    "fecha": "2025-01-16T21:51:57.488Z",
+    "fecha": {
+      "$date": "2025-01-16T21:51:57.488Z"
+    },
     "_id": {
       "$oid": "67897f7d8bd9866100450188"
     }
@@ -52,7 +63,9 @@
   "__v": 0
 },
 {
-  "_id": "67979240479af806760c84fb",
+  "_id": {
+    "$oid": "67979240479af806760c84fb"
+  },
   "PREDIO": "predio de prueba de preciosa",
   "ICA": {
     "tipo_fruta": [
@@ -60,7 +73,9 @@
       "Limon"
     ],
     "code": "999999",
-    "fechaVencimiento": "2025-05-25T00:00:00.000Z"
+    "fechaVencimiento": {
+      "$date": "2025-05-25T00:00:00.000Z"
+    }
   },
   "CODIGO INTERNO": 12346,
   "GGN": {
@@ -87,7 +102,9 @@
   "__v": 0
 },
 {
-  "_id":"678e6c8f229e845ac3776033",
+  "_id": {
+    "$oid": "678e6c8f229e845ac3776033"
+  },
   "PREDIO": "Predio de pruebas unitarias",
   "ICA": {
     "code": "ICA-TEST-123",
@@ -95,12 +112,16 @@
       "Naranja",
       "Limon"
     ],
-    "fechaVencimiento": "2025-01-20T15:32:31.940Z"
+    "fechaVencimiento": {
+      "$date": "2025-01-20T15:32:31.940Z"
+    }
   },
   "CODIGO INTERNO": 12345,
   "GGN": {
     "code": "GGN-TEST-ABC",
-    "fechaVencimiento": "2025-01-20T15:32:31.940Z",
+    "fechaVencimiento": {
+      "$date": "2025-01-20T15:32:31.940Z"
+    },
     "paises": [
       "Colombia",
       "Brasil"
@@ -133,7 +154,10 @@
       "15": 800,
       "frutaNacional": 400,
       "descarte": 350,
-      "combinado": 250
+      "combinado": 250,
+      "_id": {
+        "$oid": "678e6c8f229e845ac3776035"
+      }
     },
     "Naranja": {
       "1": 700,
@@ -141,9 +165,17 @@
       "15": 800,
       "frutaNacional": 1000,
       "descarte": 1100,
-      "zumex": 1200
+      "zumex": 1200,
+      "_id": {
+        "$oid": "678e6c8f229e845ac3776036"
+      }
     },
-    "fecha":"2025-01-20T15:32:31.940Z"
+    "fecha": {
+      "$date": "2025-01-20T15:32:31.940Z"
+    },
+    "_id": {
+      "$oid": "678e6c8f229e845ac3776034"
+    }
   },
   "SISPAP": false,
   "telefono_predio": "3000000000",
@@ -156,7 +188,9 @@
   "__v": 0
 },
 {
-  "_id": "679903eef8bc86beedc8babc",
+  "_id": {
+    "$oid": "679903eef8bc86beedc8babc"
+  },
   "PREDIO": "Predio de pruebas unitarias",
   "ICA": {
     "code": "ICA-TEST-123",
@@ -164,12 +198,16 @@
       "Naranja",
       "Limon"
     ],
-    "fechaVencimiento": "2025-01-28T16:21:02.033Z"
+    "fechaVencimiento": {
+      "$date": "2025-01-28T16:21:02.033Z"
+    }
   },
   "CODIGO INTERNO": 12345,
   "GGN": {
     "code": "GGN-TEST-ABC",
-    "fechaVencimiento": "2025-01-28T16:21:02.033Z",
+    "fechaVencimiento": {
+      "$date": "2025-01-28T16:21:02.033Z"
+    },
     "paises": [
       "Colombia",
       "Brasil"
@@ -212,7 +250,9 @@
       "descarte": 1100,
       "zumex": 1200
     },
-    "fecha": "2025-01-28T16:21:02.033Z"
+    "fecha": {
+      "$date": "2025-01-28T16:21:02.033Z"
+    }
   },
   "SISPAP": false,
   "telefono_predio": "3000000000",
@@ -223,5 +263,410 @@
   "razon_social": "Empresa ABC",
   "nit_facturar": "900123456-7",
   "__v": 0
-}
-]
+},
+{
+  "_id": {
+    "$oid": "678a76626049ea71c63dd652"
+  },
+  "PREDIO": "prueba modificado",
+  "ICA": {
+    "tipo_fruta": [
+      "",
+      "Limon",
+      "Naranja"
+    ],
+    "code": "9999999",
+    "fechaVencimiento": {
+      "$date": "2025-01-19T00:00:00.000Z"
+    }
+  },
+  "CODIGO INTERNO": 148,
+  "GGN": {
+    "paises": [
+      "",
+      "Canada",
+      "Estados unidos"
+    ],
+    "tipo_fruta": [
+      "",
+      "Limon"
+    ],
+    "_id": {
+      "$oid": "678a76626049ea71c63dd653"
+    },
+    "fechaVencimiento": {
+      "$date": "2025-01-19T00:00:00.000Z"
+    },
+    "code": "9888888"
+  },
+  "tipo_fruta": {
+    "Limon": {
+      "Arboles": 150,
+      "Hectareas": 15
+    },
+    "Naranja": {
+      "Arboles": 180,
+      "Hectareas": 18
+    }
+  },
+  "urlArchivos": [],
+  "activo": true,
+  "SISPAP": true,
+  "telefono_predio": "7589652",
+  "contacto_finca": "vcvcvcv",
+  "correo_informes": "ssssas@sadasd.com",
+  "telefono_propietario": "8888888",
+  "propietario": "ppopopopo",
+  "razon_social": "SAS",
+  "nit_facturar": "222222222",
+  "__v": 0,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "combinado": 250,
+      "descarte": 350,
+      "frutaNacional": 400
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "descarte": 0,
+      "frutaNacional": 0,
+      "zumex": 0
+    }
+  }
+},
+{
+  "_id": {
+    "$oid": "655e68b24e055637327c2f97"
+  },
+  "PREDIO": "El Limonar",
+  "ICA": {
+    "code": "635940479",
+    "tipo_fruta": [
+      "Limon"
+    ]
+  },
+  "CODIGO INTERNO": 147,
+  "GGN": {
+    "code": null,
+    "fechaVencimiento": null,
+    "paises": [],
+    "tipo_fruta": [],
+    "_id": {
+      "$oid": "6747876a15aaa65ae3f7f39e"
+    }
+  },
+  "FECHA VENCIMIENTO GGN": "",
+  "PROVEEDORES": "",
+  "DEPARTAMENTO": "Quindío",
+  "activo": false,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450183"
+      }
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "frutaNacional": 0,
+      "descarte": 0,
+      "zumex": 0,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450184"
+      }
+    },
+    "fecha": {
+      "$date": "2025-01-16T21:51:57.488Z"
+    },
+    "_id": {
+      "$oid": "67897f7d8bd9866100450185"
+    }
+  },
+  "SISPAP": false,
+  "alt": {
+    "$oid": "655e68b24e055637327c2f97"
+  },
+  "ICA_temp": "635940479",
+  "urlArchivos": [],
+  "tipo_fruta": {
+    "0": "Limon"
+  }
+},
+{
+  "_id": {
+    "$oid": "655e68b24e055637327c2f96"
+  },
+  "PREDIO": "Hda Córcega",
+  "ICA": {
+    "code": "635940540",
+    "tipo_fruta": [
+      "Limon"
+    ]
+  },
+  "CODIGO INTERNO": 146,
+  "GGN": {
+    "code": null,
+    "fechaVencimiento": null,
+    "paises": [],
+    "tipo_fruta": [],
+    "_id": {
+      "$oid": "674786eb15aaa65ae3f7f04c"
+    }
+  },
+  "FECHA VENCIMIENTO GGN": "",
+  "PROVEEDORES": "",
+  "DEPARTAMENTO": "Quindío",
+  "activo": true,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450180"
+      }
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "frutaNacional": 0,
+      "descarte": 0,
+      "zumex": 0,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450181"
+      }
+    },
+    "fecha": {
+      "$date": "2025-01-16T21:51:57.488Z"
+    },
+    "_id": {
+      "$oid": "67897f7d8bd9866100450182"
+    }
+  },
+  "SISPAP": false,
+  "alt": {
+    "$oid": "655e68b24e055637327c2f96"
+  },
+  "ICA_temp": "635940540",
+  "urlArchivos": [],
+  "tipo_fruta": {
+    "0": "Limon"
+  }
+},
+{
+  "_id": {
+    "$oid": "655e68b24e055637327c2f95"
+  },
+  "PREDIO": "La Rivera",
+  "ICA": {
+    "code": "767360173",
+    "tipo_fruta": [
+      "Naranja",
+      "Limon"
+    ]
+  },
+  "CODIGO INTERNO": 145,
+  "GGN": {
+    "code": null,
+    "fechaVencimiento": null,
+    "paises": [],
+    "tipo_fruta": [],
+    "_id": {
+      "$oid": "678a5feccba92de54cd90f12"
+    }
+  },
+  "FECHA VENCIMIENTO GGN": "",
+  "PROVEEDORES": "Carlos Alberto Torres Sierra",
+  "DEPARTAMENTO": "Valle del Cauca",
+  "activo": true,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250,
+      "_id": {
+        "$oid": "67897f7d8bd986610045017d"
+      }
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "frutaNacional": 0,
+      "descarte": 0,
+      "zumex": 0,
+      "_id": {
+        "$oid": "67897f7d8bd986610045017e"
+      }
+    },
+    "fecha": {
+      "$date": "2025-01-16T21:51:57.488Z"
+    },
+    "_id": {
+      "$oid": "67897f7d8bd986610045017f"
+    }
+  },
+  "SISPAP": false,
+  "alt": {
+    "$oid": "655e68b24e055637327c2f52"
+  },
+  "ICA_temp": "767360173",
+  "urlArchivos": [],
+  "tipo_fruta": {
+    "0": "Naranja",
+    "1": "Limon"
+  }
+},
+{
+  "_id": {
+    "$oid": "655e68b24e055637327c2f94"
+  },
+  "PREDIO": "El Jazmin",
+  "ICA": {
+    "code": "170880007",
+    "tipo_fruta": [
+      "Naranja",
+      "Limon",
+      "Mandarina"
+    ]
+  },
+  "CODIGO INTERNO": 144,
+  "GGN": {
+    "code": null,
+    "fechaVencimiento": null,
+    "paises": [],
+    "tipo_fruta": [],
+    "_id": {
+      "$oid": "678a5feccba92de54cd90f0b"
+    }
+  },
+  "FECHA VENCIMIENTO GGN": "",
+  "PROVEEDORES": "Comercializadora el Jazmin",
+  "DEPARTAMENTO": "Caldas",
+  "activo": false,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250,
+      "_id": {
+        "$oid": "67897f7d8bd986610045017a"
+      }
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "frutaNacional": 0,
+      "descarte": 0,
+      "zumex": 0,
+      "_id": {
+        "$oid": "67897f7d8bd986610045017b"
+      }
+    },
+    "fecha": {
+      "$date": "2025-01-16T21:51:57.488Z"
+    },
+    "_id": {
+      "$oid": "67897f7d8bd986610045017c"
+    }
+  },
+  "SISPAP": false,
+  "alt": {
+    "$oid": "655e68b24e055637327c2f94"
+  },
+  "ICA_temp": "170880007",
+  "urlArchivos": [],
+  "tipo_fruta": {
+    "0": "Naranja",
+    "1": "Limon",
+    "2": "Mandarina"
+  }
+},
+{
+  "_id": {
+    "$oid": "655e68b24e055637327c2f92"
+  },
+  "PREDIO": "La Leyenda",
+  "ICA": {
+    "code": "635940555",
+    "tipo_fruta": [
+      "Limon"
+    ]
+  },
+  "CODIGO INTERNO": 142,
+  "GGN": {
+    "code": null,
+    "fechaVencimiento": null,
+    "paises": [],
+    "tipo_fruta": [],
+    "_id": {
+      "$oid": "678a5feccba92de54cd90f04"
+    }
+  },
+  "FECHA VENCIMIENTO GGN": "",
+  "PROVEEDORES": "",
+  "DEPARTAMENTO": "Quindío",
+  "activo": true,
+  "precio": {
+    "Limon": {
+      "1": 1500,
+      "2": 1000,
+      "15": 800,
+      "frutaNacional": 400,
+      "descarte": 350,
+      "combinado": 250,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450177"
+      }
+    },
+    "Naranja": {
+      "1": 0,
+      "2": 0,
+      "15": 0,
+      "frutaNacional": 0,
+      "descarte": 0,
+      "zumex": 0,
+      "_id": {
+        "$oid": "67897f7d8bd9866100450178"
+      }
+    },
+    "fecha": {
+      "$date": "2025-01-16T21:51:57.487Z"
+    },
+    "_id": {
+      "$oid": "67897f7d8bd9866100450179"
+    }
+  },
+  "SISPAP": true,
+  "alt": {
+    "$oid": "655e68b24e055637327c2f92"
+  },
+  "ICA_temp": "635940555",
+  "urlArchivos": [],
+  "tipo_fruta": {
+    "0": "Limon"
+  }
+}]

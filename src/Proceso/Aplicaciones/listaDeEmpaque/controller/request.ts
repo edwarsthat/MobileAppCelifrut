@@ -3,9 +3,9 @@ import * as Keychain from "react-native-keychain";
 
 export const socketRequest = async (socket: Socket, request:any):Promise<{status:number, data:any, cajasSinPallet?:any} >=> {
     return await new Promise((resolve, reject) => {
-        socket.emit("Mobile", request, (serverResponse: any) => {
+        socket.emit("Desktop2", request, (serverResponse: any) => {
             if (serverResponse.status !== 200) {
-                reject(new Error(`${serverResponse.message}`));
+                reject(new Error(`Code ${serverResponse.status} ${serverResponse.message}`));
             }
             resolve(serverResponse);
         });

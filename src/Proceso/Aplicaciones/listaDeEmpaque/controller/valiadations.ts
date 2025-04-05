@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import { predioType } from "../../../../../types/predioType";
 
@@ -29,9 +29,8 @@ export const validarSumarDato = (cajas: number, loteActual: predioType, pallet: 
     if (contenedor.pallets[pallet].settings.calibre === 0) { throw new Error('Error configure el pallet'); }
     if (contenedor.pallets[pallet].settings.calidad === 0) { throw new Error('Error configure el pallet'); }
 };
-export const validarEliminar = (cajas: number, loteActual: predioType, seleccion: number[]) => {
+export const validarEliminar = (cajas: number, seleccion: number[]) => {
     if (isNaN(cajas)) { throw new Error('Ingrese el numero de cajas'); }
-    if (loteActual.enf === '') { throw new Error('Seleccione un lote'); }
     if (seleccion.length === 0) { throw new Error('Seleccione el item que desea eliminar'); }
 };
 export const validarResta = (contenedor: contenedoresType, cajas: number, seleccion: number[], pallet: number) => {

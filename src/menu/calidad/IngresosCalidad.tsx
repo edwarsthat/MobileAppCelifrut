@@ -10,12 +10,13 @@ type propsType = {
 
 export default function IngresosCalidad(props: propsType): React.JSX.Element {
     const clasificacion_descarte = useRef(new Animated.Value(1)).current;
+    const higiene_personal = useRef(new Animated.Value(1)).current;
 
     const [permisos, setPermisos] = useState<string[]>();
 
     useEffect(() => {
         if (props.permisos) {
-            const perm = Object.keys(props.permisos.Calidad);
+            const perm = Object.keys(props.permisos.Calidad["Ingresos Calidad"]);
             setPermisos(perm);
         }
     }, [props.permisos]);
@@ -35,7 +36,7 @@ export default function IngresosCalidad(props: propsType): React.JSX.Element {
     return (
         <View style={styles.container}>
 
-            {permisos?.includes('Ingresos Calidad') && (
+            {permisos?.includes('Ingreso Clasificacion descarte') && (
                 <TouchableWithoutFeedback
                     onPress={() => props.seleccionWindow("66b6701177549ed0672a9022")}
                     onPressIn={() => handlePressIn(clasificacion_descarte)}
@@ -44,6 +45,19 @@ export default function IngresosCalidad(props: propsType): React.JSX.Element {
                     <Animated.View style={[styles.button, { transform: [{ scale: clasificacion_descarte }] }]}>
                         <Icon name="flask" size={24} color="#fff" />
                         <Text style={styles.text}>Clasificaciíon descarte</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+
+            )}
+            {permisos?.includes('Higiene personal') && (
+                <TouchableWithoutFeedback
+                    onPress={() => props.seleccionWindow("66c5130bb51eef12da89050e")}
+                    onPressIn={() => handlePressIn(higiene_personal)}
+                    onPressOut={() => handlePressOut(higiene_personal)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: higiene_personal }] }]}>
+                        <Icon name="flask" size={24} color="#fff" />
+                        <Text style={styles.text}>Higiene personal</Text>
                     </Animated.View>
                 </TouchableWithoutFeedback>
             )}

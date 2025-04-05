@@ -30,7 +30,6 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
     const [query, setQuery] = useState('');
     const [selectedOperario, setSelectedOperario] = useState<userType | null>(null);
 
-
     const [showOperarios, setShowOperarios] = useState<boolean>(true);
     const [formState, setFormState] = useState<FormatoType>(formatoInit);
 
@@ -42,7 +41,7 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
         try {
             setLoading(true);
             const token = await getCredentials();
-            const requesOperariosJSON = await fetch(`${URL}/sistema/obtener_operarios_higiene`, {
+            const requesOperariosJSON = await fetch(`${URL}/Calidad/get_calidad_ingresos_higienePersonal`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -67,14 +66,13 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
     const handleGuardar = async (): Promise<void> => {
         try {
             const request = {
-                action: "add_higiene_personal",
                 data: {
                     ...formState,
                     operario: selectedOperario?._id,
                 },
             };
             const token = await getCredentials();
-            const responseJSON = await fetchWithTimeout(`${URL}/sistema/add_higiene_personal`, {
+            const responseJSON = await fetchWithTimeout(`${URL}/Calidad/post_calidad_ingresos_higienePersonal`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -105,7 +103,6 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
             [key]: event,
         });
     };
-
 
     useEffect(() => {
         if (query === '') {
@@ -189,99 +186,105 @@ export default function IngresoHigienePersonal(): React.JSX.Element {
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     componentContainer: {
         flex: 1,
-        backgroundColor: "#FAFAFA",
-        paddingTop: 20,
-        width: '100%',
-        paddingBottom: 15,
-        alignItems: 'center',
+        backgroundColor: "#FFFFFF",
+        padding: 16,
+        alignItems: "center",
+        width:"100%",
     },
     title: {
-        fontSize: 26,
+        fontSize: 24,
         fontWeight: "bold",
+        color: "#333333",
+        marginVertical: 20,
         textAlign: "center",
-        marginVertical: 10,
-        color: "#333",
     },
     operarioInputContainer: {
-        width: '100%',
-        alignItems: 'center',
+        width: "100%",
+        alignItems: "center",
     },
     inputs: {
-        borderWidth: 1,
-        borderColor: "#7D9F3A", // Verde suave para los bordes
         width: "90%",
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: "#DDDDDD",
         borderRadius: 8,
-        backgroundColor: "#fff", // Fondo blanco para contraste
-        elevation: 2, // Sombra para los inputs
-        shadowColor: "#000",
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        backgroundColor: "#FFFFFF",
+        fontSize: 16,
+        shadowColor: "#000000",
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
+        shadowOpacity: 0.05,
         shadowRadius: 4,
+        elevation: 1,
+        marginBottom: 10,
     },
     centerListOperarios: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100%',
+        width: "90%",
+        alignSelf: "center",
+        backgroundColor: "#FFFFFF",
+        borderRadius: 8,
+        marginTop: 4,
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 1,
     },
     listItemText: {
-        fontSize: 14,
-        paddingVertical: 10,
+        fontSize: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 8,
         borderBottomWidth: 1,
-        borderBottomColor: "#E0E0E0",
+        borderBottomColor: "#EEEEEE",
     },
     formulariosContainer: {
-        marginBottom: 15,
-        width: '100%',
+        width: "100%",
+        marginTop: 15,
     },
     formulariosCheckbox: {
-        width: "100%",
+        width: "90%",
         flexDirection: "row",
         alignItems: "center",
-        marginVertical: 5,
+        marginVertical: 6,
         paddingVertical: 12,
         paddingHorizontal: 10,
-        backgroundColor: "#F7F7F7",
-        borderRadius: 10,
-        // Sombra suave
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
+        backgroundColor: "#FFFFFF",
+        borderRadius: 8,
+        alignSelf: "center",
+        // Sombra sutil para caja
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
-        shadowRadius: 2,
-        elevation: 2,
+        shadowRadius: 4,
+        elevation: 1,
     },
     checkboxText: {
         flex: 1,
         fontSize: 16,
-        color: "#333",
+        color: "#333333",
+        marginRight: 8,
     },
     switch: {
-        transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }],
+        transform: [{ scaleX: 1 }, { scaleY: 1 }],
     },
     button: {
+        width: "90%",
         backgroundColor: "#4CAF50",
-        paddingVertical: 15,
+        paddingVertical: 14,
         borderRadius: 8,
         alignItems: "center",
-        marginTop: 10,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
+        justifyContent: "center",
+        alignSelf: "center",
+        marginTop: 16,
+        // Sombra para el botón
+        shadowColor: "#000000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
         shadowRadius: 4,
-        elevation: 3,
+        elevation: 2,
     },
     buttonText: {
         color: "#FFFFFF",
@@ -289,20 +292,22 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     },
     autocompleteInput: {
-        borderColor: '#ccc',
+        borderColor: "#DDDDDD",
         borderWidth: 1,
-        borderRadius: 5,
+        borderRadius: 8,
         paddingLeft: 10,
         height: 40,
         marginVertical: 5,
+        fontSize: 16,
     },
     itemText: {
         padding: 10,
-        borderBottomColor: '#eee',
+        borderBottomColor: "#EEEEEE",
         borderBottomWidth: 1,
+        fontSize: 16,
     },
     selected: {
         marginTop: 10,
-        fontWeight: 'bold',
+        fontWeight: "bold",
     },
 });

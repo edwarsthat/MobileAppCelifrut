@@ -96,7 +96,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
   const clickEliminar = () => {
     try {
-      validarEliminar(cajas, loteActual, seleccion);
+      validarEliminar(cajas, seleccion);
       Alert.alert('Eliminar items', '¿Desea eliminar los items?', [
         {
           text: 'Cancelar',
