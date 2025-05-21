@@ -14,6 +14,7 @@ import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppContext } from "../../../hooks/useAppContext";
+import { validarAddItem, validarDeleteItems, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
 
 let socket: Socket;
 
@@ -193,6 +194,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
+            console.log(request);
+            validarAddItem(request.data);
             await socketRequest(socket, request);
             // setContenedoresProvider(response.data);
             Alert.alert("Guardado con exito ");
@@ -219,6 +222,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
+            validarDeleteItems(request.data);
             await socketRequest(socket, request);
             Alert.alert("Eliminado con exito");
             // console.log(response);
@@ -246,6 +250,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
+            validarRestarItem(request.data);
             await socketRequest(socket, request);
             Alert.alert("Restado con exito");
         } catch (err) {
@@ -281,6 +286,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
+            validarMoverItem(request.data);
             await socketRequest(socket, request);
             Alert.alert("Se movió con exito");
 
@@ -366,6 +372,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
+            validarModificarItem(request.data);
             await socketRequest(socket, request);
             Alert.alert("Guardado con exito");
         } catch (err) {
