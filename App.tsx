@@ -67,8 +67,8 @@ type envContexttype = {
 // });
 
 export const envContext = createContext<envContexttype>({
-  url: "http://172.31.176.1:3010",
-  socketURL: "ws://172.31.176.1",
+  url: "http://127.0.0.1:3010", // Este valor será sobrescrito por el Provider
+  socketURL: "ws://127.0.0.1",
 });
 
 export const deviceWidth = createContext<number>(0);
@@ -88,8 +88,17 @@ function App(): React.JSX.Element {
   //estado lote seleccionado para las diferentes aplicaciones
   const [lote, setLote] = useState<lotesType>();
 
-  // const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
-  const env = { url: "http://172.31.176.1:3010", socketURL: "ws://172.31.176.1" };
+  // Configuración para producción
+// const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
+
+// Configuración para desarrollo local
+const isEmulator = DeviceInfo.isEmulatorSync();
+const localIP = isEmulator ? '10.0.2.2' : '192.168.20.81'; // Usa tu IP local si estás en dispositivo físico
+const env = {
+  url: `http://${localIP}:3010`,
+  // socketURL: `ws://${localIP}:3010`,
+  socketURL: `http://${localIP}:3010`,
+};
 
   useEffect(() => {
     const handleBackPress = (): boolean | any => {

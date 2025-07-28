@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 export type cajasSinPalletType = {
     lote: {
         _id: string
@@ -28,3 +28,5 @@ export type itemType =  {
     tipoFruta: string;
     fecha: Date;
 }
+
+export type PalletAsyncData = { cajasContadas: string; selectedColor: string };

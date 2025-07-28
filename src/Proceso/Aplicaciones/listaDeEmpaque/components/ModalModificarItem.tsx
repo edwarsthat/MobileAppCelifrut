@@ -1,12 +1,13 @@
 import React, { useContext, useState } from "react";
-import { Modal,Button, FlatList, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { Modal, Button, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { contenedoresContext, contenedorSeleccionadoContext } from "../ListaDeEmpaque";
 import { contenedoresType } from "../../../../../types/contenedoresType";
+import { ModalOpciones } from "./ModalOpciones";
 
 type propsType = {
     openModalEditar: boolean
-    setOpenModalEditar: (e:boolean) => void
-    modificarItems: (item:any) => void
+    setOpenModalEditar: (e: boolean) => void
+    modificarItems: (item: any) => void
 }
 export default function ModalModificarItem(props: propsType): React.JSX.Element {
     const idContenedor = useContext(contenedorSeleccionadoContext);
@@ -30,15 +31,21 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
         setModalTipoCaja(true);
     };
     const handleModificar = () => {
-        if(calibre === 'Calibre' || calidad === 'Calidad' || tipoCaja === 'Tipo de caja'){
+        if (calibre === 'Calibre' || calidad === 'Calidad' || tipoCaja === 'Tipo de caja') {
             return Alert.alert("Error, seleccione el calibre y la calidad");
         }
         const data = {
-            calidad:calidad,
-            calibre:calibre,
+            calidad: calidad,
+            calibre: calibre,
             tipoCaja: tipoCaja,
         };
         props.modificarItems(data);
+        props.setOpenModalEditar(false);
+        setCalibre('Calibre');
+        setCalidad('Calidad');
+        setTipoCaja('Tipo de caja');
+    };
+    const handleCancel = () => {
         props.setOpenModalEditar(false);
         setCalibre('Calibre');
         setCalidad('Calidad');
@@ -73,81 +80,42 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
 
                         </View>
                         <View style={styles.viewButtonsModal}>
-                            <Button title="Editar" onPress={handleModificar}/>
-                            <Button title="Cancelar" onPress={() => props.setOpenModalEditar(false)} />
+                            <Button title="Editar" onPress={handleModificar} />
+                            <Button title="Cancelar" onPress={handleCancel}  />
                         </View>
                     </View>
                 </View>
             </Modal>
             {/* //opciones calidad */}
-            <Modal transparent={true} visible={modalCalidad} animationType="fade">
-                <View style={styles.centerModal}>
-                    <View style={styles.viewModalItem}>
-                        <FlatList
-                            data={contenedor?.infoContenedor.calidad}
-                            style={styles.pressableStyle}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.buttonContenedores}
-                                    onPress={() => {
-                                        setModalCalidad(false);
-                                        setCalidad(item);
-                                    }}>
-                                    <Text style={styles.textList}>
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            keyExtractor={item => item}
-                        />
-                    </View>
-                </View>
-            </Modal>
+            <ModalOpciones
+                visible={modalCalidad}
+                data={contenedor?.infoContenedor.calidad || []}
+                onSelect={(item) => {
+                    setModalCalidad(false);
+                    setCalidad(item);
+                }}
+                styles={styles}
+            />
             {/* opciones calibre */}
-            <Modal transparent={true} visible={modalCalibre} animationType="fade">
-                <View style={styles.centerModal}>
-                    <View style={styles.viewModalItem}>
-                        <FlatList
-                            data={contenedor?.infoContenedor.calibres}
-                            style={styles.pressableStyle}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.buttonContenedores}
-                                    onPress={() => {
-                                        setModalCalibre(false);
-                                        setCalibre(item);
-                                    }}>
-                                    <Text style={styles.textList}>
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            keyExtractor={item => item}
-                        />
-                    </View>
-                </View>
-            </Modal>
+            <ModalOpciones
+                visible={modalCalibre}
+                data={contenedor?.infoContenedor.calibres || []}
+                onSelect={(item) => {
+                    setModalCalibre(false);
+                    setCalibre(item);
+                }}
+                styles={styles}
+            />
             {/* opciones tipo de caja */}
-            <Modal transparent={true} visible={modalTipoCaja} animationType="fade">
-                <View style={styles.centerModal}>
-                    <View style={styles.viewModalItem}>
-                        <FlatList
-                            data={contenedor?.infoContenedor.tipoCaja}
-                            style={styles.pressableStyle}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity style={styles.buttonContenedores}
-                                    onPress={() => {
-                                        setModalTipoCaja(false);
-                                        setTipoCaja(item);
-                                    }}>
-                                    <Text style={styles.textList}>
-                                        {item}
-                                    </Text>
-                                </TouchableOpacity>
-                            )}
-                            keyExtractor={item => item}
-                        />
-                    </View>
-                </View>
-            </Modal>
+            <ModalOpciones
+                visible={modalTipoCaja}
+                data={contenedor?.infoContenedor.tipoCaja || []}
+                onSelect={(item) => {
+                    setModalTipoCaja(false);
+                    setTipoCaja(item);
+                }}
+                styles={styles}
+            />
         </>
     );
 }
@@ -223,5 +191,5 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 30,
-      },
+    },
 });

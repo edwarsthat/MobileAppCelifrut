@@ -47,6 +47,8 @@ export default function Login(props: propsType): React.JSX.Element {
     const handlelogin = async (): Promise<void> => {
         try {
             setLoading(true);
+            console.log(url);
+
             const responseJSON = await fetch(`${url}/login2`, {
                 method: 'POST',
                 headers: {
@@ -58,7 +60,7 @@ export default function Login(props: propsType): React.JSX.Element {
                 }),
             });
             const response = await responseJSON.json();
-
+            console.log(response);
             if (response.status === 401) {
                 setError(401);
                 setTimeout(() => {

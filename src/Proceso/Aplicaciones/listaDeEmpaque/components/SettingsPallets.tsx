@@ -4,6 +4,8 @@ import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoC
 import { settingsType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import RadioButtonGroup from "./RadioButtonGroup";
+import { INITIAL_CONFIG_PALLET } from "../constants/configs";
 
 type propsType = {
     openModal: boolean;
@@ -35,59 +37,57 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
     const [isTablet, setIsTablet] = useState<boolean>(false);
     const [cajasContadas, setCajasContadas] = useState<string>('');
 
-
     useEffect(() => {
         setIsTablet(anchoDevice >= 721);
         getCajasContadas();
         if (pallet !== -1 && contenedor) {
             const infoLiberacion = contenedor.pallets[pallet].listaLiberarPallet;
-            setRotulado(infoLiberacion.rotulado);
-            setPaletizado(infoLiberacion.paletizado);
-            setEnzunchado(infoLiberacion.enzunchado);
-            setEstadoCajas(infoLiberacion.estadoCajas);
-            setEstiba(infoLiberacion.estiba);
+            setConfig(prevConfig => ({
+                ...prevConfig,
+                rotulado: infoLiberacion.rotulado,
+                paletizado: infoLiberacion.paletizado,
+                enzunchado: infoLiberacion.enzunchado,
+                estadoCajas: infoLiberacion.estadoCajas,
+                estiba: infoLiberacion.estiba,
+            }));
         } else {
-            setRotulado(false);
-            setPaletizado(false);
-            setEnzunchado(false);
-            setEstadoCajas(false);
-            setEstiba(false);
+            setConfig(prevConfig => ({
+                ...prevConfig,
+                rotulado: false,
+                paletizado: false,
+                enzunchado: false,
+                estadoCajas: false,
+                estiba: false,
+            }));
         }
     }, [props.openModal, contenedor, pallet, anchoDevice]);
 
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
+    const [config, setConfig] = useState(INITIAL_CONFIG_PALLET);
 
-    const [radioButtonTipoCaja, setRadioButtonTipoCaja] = useState<string>('');
-    const [radioButtonCalidad, setRadioButtonCalidad] = useState<string>('');
-    const [radioButtonCalibre, setRadioButtonCalibre] = useState<string>('');
-
-    const [rotulado, setRotulado] = useState<boolean>(false);
-    const [paletizado, setPaletizado] = useState<boolean>(false);
-    const [enzunchado, setEnzunchado] = useState<boolean>(false);
-    const [estadoCajas, setEstadoCajas] = useState<boolean>(false);
-    const [estiba, setEstiba] = useState<boolean>(false);
     const clickGuardar = (): void => {
-        if (radioButtonCalibre === '' && radioButtonCalidad === '' && radioButtonTipoCaja === '') {
-            props.closeModal();
-            return Alert.alert("No ha seleccionado ninguna configuración");
+        if (config.tipoCaja === '' || config.calidad === '' || config.calibre === '') {
+            return Alert.alert("No ha seleccionado todos los campos necesarios");
         }
         props.guardarPalletSettings({
-            tipoCaja: radioButtonTipoCaja,
-            calidad: radioButtonCalidad,
-            calibre: radioButtonCalibre,
+            tipoCaja: config.tipoCaja,
+            calidad: config.calidad,
+            calibre: config.calibre,
         });
         props.closeModal();
-        setRadioButtonCalibre('');
-        setRadioButtonTipoCaja('');
-        setRadioButtonCalidad('');
+        setConfig(INITIAL_CONFIG_PALLET);
+    };
+    const clickClose = (): void => {
+        props.closeModal();
+        setConfig(INITIAL_CONFIG_PALLET);
     };
     const liberarPallets = (): void => {
         const item = {
-            rotulado: rotulado,
-            paletizado: paletizado,
-            enzunchado: enzunchado,
-            estadoCajas: estadoCajas,
-            estiba: estiba,
+            rotulado: config.rotulado,
+            paletizado: config.paletizado,
+            enzunchado: config.enzunchado,
+            estadoCajas: config.estadoCajas,
+            estiba: config.estiba,
         };
         props.liberarPallet(item);
         props.closeModal();
@@ -140,57 +140,30 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                     {props.isTablet &&
                         <ScrollView style={styles.modal}>
                             <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
-                            <View style={styles.containerConfigurarPallet}>
-                                {contenedor?.infoContenedor.tipoCaja?.map((caja, index) => (
-                                    <TouchableOpacity onPress={() => setRadioButtonTipoCaja(caja)} key={caja + index}>
-                                        <View style={styles.radioButton}>
-                                            <View style={styles.radio}>
-                                                {radioButtonTipoCaja === caja ? (
-                                                    <View style={styles.radioBg}>{ }</View>
-                                                ) : null}
-                                            </View>
-                                            <Text>{caja} Kg</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                ))}
-                            </View>
-                            <View style={styles.containerConfigurarPallet}>
-                                <Text>Calidad</Text>
-                                <View style={styles.viewCalidad}>
-                                    {contenedor?.infoContenedor.calidad.map((calidad, index) => (
-                                        <TouchableOpacity onPress={() => setRadioButtonCalidad(calidad)} key={index}>
-                                            <View style={styles.radioButton}>
-                                                <View style={styles.radio}>
-                                                    {radioButtonCalidad === calidad ? (
-                                                        <View style={styles.radioBg}>{ }</View>
-                                                    ) : null}
-                                                </View>
-                                                <Text>{calidad}</Text>
-                                            </View>
-                                        </TouchableOpacity>
-                                    ))}
-                                </View>
-                                <View style={styles.containerConfigurarPallet}>
-                                    <Text>Calibre</Text>
-                                    <View style={styles.viewCalidad}>
-                                        {contenedor?.infoContenedor.calibres.map((calibre, index) => (
-                                            <TouchableOpacity onPress={() => setRadioButtonCalibre(calibre)} key={index}>
-                                                <View style={styles.radioButton}>
-                                                    <View style={styles.radio}>
-                                                        {radioButtonCalibre === calibre ? (
-                                                            <View style={styles.radioBg}>{ }</View>
-                                                        ) : null}
-                                                    </View>
-                                                    <Text>{calibre}</Text>
-                                                </View>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </View>
-                                </View>
-                            </View>
+                            <RadioButtonGroup
+                                options={contenedor?.infoContenedor.tipoCaja || []}
+                                value={config.tipoCaja}
+                                onSelect={(value) => setConfig((prev) => ({ ...prev, tipoCaja: value }))}
+                                label="Tipo de Caja"
+                                styles={styles} />
+
+                            <RadioButtonGroup
+                                options={contenedor?.infoContenedor.calidad || []}
+                                value={config.calidad}
+                                onSelect={(value) => setConfig((prev) => ({ ...prev, calidad: value }))}
+                                label="Calidad"
+                                styles={styles} />
+
+                            <RadioButtonGroup
+                                options={contenedor?.infoContenedor.calibres || []}
+                                value={config.calibre}
+                                onSelect={(value) => setConfig((prev) => ({ ...prev, calibre: value }))}
+                                label="Calibre"
+                                styles={styles} />
+
                             <View style={styles.containerButtonsModal}>
                                 <Button title="Guardar" onPress={clickGuardar} />
-                                <Button title="Cancelar" onPress={props.closeModal} />
+                                <Button title="Cancelar" onPress={clickClose} />
                             </View>
                         </ScrollView>
                     }
@@ -199,42 +172,42 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             <Text style={styles.tituloModal}>Liberacion pallets</Text>
                         </View>
                         <View style={isTablet ? styles.contenedorLiberacionPallet : stylesCel.contenedorLiberacionPallet}>
-                            <TouchableOpacity onPress={() => setRotulado(!rotulado)}>
+                            <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, rotulado: !prevConfig.rotulado }))}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
-                                        {rotulado ? <View style={styles.radioBg}>{ }</View> : null}
+                                        {config.rotulado ? <View style={styles.radioBg}>{ }</View> : null}
                                     </View>
                                     <Text>Rotulado</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setPaletizado(!paletizado)}>
+                            <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, paletizado: !prevConfig.paletizado }))}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
-                                        {paletizado ? <View style={styles.radioBg}>{ }</View> : null}
+                                        {config.paletizado ? <View style={styles.radioBg}>{ }</View> : null}
                                     </View>
                                     <Text>Paletizado</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setEnzunchado(!enzunchado)}>
+                            <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, enzunchado: !prevConfig.enzunchado }))}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
-                                        {enzunchado ? <View style={styles.radioBg}>{ }</View> : null}
+                                        {config.enzunchado ? <View style={styles.radioBg}>{ }</View> : null}
                                     </View>
                                     <Text>Enzunchado</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setEstadoCajas(!estadoCajas)}>
+                            <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, estadoCajas: !prevConfig.estadoCajas }))}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
-                                        {estadoCajas ? <View style={styles.radioBg}>{ }</View> : null}
+                                        {config.estadoCajas ? <View style={styles.radioBg}>{ }</View> : null}
                                     </View>
                                     <Text>Estado cajas</Text>
                                 </View>
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setEstiba(!estiba)}>
+                            <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, estiba: !prevConfig.estiba }))}>
                                 <View style={styles.radioButton}>
                                     <View style={styles.radio}>
-                                        {estiba ? <View style={styles.radioBg}>{ }</View> : null}
+                                        {config.estiba ? <View style={styles.radioBg}>{ }</View> : null}
                                     </View>
                                     <Text>Estiba tipo exportación</Text>
                                 </View>

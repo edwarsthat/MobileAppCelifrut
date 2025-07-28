@@ -15,6 +15,11 @@ import { getCredentials } from "../../../../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppContext } from "../../../hooks/useAppContext";
 import { validarAddItem, validarDeleteItems, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
+import useGetCatalogs from "../../../hooks/useGetCatalogs";
+import { cuartosFriosType } from "../../../../types/catalogs";
+import { validarEnviarCuartoFrioRequest } from "./controller/valiadations";
+import { ZodError } from "zod";
+import { getErrorMessages } from "../../../utils/errorsUtils";
 
 let socket: Socket;
 
@@ -57,7 +62,10 @@ export const itemSeleccionContext = createContext<number[]>([]);
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
+    const { obtenerCuartosFrios, cuartosFrios } = useGetCatalogs();
     const { setLoading, anchoDevice } = useAppContext();
+
+
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
     const [contenedoresProvider, setContenedoresProvider] = useState<contenedoresType[]>([]);
     const [palletSeleccionado, setPalletSeleccionado] = useState<number>(-1);
@@ -80,7 +88,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const createSocketConnection = useCallback(async () => {
         try {
             const token = await getCredentials();
-            // socket = io(`ws://operativo.celifrut.com:3011/`, {
             socket = io(`${url}/`, {
                 auth: {
                     token: token,
@@ -88,7 +95,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 rejectUnauthorized: false,
             });
             socket.on('connect', () => {
-                // console.log(`Conectado a ws://operativo.celifrut.com:3011/`);
                 console.log(`Conectado a ${url}/`);
             });
             socket.on('connect_error', (error) => {
@@ -111,10 +117,23 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     }, []);
 
     useEffect(() => {
-        setIsTablet(anchoDevice >= 721);
-        createSocketConnection();
-        obtenerPredioProcesando();
-        obtenerContenedores();
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                await obtenerCuartosFrios();
+                setIsTablet(anchoDevice >= 721);
+                createSocketConnection();
+                await obtenerPredioProcesando();
+                await obtenerContenedores();
+            } catch (error) {
+                Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+
         return () => {
             if (socket) {
                 socket.disconnect();
@@ -384,6 +403,46 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
+    const eviarPalletCuartoFrio = async (data: cuartosFriosType) => {
+        try {
+            console.log("Eviar pallet cuarto frio", data);
+            setLoading(true);
+            const token = await obtenerAccessToken();
+            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
+            const request = {
+                data: {
+                    action: 'put_inventarios_pallet_eviarCuartoFrio',
+                    _id: cont?._id,
+                    pallet: palletSeleccionado,
+                    cuartoFrio: data,
+                },
+                token: token,
+            };
+            console.log(request);
+
+            // Validar usando Zod con manejo de errores
+            try {
+                validarEnviarCuartoFrioRequest().parse(request.data);
+            } catch (validationError) {
+                if (validationError instanceof ZodError) {
+                    const errorMessages = getErrorMessages(validationError);
+                    const firstErrorKey = Object.keys(errorMessages)[0];
+                    const firstErrorMessage = errorMessages[firstErrorKey as keyof typeof errorMessages];
+                    Alert.alert("Error de validación", firstErrorMessage);
+                    return; // Salir de la función sin hacer la petición
+                }
+                throw validationError; // Re-lanzar si no es un error de Zod
+            }
+            await socketRequest(socket, request);
+            Alert.alert("Guardado con exito ");
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert(err.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleShowResumen = () => {
         setShowResumen(!showResumen);
     };
@@ -396,6 +455,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
 
                             <SafeAreaView style={styles.container}>
                                 <Header
+                                    eviarPalletCuartoFrio={eviarPalletCuartoFrio}
+                                    cuartosFrios={cuartosFrios}
                                     setPalletSeleccionado={setPalletSeleccionado}
                                     showResumen={showResumen}
                                     handleShowResumen={handleShowResumen}

@@ -26,6 +26,7 @@ export default function InfoProveedores(): React.JSX.Element {
                     },
                 });
                 const response = await requesOperariosJSON.json();
+                console.log(response);
                 if (response.status !== 200) {
                     throw new Error(`Cose ${response.status}: ${response.message}`);
                 }

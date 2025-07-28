@@ -59,6 +59,7 @@ export default function DescarteEncerado(): React.JSX.Element {
                 _id: datosPredio._id,
                 data: data,
             };
+            console.log(request)
             const token = await getCredentials();
             const responseJSON = await fetchWithTimeout(`${url}/proceso/ingresar_descarte_encerado`, {
                 method: "PUT",
@@ -69,6 +70,7 @@ export default function DescarteEncerado(): React.JSX.Element {
                 body: JSON.stringify(request),
             });
             const response = await responseJSON.json();
+            console.log(response)
             if (response.status !== 200) {
                 throw new Error(`Error guardando los datos ${response.message}`);
             }
