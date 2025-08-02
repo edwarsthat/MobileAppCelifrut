@@ -20,6 +20,7 @@ import { cuartosFriosType } from "../../../../types/catalogs";
 import { validarEnviarCuartoFrioRequest } from "./controller/valiadations";
 import { ZodError } from "zod";
 import { getErrorMessages } from "../../../utils/errorsUtils";
+import { useAppStore } from "../../../stores/useAppStore";
 
 let socket: Socket;
 
@@ -63,7 +64,8 @@ export const itemSeleccionContext = createContext<number[]>([]);
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
     const { obtenerCuartosFrios, cuartosFrios } = useGetCatalogs();
-    const { setLoading, anchoDevice } = useAppContext();
+    const { anchoDevice } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
 
 
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
@@ -403,7 +405,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const eviarPalletCuartoFrio = async (data: cuartosFriosType) => {
+    const enviarPalletCuartoFrio = async (data: cuartosFriosType) => {
         try {
             console.log("Eviar pallet cuarto frio", data);
             setLoading(true);

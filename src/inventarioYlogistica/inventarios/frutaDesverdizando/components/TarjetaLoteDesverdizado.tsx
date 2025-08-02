@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import React, { useState } from "react";
 import { Button, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { lotesType } from "../../../../../types/lotesType";

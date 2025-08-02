@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-//esta pendiente porque no tengo fruta desverdizando y me da pereza meter
+
 import React, { useEffect, useState } from "react";
 import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import HorizontalLine from "../../../components/HorizontalLine";

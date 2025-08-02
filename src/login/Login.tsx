@@ -5,7 +5,7 @@ import DeviceInfo from 'react-native-device-info';
 import RNFS from 'react-native-fs';
 import { CargoType } from '../../types/cargosType';
 import useEnvContext from '../hooks/useEnvContext';
-import { useAppContext } from '../hooks/useAppContext';
+import { useAppStore } from '../stores/useAppStore';
 const { ApkInstaller } = NativeModules;
 
 type propsType = {
@@ -15,7 +15,8 @@ type propsType = {
 
 export default function Login(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
-    const { setLoading }  = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
+    const loading = useAppStore((state) => state.loading);
     const [user, setUser] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<number>(0);
@@ -154,7 +155,7 @@ export default function Login(props: propsType): React.JSX.Element {
                         {error === 402 ? "Contraseña incorrecta" : ""}
                     </Text>
 
-                    <Button title="Ingresar" onPress={handlelogin} />
+                    <Button disabled={loading} title="Ingresar" onPress={handlelogin} />
                 </View>
             </>
         }

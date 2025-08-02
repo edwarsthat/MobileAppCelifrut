@@ -15,14 +15,13 @@ import { userType } from "../../../../types/cuentas";
 import { getCredentials } from "../../../../utils/auth";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { fetchWithTimeout } from "../../../../utils/connection";
-import { useAppContext } from "../../../hooks/useAppContext";
 import HorizontalLine from "../../../components/HorizontalLine";
 import formato from "./formularios/formularioCalidad0.0.1.json";
+import { useAppStore } from "../../../stores/useAppStore";
 
 export default function IngresoHigienePersonal(): React.JSX.Element {
     const { url: URL } = useEnvContext();
-    const { setLoading } = useAppContext();
-
+    const setLoading = useAppStore((state) => state.setLoading);
 
     const [operariosOri, setOperariosOri] = useState<userType[]>();
     const [operarios, setOperarios] = useState<userType[]>();

@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+
 import React from "react";
 import { StyleSheet, ActivityIndicator, FlatList } from "react-native";
 import { lotesType } from "../../../../../types/lotesType";

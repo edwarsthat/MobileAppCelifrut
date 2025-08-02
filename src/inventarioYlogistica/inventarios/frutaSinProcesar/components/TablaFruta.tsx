@@ -2,21 +2,22 @@ import React, { useEffect } from "react";
 import { StyleSheet, FlatList } from "react-native";
 import { lotesType } from "../../../../../types/lotesType";
 import TaejetaLote from "./TarjetaLote";
-import { useAppContext } from "../../../../hooks/useAppContext";
+import { useAppStore } from "../../../../stores/useAppStore";
 
 type propstType = {
     data: lotesType[] | undefined
 }
 
 export default function TablaFruta(props: propstType): React.JSX.Element {
-    const { setLoading } = useAppContext();
-    useEffect(()=>{
-        if( props.data === undefined){
+    const setLoading = useAppStore((state) => state.setLoading);
+
+    useEffect(() => {
+        if (props.data === undefined) {
             setLoading(true);
         } else {
             setLoading(false);
         }
-    },[props.data]);
+    }, [props.data]);
     return (
         <FlatList
             data={props.data}

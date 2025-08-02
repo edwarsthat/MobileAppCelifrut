@@ -9,11 +9,12 @@ import ShowData from "./components/ShowData";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import { fetchWithTimeout } from "../../../../utils/connection";
-import { useAppContext } from "../../../hooks/useAppContext";
+import { useAppStore } from "../../../stores/useAppStore";
 
 export default function IngresoClasificacionCalidad(): React.JSX.Element {
   const { url } = useEnvContext();
-  const { setLoading } = useAppContext();
+  const setLoading = useAppStore((state) => state.setLoading);
+
   const [lotesData, setLotesData] = useState<lotesType[]>([]);
   const [lote, setLote] = useState<lotesType>();
   const [dataArray, setDataArray] = useState<elementoDefectoType[]>([]);
@@ -177,7 +178,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#F8F8F8',
-    width:'100%',
+    width: '100%',
   },
 
   // Contenedor interno centrado y con separación

@@ -6,13 +6,13 @@ import { getCredentials } from "../../../../utils/auth";
 import { lotesType } from "../../../../types/lotesType";
 import OrdenVaceoTarjetaPredio from "./components/OrdenVaceoTarjetaPredio";
 import HorizontalLine from "../../../components/HorizontalLine";
-import { useAppContext } from "../../../hooks/useAppContext";
+import { useAppStore } from "../../../stores/useAppStore";
 
 
 
 export default function OrdenVaceo(): React.JSX.Element {
     const { url } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
     const [_, setLotesOriginal] = useState<lotesType[]>([]);
     const [lotesOrdenVaceo, setLotesOrdenVaceo] = useState<lotesType[]>([]);
     const [_1] = useState<number | null>(null);

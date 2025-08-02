@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, Image, StyleSheet, View, Text, Alert, Modal, FlatList } from 'react-native';
 import useEnvContext from '../hooks/useEnvContext';
 import { lotesType } from '../../types/lotesType';
-import { useAppContext } from '../hooks/useAppContext';
+import { useAppStore } from '../stores/useAppStore';
 const logoImage = require('../../assets/logo_app.png');
 
 type propsType = {
@@ -13,7 +13,7 @@ type propsType = {
 
 export default function Header(props: propsType) {
     const { url } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
     const [lotes, setLotes] = useState<lotesType[] | null>(null);
     const [lote, setLote] = useState<lotesType | null>(null);
     const [modalVisible, setModalVisible] = useState<boolean>(false);

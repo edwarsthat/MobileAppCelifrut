@@ -6,7 +6,7 @@
  * @format
  */
 
-import React, { createContext, Dispatch, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -33,8 +33,6 @@ import HistorialDescarteEnceradoProceso from './src/Proceso/historial/historialD
 import FotosCalidad from './src/Proceso/Aplicaciones/FotosCalidad/FotosCalidad';
 import HistorialFotosCalidad from './src/Proceso/historial/fotosCalidad/HistorialFotosCalidad';
 import ListaDeEmpaque from './src/Proceso/Aplicaciones/listaDeEmpaque/ListaDeEmpaque';
-import PrecioLimon from './src/comercial/precios/limon/PrecioLimon';
-import PrecioNaranja from './src/comercial/precios/naranja/PrecioNaranja';
 import IngresoClasificacionCalidad from './src/calidad/ingresos/Clasificacion descarte/IngresoClasificacionCalidad';
 import { CargoType } from './types/cargosType';
 import IngresoHigienePersonal from './src/calidad/ingresos/ingresoHigienePersonal/IngresoHigienePersonal';
@@ -55,6 +53,8 @@ import Inventarios from './src/menu/Invetarios/Inventarios';
 import Comercial from './src/menu/Comercial';
 import Proveedores from './src/menu/comercial/Proveedores';
 import InfoProveedores from './src/comercial/proveedores/InfoProveedores';
+import Loader from './src/utils/Loader';
+import { useAppStore } from './src/stores/useAppStore';
 
 type envContexttype = {
   url: string,
@@ -73,13 +73,12 @@ export const envContext = createContext<envContexttype>({
 
 export const deviceWidth = createContext<number>(0);
 export const stackContext = createContext<string[]>([]);
-export const loadingContext = createContext<Dispatch<React.SetStateAction<boolean>> | undefined>(undefined);
 
 function App(): React.JSX.Element {
+  const loading = useAppStore((state) => state.loading);
   const isDarkMode = useColorScheme() === 'dark';
   const [isLogin, setIslogin] = useState<boolean>(false);
   const [permisos, setPermisos] = useState<CargoType>();
-  const [loading, setLoading] = useState<boolean>(false);
   const [section, setSection] = useState<string>('menu');
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
   const [version, setVersion] = useState<string>('');
@@ -89,16 +88,16 @@ function App(): React.JSX.Element {
   const [lote, setLote] = useState<lotesType>();
 
   // Configuración para producción
-// const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
+  // const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
 
-// Configuración para desarrollo local
-const isEmulator = DeviceInfo.isEmulatorSync();
-const localIP = isEmulator ? '10.0.2.2' : '192.168.20.81'; // Usa tu IP local si estás en dispositivo físico
-const env = {
-  url: `http://${localIP}:3010`,
-  // socketURL: `ws://${localIP}:3010`,
-  socketURL: `http://${localIP}:3010`,
-};
+  // Configuración para desarrollo local
+  const isEmulator = DeviceInfo.isEmulatorSync();
+  const localIP = isEmulator ? '10.0.2.2' : '192.168.20.81'; // Usa tu IP local si estás en dispositivo físico
+  const env = {
+    url: `http://${localIP}:3010`,
+    // socketURL: `ws://${localIP}:3010`,
+    socketURL: `http://${localIP}:3010`,
+  };
 
   useEffect(() => {
     const handleBackPress = (): boolean | any => {
@@ -150,7 +149,6 @@ const env = {
     <envContext.Provider value={env}>
       <stackContext.Provider value={stack} >
         <deviceWidth.Provider value={anchoDevice}>
-          <loadingContext.Provider value={setLoading} >
             <SafeAreaView style={styles.container}>
               <StatusBar
                 barStyle={isDarkMode ? 'light-content' : 'dark-content'}
@@ -159,6 +157,7 @@ const env = {
               {
                 !isLogin ?
                   <>
+                    <Loader url={env.url} />
                     <Text>V-{version}</Text>
                     <Login
                       obtenerPermisos={obtenerPermisos}
@@ -166,12 +165,12 @@ const env = {
                   </>
                   :
                   <View style={styles.container}>
-                    {(section !== '66b6707777549ed0672a9029'  )
+                    {(section !== '66b6707777549ed0672a9029')
                       ? <Header
-                          seleccionWindow={seleccionWindow}
-                          setLote={setLote}
-                          section={section} />
-                        : null}
+                        seleccionWindow={seleccionWindow}
+                        setLote={setLote}
+                        section={section} />
+                      : null}
                     {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
                     {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
                     {section === 'Proceso' && <ProcesoMenu permisos={permisos} seleccionWindow={seleccionWindow} />}
@@ -205,9 +204,6 @@ const env = {
 
                     {/* comercial */}
                     {section === "Comercial/Proveedores" && <Proveedores permisos={permisos} seleccionWindow={seleccionWindow} />}
-
-                    {section === '66b670a777549ed0672a902d' && <PrecioLimon />}
-                    {section === '66b670b077549ed0672a902e' && <PrecioNaranja />}
                     {section === '66b670ca77549ed0672a9030' && <InfoProveedores />}
 
                     {/* inventario y logistica */}
@@ -222,7 +218,6 @@ const env = {
               <LoadingModal visible={loading} />
 
             </SafeAreaView>
-          </loadingContext.Provider>
         </deviceWidth.Provider>
       </stackContext.Provider>
     </envContext.Provider>
@@ -234,7 +229,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent:'center',
+    justifyContent: 'center',
     width: '100%',
   },
 });

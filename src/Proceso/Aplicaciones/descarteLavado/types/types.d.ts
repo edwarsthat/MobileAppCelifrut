@@ -5,16 +5,3 @@ export type datosPredioType = {
     tipoFruta: string;
 };
 
-export type FormCategory = {
-    canastillas: number;
-    kilos: number;
-};
-
-export type FormState = {
-    descarteGeneral: FormCategory;
-    pareja: FormCategory;
-    balin: FormCategory;
-    descompuesta: FormCategory;
-    piel: FormCategory;
-    hojas: FormCategory;
-};

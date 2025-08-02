@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Text, View, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import useEnvContext from '../../../hooks/useEnvContext';
-import { useAppContext } from '../../../hooks/useAppContext';
 import { getCredentials } from '../../../../utils/auth';
+import { useAppStore } from '../../../stores/useAppStore';
 
 export default function HistorialDescarteLavadoProceso(): React.JSX.Element {
     const { url: URL } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
     const [data, setData] = useState();
     const [itemSeleccionado, setItemSeleccionado] = useState('');
     useEffect(() => {

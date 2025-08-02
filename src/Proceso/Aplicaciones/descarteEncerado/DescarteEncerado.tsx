@@ -5,11 +5,11 @@ import { FormCategory, FormState, datosPredioType } from "./types/types";
 import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import { fetchWithTimeout } from "../../../../utils/connection";
-import { useAppContext } from "../../../hooks/useAppContext";
+import { useAppStore } from "../../../stores/useAppStore";
 
 export default function DescarteEncerado(): React.JSX.Element {
     const { url } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
     const [formState, setFormState] = useState<FormState>(formInit);
     const [datosPredio, setDatosPredio] = useState<datosPredioType>({
         _id: "",

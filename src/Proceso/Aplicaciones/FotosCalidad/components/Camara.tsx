@@ -6,7 +6,7 @@ import RNFS from 'react-native-fs';
 import useEnvContext from "../../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../../utils/auth";
 import { lotesType } from "../../../../../types/lotesType";
-import { useAppContext } from "../../../../hooks/useAppContext";
+import { useAppStore } from "../../../../stores/useAppStore";
 
 type propsType = {
     lote: lotesType | undefined
@@ -14,7 +14,7 @@ type propsType = {
 
 export default function Camara(props:propsType): React.JSX.Element {
     const { url } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
     const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
     const appState = useRef(AppState.currentState);

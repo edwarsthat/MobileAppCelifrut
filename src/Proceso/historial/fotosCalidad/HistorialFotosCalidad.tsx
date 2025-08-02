@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Alert, FlatList, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Keychain from 'react-native-keychain';
 import useEnvContext from "../../../hooks/useEnvContext";
-import { useAppContext } from "../../../hooks/useAppContext";
+import { useAppStore } from "../../../stores/useAppStore";
 
 
 export default function HistorialFotosCalidad(): React.JSX.Element {
     const { url: URL } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
+
     const [data, setData] = useState();
     const [itemSeleccionado, setItemSeleccionado] = useState('');
     const [image, setImage] = useState<string | null>(null);

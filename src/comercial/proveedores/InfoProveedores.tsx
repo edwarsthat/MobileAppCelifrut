@@ -4,12 +4,13 @@ import React, { useEffect, useState } from "react";
 import useEnvContext from "../../hooks/useEnvContext";
 import { proveedoresType } from "../../../types/proveedoresType";
 import { getCredentials } from "../../../utils/auth";
-import { useAppContext } from "../../hooks/useAppContext";
 import TarjetaProveedor from "./components/TarjetaProveedor";
+import { useAppStore } from "../../stores/useAppStore";
 
 export default function InfoProveedores(): React.JSX.Element {
     const { url } = useEnvContext();
-    const { setLoading } = useAppContext();
+    const setLoading = useAppStore((state) => state.setLoading);
+
     const [data, setData] = useState<proveedoresType[]>();
     const [dataOriginal, setDataOriginal] = useState<proveedoresType[]>();
     const [filtro, setFiltro] = useState<string>('');
