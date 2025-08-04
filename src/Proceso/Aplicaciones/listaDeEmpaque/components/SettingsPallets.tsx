@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { View, ScrollView, Modal, StyleSheet, Text, TouchableOpacity, Button, Alert, TextInput } from "react-native";
-import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { settingsType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RadioButtonGroup from "./RadioButtonGroup";
 import { INITIAL_CONFIG_PALLET } from "../constants/configs";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 
 type propsType = {
     openModal: boolean;
@@ -30,9 +30,9 @@ const colors = [
 ];
 
 export default function SettingsPallets(props: propsType): React.JSX.Element {
-    const pallet = useContext(palletSeleccionadoContext);
-    const contenedorSeleccionado = useContext(contenedorSeleccionadoContext);
-    const contenedor = useContext(contenedoresContext).find(cont => cont._id === contenedorSeleccionado);
+
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const pallet = useListaDeEmpaqueStore(state => state.pallet);
     const anchoDevice = useContext(deviceWidth);
     const [isTablet, setIsTablet] = useState<boolean>(false);
     const [cajasContadas, setCajasContadas] = useState<string>('');

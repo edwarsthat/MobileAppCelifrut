@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { View, SafeAreaView, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
 import { validarActualizarPallet, validarEliminar, validarMoverItem, validarResta, validarSumarDato } from "../controller/valiadations";
-import { contenedorSeleccionadoContext, contenedoresContext, itemSeleccionContext, loteSeleccionadoContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
-import { contenedoresType } from "../../../../../types/contenedoresType";
 import { itemType } from "../types/types";
 import { deviceWidth } from "../../../../../App";
 import ModalModificarItem from "./ModalModificarItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 
 type propsType = {
   agregarItem: (item: itemType) => void;
@@ -18,13 +17,10 @@ type propsType = {
 
 export default function Footer(props: propsType): React.JSX.Element {
   const anchoDevice = useContext(deviceWidth);
-  const loteActual = useContext(loteSeleccionadoContext);
-  const seleccion = useContext(itemSeleccionContext);
-  const pallet = useContext(palletSeleccionadoContext);
-  const idContenedor = useContext(contenedorSeleccionadoContext);
-  const contenedores = useContext(contenedoresContext);
-  const contenedor: contenedoresType | undefined = useContext(contenedoresContext)
-    .find(item => item._id === idContenedor);
+  const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+  const pallet = useListaDeEmpaqueStore(state => state.pallet);
+  const loteActual = useListaDeEmpaqueStore(state => state.loteSeleccionado);
+  const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
 
   const [contenedorID, setContenedorID] = useState<string>("");
   const [entradaModalPallet, setEntradaModalPallet] = useState<string>('');
@@ -44,6 +40,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   const clickActualizar = async () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
+      if(!loteActual) { throw new Error("Seleccione un lote"); }
 
       const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
       let cajas_input;
@@ -57,12 +54,12 @@ export default function Footer(props: propsType): React.JSX.Element {
       const cajasActual = validarActualizarPallet(cajas_input, loteActual, pallet, contenedor);
 
       const item = {
-        lote: loteActual._id,
+        lote: loteActual?._id,
         cajas: cajasActual,
         tipoCaja: contenedor?.pallets[pallet].settings.tipoCaja,
         calibre: String(contenedor?.pallets[pallet].settings.calibre),
         calidad: String(contenedor?.pallets[pallet].settings.calidad),
-        tipoFruta: loteActual.tipoFruta,
+        tipoFruta: loteActual?.tipoFruta || "",
         fecha: new Date(),
       };
       props.agregarItem(item);
@@ -76,6 +73,8 @@ export default function Footer(props: propsType): React.JSX.Element {
   const clickSumar = () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
+      if (!loteActual) { throw new Error("Seleccione un lote"); }
+
       validarSumarDato(cajas, loteActual, pallet, contenedor);
       const item: itemType = {
         lote: loteActual._id,
@@ -159,7 +158,7 @@ export default function Footer(props: propsType): React.JSX.Element {
         contenedorID,
         entradaModalPallet,
         contenedor,
-        contenedor2
+        contenedorID
       );
 
       const item = {

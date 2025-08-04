@@ -1,45 +1,36 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal, Alert } from "react-native";
 import { predioType } from "../../../../../types/predioType";
-import { contenedoresContext, contenedorSeleccionadoContext, loteSeleccionadoContext } from "../ListaDeEmpaque";
 import { cuartosFriosType } from "../../../../../types/catalogs";
+import { contenedoresType } from "../../../../../types/contenedoresType";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 
 type propsType = {
+    cuartosFrios: cuartosFriosType[];
     setSection: (e: string) => void,
+    isTablet: boolean
+    contenedores: contenedoresType[]
     loteVaciando: predioType[] | undefined
-    seleccionarLote: (item: predioType) => void
-    setIdContenedor: (data: string) => void;
+    showResumen: boolean,
     cerrarContenendor: () => void
     handleShowResumen: () => void
-    showResumen: boolean,
-    setPalletSeleccionado: (e: number) => void
-    isTablet: boolean
-    cuartosFrios: cuartosFriosType[];
-    eviarPalletCuartoFrio: (e: cuartosFriosType) => Promise<void>;
 }
 
-export default function Header(props: propsType): React.JSX.Element {
-    const loteSeleccionado = useContext(loteSeleccionadoContext);
-    const contenedores = useContext(contenedoresContext);
-    const idContenedor = useContext(contenedorSeleccionadoContext);
+export default function Header({
+    contenedores, setSection, isTablet, loteVaciando, showResumen, cerrarContenendor, handleShowResumen,
+}: propsType): React.JSX.Element {
+
+    const contenedor = useListaDeEmpaqueStore((state) => state.contenedor);
+    const seleccionarContenedor = useListaDeEmpaqueStore((state) => state.seleccionarContenedor);
+    const loteSeleccionado = useListaDeEmpaqueStore((state) => state.loteSeleccionado);
+    const seleccionarLote = useListaDeEmpaqueStore((state) => state.seleccionarLote);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalPrediosVisible, setModalPrediosVisible] = useState<boolean>(false);
-    const [modalCuartosFriosVisible, setModalCuartosFriosVisible] = useState<boolean>(false);
-
-    // Obtén el contenedor seleccionado
-    const contenedorSeleccionado = contenedores.find(cont => cont._id === idContenedor);
-    // Texto para el botón:
-    const clienteButtonText = contenedorSeleccionado
-        ? `${contenedorSeleccionado.numeroContenedor} - ${contenedorSeleccionado.infoContenedor?.clienteInfo.CLIENTE}`
-        : 'Contenedores';
-    // loteSeleccionado debería venir de context o prop (ya lo tienes)
-    const loteButtonText = loteSeleccionado && loteSeleccionado.enf && loteSeleccionado.nombrePredio
-        ? `${loteSeleccionado.enf}-${loteSeleccionado.nombrePredio}`
-        : 'Lote';
+    // const [modalCuartosFriosVisible, setModalCuartosFriosVisible] = useState<boolean>(false);
 
     const backMainMenu = (): void => {
-        props.setSection("menu");
+        setSection("menu");
     };
     const handleCerrarContenedor = () => {
         Alert.alert('Cerrar contenedor', `¿Desea cerrar el contenedor?`, [
@@ -51,7 +42,7 @@ export default function Header(props: propsType): React.JSX.Element {
             {
                 text: 'Aceptar',
                 onPress: () => {
-                    props.cerrarContenendor();
+                    cerrarContenendor();
                 },
                 style: 'default',
             },
@@ -69,35 +60,35 @@ export default function Header(props: propsType): React.JSX.Element {
             <View style={styles.buttonContainer}>
                 <Button title="Cerrar Contenedor" onPress={handleCerrarContenedor} color="#7D9F3A" />
 
-                {props.isTablet &&
+                {isTablet &&
                     <>
                         <Button
-                            title={props.showResumen ? "Lista Empaque" : "Resumen"}
-                            onPress={props.handleShowResumen}
+                            title={showResumen ? "Lista Empaque" : "Resumen"}
+                            onPress={handleShowResumen}
                             color="#7D9F3A"
                         />
-                        <Button title="Enviar Cuartos Frios" onPress={() => setModalCuartosFriosVisible(true)} color="#7D9F3A" />
-                        <Button title="Agregar pallet" color="#7D9F3A" />
+                        {/* <Button title="Enviar Cuartos Frios" onPress={() => setModalCuartosFriosVisible(true)} color="#7D9F3A" /> */}
+                        {/* <Button title="Agregar pallet" color="#7D9F3A" /> */}
                     </>
 
                 }
             </View>
-            {props.isTablet &&
+            {isTablet &&
                 <TouchableOpacity
                     style={styles.selectionButton}
                     onPress={() => {
-                        if (props.loteVaciando && props.loteVaciando.length !== 0) {
+                        if (loteVaciando && loteVaciando.length !== 0) {
                             setModalPrediosVisible(true);
                         }
                     }}
                 >
                     <View style={styles.buttonTextPredio}>
                         <Text style={styles.buttonText}>
-                            {loteButtonText}
+                            {loteSeleccionado && loteSeleccionado.enf + "-" + loteSeleccionado.nombrePredio}
                         </Text>
                         <Image
                             source={
-                                loteSeleccionado.tipoFruta === 'Limon'
+                                loteSeleccionado && loteSeleccionado.tipoFruta === 'Limon'
                                     ? require('../../../../../assets/limon.jpg')
                                     : require('../../../../../assets/naranja.jpg')
                             }
@@ -112,7 +103,7 @@ export default function Header(props: propsType): React.JSX.Element {
                     if (contenedores.length !== 0) { setModalVisible(true); }
                 }}
             >
-                <Text style={styles.buttonText}>{clienteButtonText}</Text>
+                <Text style={styles.buttonText}>{contenedor ? `${contenedor.numeroContenedor} - ${contenedor.infoContenedor?.clienteInfo.CLIENTE}` : "Seleccionar"}</Text>
             </TouchableOpacity>
 
             <Modal transparent={true} visible={modalVisible} animationType="fade">
@@ -124,13 +115,10 @@ export default function Header(props: propsType): React.JSX.Element {
                                 <TouchableOpacity
                                     style={[
                                         styles.selectionButton,
-                                        (idContenedor === item._id || loteSeleccionado?._id === item._id) && styles.selectedBorder,
+                                        (contenedor?._id === item._id || loteSeleccionado?._id === item._id) && styles.selectedBorder,
                                     ]}
                                     onPress={() => {
-                                        if (item.infoContenedor) {
-                                            props.setIdContenedor(item._id || "");
-                                        }
-                                        props.setPalletSeleccionado(-1);
+                                        seleccionarContenedor(item);
                                         setModalVisible(false);
                                     }}
                                 >
@@ -149,15 +137,15 @@ export default function Header(props: propsType): React.JSX.Element {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <FlatList
-                            data={props.loteVaciando}
+                            data={loteVaciando}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     style={[
                                         styles.selectionButton,
-                                        (idContenedor === item._id || loteSeleccionado?._id === item._id) && styles.selectedBorder,
+                                        (contenedor?._id === item._id || loteSeleccionado?._id === item._id) && styles.selectedBorder,
                                     ]}
                                     onPress={() => {
-                                        props.seleccionarLote(item);
+                                        seleccionarLote(item);
                                         setModalPrediosVisible(false);
                                     }}
                                 >
@@ -165,7 +153,7 @@ export default function Header(props: propsType): React.JSX.Element {
                                         <Text style={styles.buttonText}>
                                             {`${item.enf} - ${item.nombrePredio}`}
                                         </Text>
-                                        {/* ... */}
+
                                     </View>
                                 </TouchableOpacity>
                             )}
@@ -175,7 +163,7 @@ export default function Header(props: propsType): React.JSX.Element {
                 </View>
             </Modal>
 
-            <Modal transparent={true} visible={modalCuartosFriosVisible} animationType="fade">
+            {/* <Modal transparent={true} visible={modalCuartosFriosVisible} animationType="fade">
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <FlatList
@@ -188,22 +176,22 @@ export default function Header(props: propsType): React.JSX.Element {
                                     ]}
                                     onPress={async () => {
                                         setModalCuartosFriosVisible(false);
-                                        await props.eviarPalletCuartoFrio(item);
+                                        // await props.eviarPalletCuartoFrio(item);
                                     }}
                                 >
                                     <View style={styles.buttonTextPredio}>
                                         <Text style={styles.buttonText}>
                                             {`${item.nombre}`}
-                                        </Text>
-                                        {/* ... */}
-                                    </View>
+                                        </Text> */}
+            {/* ... */}
+            {/* </View>
                                 </TouchableOpacity>
                             )}
                             keyExtractor={item => item._id}
                         />
                     </View>
                 </View>
-            </Modal>
+            </Modal> */}
 
 
         </SafeAreaView>

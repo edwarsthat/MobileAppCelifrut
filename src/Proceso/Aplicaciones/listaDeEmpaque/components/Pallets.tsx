@@ -1,40 +1,41 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList, Alert } from "react-native";
-import { contenedorSeleccionadoContext, contenedoresContext } from "../ListaDeEmpaque";
 import PalletComponent from "./PalletComponent";
 import SettingsPallets from "./SettingsPallets";
 import { PalletAsyncData, settingsType } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useAppContext } from "../../../../hooks/useAppContext";
-import { CONTENEDOR_VACIO } from "../constants/configs";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { useAppStore } from "../../../../stores/useAppStore";
 
 type propsType = {
-    setPalletSeleccionado: (data: number) => void;
+
     guardarPalletSettings: (settings: settingsType) => Promise<void>;
     liberarPallet: (item: any) => void
-    setSeleccion: (e: number[]) => void
     isTablet: boolean
 
 };
 
-export default function Pallets(props: propsType): React.JSX.Element {
-    const { setLoading } = useAppContext();
-    const contenedores = useContext(contenedoresContext);
-    const idContenedor = useContext(contenedorSeleccionadoContext);
+export default function Pallets({
+    isTablet, liberarPallet, guardarPalletSettings,
+}: propsType): React.JSX.Element {
+    const setLoading = useAppStore(state => state.setLoading);
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const palletSeleccionado = useListaDeEmpaqueStore(state => state.seleccionarPallet);
+
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [columnas, setColumnas] = useState<number>(1);
 
     const [palletsAsyncData, setPalletsAsyncData] = useState<({ [key: number]: PalletAsyncData })>({});
-    const contenedorSeleccionado = contenedores.find(cont => cont._id === idContenedor) ?? CONTENEDOR_VACIO;
-    const data = contenedorSeleccionado?.pallets.map((_, idx) => idx) || [];
+
+    const data = contenedor?.pallets.map((_, idx) => idx) || [];
 
     useEffect(() => {
-        if (props.isTablet) {
+        if (isTablet) {
             setColumnas(6);
         } else {
             setColumnas(2);
         }
-    }, [props.isTablet]);
+    }, [isTablet]);
 
     useEffect(() => {
         let mounted = true;
@@ -42,10 +43,12 @@ export default function Pallets(props: propsType): React.JSX.Element {
             try {
                 setLoading(true);
                 // Construimos todas las promesas de lectura
+                if (!contenedor) { return; }
+
                 const results = await Promise.all(
-                    contenedorSeleccionado.pallets.map(async (palletNumber, index) => {
-                        const value = await AsyncStorage.getItem(`${contenedorSeleccionado._id}:${index}`);
-                        const color = await AsyncStorage.getItem(`${contenedorSeleccionado._id}:${index}:color`);
+                    contenedor.pallets.map(async (palletNumber, index) => {
+                        const value = await AsyncStorage.getItem(`${contenedor._id}:${index}`);
+                        const color = await AsyncStorage.getItem(`${contenedor._id}:${index}:color`);
                         return {
                             pallet: index,
                             cajasContadas: value ?? '',
@@ -53,6 +56,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
                         };
                     })
                 );
+
                 // Convertimos a un objeto indexado por número de pallet
                 const dataObj: { [key: number]: { cajasContadas: string; selectedColor: string } } = {};
                 results.forEach(result => {
@@ -70,7 +74,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
         };
         fetchAllPalletsData();
         return () => { mounted = false; };
-    }, [contenedorSeleccionado]);
+    }, [contenedor]);
 
     const openPalletSettings = () => {
         setOpenModal(true);
@@ -79,8 +83,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
         setOpenModal(false);
     };
     const handleClickPallet = (e: number) => {
-        props.setPalletSeleccionado(e);
-        props.setSeleccion([]);
+        palletSeleccionado(e);
     };
     return (
         <View style={styles.view1}>
@@ -94,7 +97,7 @@ export default function Pallets(props: propsType): React.JSX.Element {
                     renderItem={({ item, index }) => (
                         <PalletComponent
                             palletsAsyncData={palletsAsyncData[index] || { cajasContadas: '', selectedColor: '#FFFFFF' }}
-                            pallet={item}
+                            numeroPallet={item}
                             handleClickPallet={handleClickPallet}
                             openPalletSettings={openPalletSettings}
                         />
@@ -103,9 +106,9 @@ export default function Pallets(props: propsType): React.JSX.Element {
                 />
 
                 <SettingsPallets
-                    liberarPallet={props.liberarPallet}
-                    isTablet={props.isTablet}
-                    guardarPalletSettings={props.guardarPalletSettings}
+                    liberarPallet={liberarPallet}
+                    isTablet={isTablet}
+                    guardarPalletSettings={guardarPalletSettings}
                     closeModal={closeModal}
                     openModal={openModal} />
             </View>

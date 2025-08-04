@@ -1,37 +1,8 @@
 
 
-import { FormState, datosPredioType } from '../types/types';
-type ClaveForm = keyof FormState;
-export const formInit: FormState = {
-    descarteGeneral: {
-        canastillas: 0,
-        kilos: 0,
-    },
-    pareja: {
-        canastillas: 0,
-        kilos: 0,
-    },
-    balin: {
-        canastillas: 0,
-        kilos: 0,
-    },
-    descompuesta: {
-        canastillas: 0,
-        kilos: 0,
-    },
-    extra: {
-        canastillas: 0,
-        kilos: 0,
-    },
-    suelo: {
-        canastillas: 0,
-        kilos: 0,
-    },
-    frutaNacional: {
-        canastillas: 0,
-        kilos: 0,
-    },
-};
+import { tiposFrutasType } from '../../../../../types/tiposFrutas';
+import {  datosPredioType } from '../types/types';
+import { FormState } from '../validations/validations';
 
 export const labels = {
     descarteGeneral: 'Descarte General',
@@ -45,20 +16,15 @@ export const labels = {
 
 
 
-export const sumarDatos = (datos: FormState, lote: datosPredioType): Record<ClaveForm, number> => {
+export const sumarDatos = (datos: FormState, lote: datosPredioType, tipoFrutas:tiposFrutasType[]): Record<string, number> => {
     let mult;
-    switch (lote.tipoFruta) {
-        case 'Naranja':
-        case 'Mandarina':
-            mult = 19;
-            break;
-        case 'Limon':
-            mult = 20;
-            break;
-        default:
-            mult = 19;
+    const tipoFruta = tipoFrutas.find(item => item.tipoFruta === lote.tipoFruta);
+    if (tipoFruta) {
+        mult = tipoFruta.valorPromedio;
+    } else {
+        mult = 1;
     }
-    const salida: Record<ClaveForm, number> = {
+    const salida: Record<string, number> = {
         descarteGeneral: 0,
         pareja: 0,
         balin: 0,
@@ -67,8 +33,8 @@ export const sumarDatos = (datos: FormState, lote: datosPredioType): Record<Clav
         suelo: 0,
         frutaNacional: 0,
     };
-    (Object.keys(datos) as ClaveForm[]).forEach(item => {
-        salida[item] = (Number(datos[item].canastillas) * mult) + Number(datos[item].kilos);
+    Object.keys(datos).forEach(item => {
+        salida[item] = (Number(datos[item as keyof FormState].canastillas) * mult) + Number(datos[item as keyof FormState].kilos);
     });
     return salida;
 };

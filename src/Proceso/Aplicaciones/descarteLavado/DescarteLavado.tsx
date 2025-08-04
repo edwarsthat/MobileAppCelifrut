@@ -8,9 +8,12 @@ import { getCredentials } from "../../../../utils/auth";
 import useForm from "../../../hooks/useForm";
 import { FormState, labelsForm, formInit, FormCategory, formSchema } from "./validations/validations";
 import { useAppStore } from "../../../stores/useAppStore";
+import useTipoFrutaStore from "../../../stores/useTipoFrutaStore";
 
 export default function DescarteLavado(): React.JSX.Element {
     const { url } = useEnvContext();
+    const tiposFrutas = useTipoFrutaStore((state) => state.tiposFruta);
+
     const setLoading = useAppStore((state) => state.setLoading);
     const loading = useAppStore((state) => state.loading);
 
@@ -62,7 +65,6 @@ export default function DescarteLavado(): React.JSX.Element {
 
     const guardarDatos = async (): Promise<any> => {
         try {
-            console.log("Datos a guardar:", formState);
             const isValid = validateForm(formSchema);
             if (!isValid) {
                 return;
@@ -71,14 +73,14 @@ export default function DescarteLavado(): React.JSX.Element {
                 throw new Error("Recargue el predio que se está vaciando");
             }
             setLoading(true);
-            const data = sumarDatos(formState, datosPredio);
+            const data = sumarDatos(formState, datosPredio, tiposFrutas);
             const request = {
-                action: "ingresar_descarte_lavado",
+                action: "put_proceso_aplicaciones_descarteLavado",
                 _id: datosPredio._id,
                 data: data,
             };
             const token = await getCredentials();
-            const responseJSON = await fetchWithTimeout(`${url}/proceso/ingresar_descarte_lavado`, {
+            const responseJSON = await fetchWithTimeout(`${url}/proceso2/put_proceso_aplicaciones_descarteLavado`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

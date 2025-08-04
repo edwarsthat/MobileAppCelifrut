@@ -1,33 +1,28 @@
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
-import { contenedorSeleccionadoContext, contenedoresContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
 import { PalletAsyncData } from "../types/types";
 import { getPalletButtonStyle } from "../utils/pallets";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 
 
 type propsType = {
-    pallet: number;
     handleClickPallet: (data: number) => void;
     openPalletSettings: () => void;
     palletsAsyncData: PalletAsyncData;
+    numeroPallet: number;
 };
 
 export default React.memo(PalletComponent);
 
 function PalletComponent({
-    pallet,
+    numeroPallet,
     handleClickPallet,
     openPalletSettings,
     palletsAsyncData,
 }: propsType): React.JSX.Element {
-    const palletSeleccionado = useContext(palletSeleccionadoContext);
-    const idContenedor = useContext(contenedorSeleccionadoContext);
-    const contenedoresList = useContext(contenedoresContext);
 
-    const contenedor = useMemo(
-        () => contenedoresList.find(cont => cont._id === idContenedor),
-        [contenedoresList, idContenedor]
-    );
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const pallet = useListaDeEmpaqueStore(state => state.pallet);
 
     const palletData = useMemo(
         () => contenedor?.pallets?.[pallet] ?? null,
@@ -63,7 +58,7 @@ function PalletComponent({
                 style={[
                     styles.palletButtonBase,
                     getPalletButtonStyle(
-                        Number(pallet) === palletSeleccionado,
+                        Number(pallet) === numeroPallet,
                         palletFree,
                         palletsAsyncData?.selectedColor,
                         styles

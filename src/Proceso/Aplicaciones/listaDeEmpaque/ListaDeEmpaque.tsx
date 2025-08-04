@@ -5,7 +5,7 @@ import Header from "./components/Header";
 import { predioType, ResponseItem } from "../../../../types/predioType";
 import { contenedoresType } from "../../../../types/contenedoresType";
 import Pallets from "./components/Pallets";
-import { cajasSinPalletType, itemType, settingsType } from "./types/types";
+import { itemType, settingsType } from "./types/types";
 import { obtenerAccessToken, socketRequest } from "./controller/request";
 import Footer from "./components/Footer";
 import Informacion from "./components/Informacion";
@@ -16,11 +16,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppContext } from "../../../hooks/useAppContext";
 import { validarAddItem, validarDeleteItems, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
 import useGetCatalogs from "../../../hooks/useGetCatalogs";
-import { cuartosFriosType } from "../../../../types/catalogs";
-import { validarEnviarCuartoFrioRequest } from "./controller/valiadations";
-import { ZodError } from "zod";
-import { getErrorMessages } from "../../../utils/errorsUtils";
+// import { cuartosFriosType } from "../../../../types/catalogs";
+// import { validarEnviarCuartoFrioRequest } from "./controller/valiadations";
+// import { ZodError } from "zod";
+// import { getErrorMessages } from "../../../utils/errorsUtils";
 import { useAppStore } from "../../../stores/useAppStore";
+import { useListaDeEmpaqueStore } from "./store/useListaDeEmpaqueStore";
 
 let socket: Socket;
 
@@ -28,36 +29,7 @@ type propsType = {
     setSection: (e: string) => void
 }
 
-export const loteSeleccionadoContext = createContext<predioType>({
-    enf: '',
-    nombrePredio: '',
-    tipoFruta: 'Limon' as 'Limon' | 'Naranja',
-    _id: '',
-    predio: '',
-});
-export const contenedoresContext = createContext<contenedoresType[]>([
-    {
-        _id: '',
-        numeroContenedor: 0,
-        pallets: [],
-        infoContenedor: {
-            clienteInfo: {
-                CLIENTE: '',
-                _id: '',
-            },
-            tipoFruta: 'Limon',
-            cerrado: false,
-            desverdizado: false,
-            tipoCaja: [''],
-            calibres: [''],
-            calidad: [''],
 
-        },
-    },
-]);
-export const contenedorSeleccionadoContext = createContext<string>("");
-export const palletSeleccionadoContext = createContext<number>(-1);
-export const cajasSinPalletContext = createContext<cajasSinPalletType[]>([]);
 export const itemSeleccionContext = createContext<number[]>([]);
 
 
@@ -66,26 +38,15 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const { obtenerCuartosFrios, cuartosFrios } = useGetCatalogs();
     const { anchoDevice } = useAppContext();
     const setLoading = useAppStore((state) => state.setLoading);
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const pallet = useListaDeEmpaqueStore(state => state.pallet);
+    const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
+    const setSeleccion = useListaDeEmpaqueStore(state => state.setSeleccion);
 
-
+    const [contenedores, setContenedores] = useState<contenedoresType[]>([]);
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
-    const [contenedoresProvider, setContenedoresProvider] = useState<contenedoresType[]>([]);
-    const [palletSeleccionado, setPalletSeleccionado] = useState<number>(-1);
-    const [loteSeleccionado, setLoteSeleccionado] = useState<predioType>({
-        enf: '',
-        nombrePredio: '',
-        tipoFruta: '',
-        _id: '',
-        predio: '',
-    });
-    const [idContenedor, setIdContenedor] = useState<string>("");
-    const [seleccion, setSeleccion] = useState<number[]>([]);
-
     const [isTablet, setIsTablet] = useState<boolean>(false);
-
     const [showResumen, setShowResumen] = useState<boolean>(false);
-
-
 
     const createSocketConnection = useCallback(async () => {
         try {
@@ -102,9 +63,9 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             socket.on('connect_error', (error) => {
                 Alert.alert(`Error en la conexion del socket: ${error}`);
             });
-            // socket.on('servidor', () => {
-            //     obtenerPredioProcesando();
-            // });
+            socket.on('servidor', () => {
+                obtenerPredioProcesando();
+            });
             socket.on('predio_vaciado', () => {
                 obtenerPredioProcesando();
             });
@@ -128,6 +89,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 await obtenerPredioProcesando();
                 await obtenerContenedores();
             } catch (error) {
+                console.log(error);
+
                 Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
             } finally {
                 setLoading(false);
@@ -176,7 +139,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             const token = await obtenerAccessToken();
             const request = { data: { action: 'get_proceso_aplicaciones_listaEmpaque_contenedores' }, token: token };
             const response = await socketRequest(socket, request);
-            setContenedoresProvider(response.data);
+            console.log(response);
+            setContenedores(response.data);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -189,8 +153,15 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
-            const request = { data: { action: 'put_proceso_aplicaciones_listaEmpaque_addSettings', _id: cont?._id, pallet: palletSeleccionado, settings: settings }, token: token };
+            if (!contenedor) {
+                return Alert.alert("No hay contenedor seleccionado");
+            }
+            const request = {
+                data: {
+                    action: 'put_proceso_aplicaciones_listaEmpaque_addSettings', _id: contenedor?._id, pallet: pallet, settings: settings,
+                },
+                token: token,
+            };
             await socketRequest(socket, request);
             Alert.alert("Guardado con exito ");
         } catch (err) {
@@ -205,17 +176,15 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_agregarItem',
-                    _id: cont?._id,
-                    pallet: palletSeleccionado,
+                    _id: contenedor?._id,
+                    pallet: pallet,
                     item: item,
                 },
                 token: token,
             };
-            console.log(request);
             validarAddItem(request.data);
             await socketRequest(socket, request);
             // setContenedoresProvider(response.data);
@@ -226,6 +195,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 Alert.alert(err.message);
             }
         } finally {
+            setSeleccion([]);
             setLoading(false);
         }
     };
@@ -233,12 +203,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_eliminarItems',
-                    _id: cont?._id,
-                    pallet: palletSeleccionado,
+                    _id: contenedor?._id,
+                    pallet: pallet,
                     seleccion: seleccion,
                 },
                 token: token,
@@ -260,12 +229,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_restarItem',
-                    _id: cont?._id,
-                    pallet: palletSeleccionado,
+                    _id: contenedor?._id,
+                    pallet: pallet,
                     seleccion: seleccion[0],
                     cajas: item,
                 },
@@ -287,15 +255,14 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
-            const cont2 = contenedoresProvider.find(contenedor => contenedor._id === item.contenedor);
+            const cont2 = contenedores.find(cont => cont._id === item.contenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_moverItems',
                     contenedor1: {
-                        _id: cont?._id,
-                        numeroContenedor: cont?.numeroContenedor,
-                        pallet: palletSeleccionado,
+                        _id: contenedor?._id,
+                        numeroContenedor: contenedor?.numeroContenedor,
+                        pallet: pallet,
                         seleccionado: seleccion,
                     },
                     contenedor2: {
@@ -323,20 +290,21 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const liberarPallet = async (item: any) => {
         try {
             setLoading(true);
+            if (!contenedor) {
+                return Alert.alert("No hay contenedor seleccionado");
+            }
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_liberarPallet',
                     item: item,
-                    _id: cont?._id,
-                    pallet: palletSeleccionado,
+                    _id: contenedor?._id,
+                    pallet: pallet,
                 },
                 token: token,
             };
             await socketRequest(socket, request);
             Alert.alert("Guardado con exito");
-            // console.log(response);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -350,20 +318,19 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_Cerrar',
-                    _id: cont?._id,
+                    _id: contenedor?._id,
                 },
                 token: token,
             };
             await socketRequest(socket, request);
 
-            const len = cont?.pallets.length;
+            const len = contenedor?.pallets.length;
             if (len) {
                 for (let i = 0; i < len; i++) {
-                    await AsyncStorage.removeItem(`${cont._id}:${i}`);
+                    await AsyncStorage.removeItem(`${contenedor._id}:${i}`);
                 }
             }
 
@@ -382,12 +349,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_modificarItems',
-                    _id: cont?._id,
-                    pallet: palletSeleccionado,
+                    _id: contenedor?._id,
+                    pallet: pallet,
                     seleccion: seleccion,
                     data: data,
                 },
@@ -405,104 +371,90 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const enviarPalletCuartoFrio = async (data: cuartosFriosType) => {
-        try {
-            console.log("Eviar pallet cuarto frio", data);
-            setLoading(true);
-            const token = await obtenerAccessToken();
-            const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
-            const request = {
-                data: {
-                    action: 'put_inventarios_pallet_eviarCuartoFrio',
-                    _id: cont?._id,
-                    pallet: palletSeleccionado,
-                    cuartoFrio: data,
-                },
-                token: token,
-            };
-            console.log(request);
+    // const enviarPalletCuartoFrio = async (data: cuartosFriosType) => {
+    //     try {
+    //         console.log("Eviar pallet cuarto frio", data);
+    //         setLoading(true);
+    //         const token = await obtenerAccessToken();
+    //         const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
+    //         const request = {
+    //             data: {
+    //                 action: 'put_inventarios_pallet_eviarCuartoFrio',
+    //                 _id: cont?._id,
+    //                 pallet: palletSeleccionado,
+    //                 cuartoFrio: data,
+    //             },
+    //             token: token,
+    //         };
+    //         console.log(request);
 
-            // Validar usando Zod con manejo de errores
-            try {
-                validarEnviarCuartoFrioRequest().parse(request.data);
-            } catch (validationError) {
-                if (validationError instanceof ZodError) {
-                    const errorMessages = getErrorMessages(validationError);
-                    const firstErrorKey = Object.keys(errorMessages)[0];
-                    const firstErrorMessage = errorMessages[firstErrorKey as keyof typeof errorMessages];
-                    Alert.alert("Error de validación", firstErrorMessage);
-                    return; // Salir de la función sin hacer la petición
-                }
-                throw validationError; // Re-lanzar si no es un error de Zod
-            }
-            await socketRequest(socket, request);
-            Alert.alert("Guardado con exito ");
-        } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(err.message);
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
+    //         // Validar usando Zod con manejo de errores
+    //         try {
+    //             validarEnviarCuartoFrioRequest().parse(request.data);
+    //         } catch (validationError) {
+    //             if (validationError instanceof ZodError) {
+    //                 const errorMessages = getErrorMessages(validationError);
+    //                 const firstErrorKey = Object.keys(errorMessages)[0];
+    //                 const firstErrorMessage = errorMessages[firstErrorKey as keyof typeof errorMessages];
+    //                 Alert.alert("Error de validación", firstErrorMessage);
+    //                 return; // Salir de la función sin hacer la petición
+    //             }
+    //             throw validationError; // Re-lanzar si no es un error de Zod
+    //         }
+    //         await socketRequest(socket, request);
+    //         Alert.alert("Guardado con exito ");
+    //     } catch (err) {
+    //         if (err instanceof Error) {
+    //             Alert.alert(err.message);
+    //         }
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const handleShowResumen = () => {
         setShowResumen(!showResumen);
     };
     return (
-        <contenedoresContext.Provider value={contenedoresProvider}>
-            <loteSeleccionadoContext.Provider value={loteSeleccionado}>
-                <contenedorSeleccionadoContext.Provider value={idContenedor}>
-                    <palletSeleccionadoContext.Provider value={palletSeleccionado}>
-                        <itemSeleccionContext.Provider value={seleccion}>
 
-                            <SafeAreaView style={styles.container}>
-                                <Header
-                                    eviarPalletCuartoFrio={eviarPalletCuartoFrio}
-                                    cuartosFrios={cuartosFrios}
-                                    setPalletSeleccionado={setPalletSeleccionado}
-                                    showResumen={showResumen}
-                                    handleShowResumen={handleShowResumen}
-                                    cerrarContenendor={cerrarContenedor}
-                                    setSection={props.setSection}
-                                    setIdContenedor={setIdContenedor}
-                                    loteVaciando={loteVaciando}
-                                    isTablet={isTablet}
-                                    seleccionarLote={setLoteSeleccionado} />
+        <SafeAreaView style={styles.container}>
+            <Header
+                cuartosFrios={cuartosFrios}
+                setSection={props.setSection}
+                isTablet={isTablet}
+                contenedores={contenedores}
+                loteVaciando={loteVaciando}
+                showResumen={showResumen}
+                handleShowResumen={handleShowResumen}
+                cerrarContenendor={cerrarContenedor}
+            />
 
-                                {showResumen ?
-                                    <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
-                                        <ResumenListaEmpaque />
-                                    </View>
-                                    :
-                                    <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
+            {showResumen ?
+                <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
+                    <ResumenListaEmpaque />
+                </View>
+                :
+                <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
 
-                                        <Pallets
-                                            setSeleccion={setSeleccion}
-                                            isTablet={isTablet}
-                                            liberarPallet={liberarPallet}
-                                            guardarPalletSettings={guardarPalletSettings}
-                                            setPalletSeleccionado={setPalletSeleccionado} />
+                    <Pallets
+                        isTablet={isTablet}
+                        liberarPallet={liberarPallet}
+                        guardarPalletSettings={guardarPalletSettings}
+                    />
 
-                                        {isTablet &&
-                                            <Informacion setSeleccion={setSeleccion} />}
+                    {isTablet &&
+                        <Informacion setSeleccion={setSeleccion} />}
 
-                                    </View>
-                                }
-                                {isTablet &&
-                                    <Footer
-                                        modificarItems={modificarItems}
-                                        moverItem={moverItem}
-                                        restarItem={restarItem}
-                                        eliminarItem={eliminarItem}
-                                        agregarItem={agregarItem} />
-                                }
-                            </SafeAreaView>
-
-                        </itemSeleccionContext.Provider>
-                    </palletSeleccionadoContext.Provider>
-                </contenedorSeleccionadoContext.Provider>
-            </loteSeleccionadoContext.Provider>
-        </contenedoresContext.Provider>
+                </View>
+            }
+            {isTablet &&
+                <Footer
+                    modificarItems={modificarItems}
+                    moverItem={moverItem}
+                    restarItem={restarItem}
+                    eliminarItem={eliminarItem}
+                    agregarItem={agregarItem} />
+            }
+        </SafeAreaView>
     );
 }
 
