@@ -1,11 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, SafeAreaView, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
 import { validarActualizarPallet, validarEliminar, validarMoverItem, validarResta, validarSumarDato } from "../controller/valiadations";
 import { itemType } from "../types/types";
-import { deviceWidth } from "../../../../../App";
 import ModalModificarItem from "./ModalModificarItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { useAppContext } from "../../../../hooks/useAppContext";
+import { contenedoresType } from "../../../../../types/contenedoresType";
 
 type propsType = {
   agregarItem: (item: itemType) => void;
@@ -13,10 +14,11 @@ type propsType = {
   restarItem: (item: any) => void;
   moverItem: (item: any) => void;
   modificarItems: (e: any) => void;
+  contenedores: contenedoresType[];
 };
 
 export default function Footer(props: propsType): React.JSX.Element {
-  const anchoDevice = useContext(deviceWidth);
+  const { anchoDevice } = useAppContext();
   const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
   const pallet = useListaDeEmpaqueStore(state => state.pallet);
   const loteActual = useListaDeEmpaqueStore(state => state.loteSeleccionado);
@@ -40,7 +42,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   const clickActualizar = async () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
-      if(!loteActual) { throw new Error("Seleccione un lote"); }
+      if (!loteActual) { throw new Error("Seleccione un lote"); }
 
       const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
       let cajas_input;
@@ -59,7 +61,7 @@ export default function Footer(props: propsType): React.JSX.Element {
         tipoCaja: contenedor?.pallets[pallet].settings.tipoCaja,
         calibre: String(contenedor?.pallets[pallet].settings.calibre),
         calidad: String(contenedor?.pallets[pallet].settings.calidad),
-        tipoFruta: loteActual?.tipoFruta || "",
+        tipoFruta: loteActual?.tipoFruta._id || "",
         fecha: new Date(),
       };
       props.agregarItem(item);
@@ -83,8 +85,9 @@ export default function Footer(props: propsType): React.JSX.Element {
         calibre: String(contenedor?.pallets[pallet].settings.calibre),
         calidad: String(contenedor?.pallets[pallet].settings.calidad),
         fecha: new Date(),
-        tipoFruta: loteActual.tipoFruta,
+        tipoFruta: loteActual.tipoFruta._id,
       };
+      console.log("item", item);
       props.agregarItem(item);
       setCajas(0);
     } catch (err) {
@@ -143,22 +146,16 @@ export default function Footer(props: propsType): React.JSX.Element {
   const clickMover = () => {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
-      let contenedor2;
-      const index = contenedores.findIndex(item => item._id === contenedorID);
-      if (index === -1) {
-        contenedor2 = "";
-      } else {
-        contenedor2 = contenedores[index];
-      }
+      const contenedor2 = props.contenedores.find(c => c._id === contenedorID) || "";
       validarMoverItem(
         Number(entradaModalCajas),
         seleccion,
         pallet,
-        idContenedor,
+        contenedor._id,
         contenedorID,
         entradaModalPallet,
         contenedor,
-        contenedorID
+        contenedor2
       );
 
       const item = {
@@ -218,7 +215,7 @@ export default function Footer(props: propsType): React.JSX.Element {
             </View>
             <TouchableOpacity
               onPress={() => {
-                if (contenedores.length !== 0) {
+                if (props.contenedores.length !== 0) {
                   setModalVisible(true);
                 }
               }}
@@ -259,7 +256,7 @@ export default function Footer(props: propsType): React.JSX.Element {
         <View style={styles.centerModal}>
           <View style={showCajasInput ? styles.viewModalItem : styles.viewModalItems}>
             <FlatList
-              data={contenedores}
+              data={props.contenedores}
               style={styles.pressableStyle}
               renderItem={({ item }) => (
                 <TouchableOpacity

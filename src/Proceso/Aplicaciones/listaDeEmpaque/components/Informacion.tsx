@@ -1,7 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import {  StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
-import { cajasSinPalletContext, contenedorSeleccionadoContext, contenedoresContext, itemSeleccionContext, palletSeleccionadoContext } from "../ListaDeEmpaque";
+import { StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
 import { deviceWidth } from "../../../../../App";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { calidadData } from "../../../../utils/functions";
+import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
     setSeleccion: (data: number[]) => void;
@@ -9,11 +11,11 @@ type propsType = {
 
 export default function Informacion(props: propsType): React.JSX.Element {
     const anchoDevice = useContext(deviceWidth);
-    const pallet = useContext(palletSeleccionadoContext);
-    const numeroContenedor = useContext(contenedorSeleccionadoContext);
-    const contenedor = useContext(contenedoresContext).find(item => item._id === numeroContenedor);
-    const seleccion = useContext(itemSeleccionContext);
-    const cajasSinPallet = useContext(cajasSinPalletContext);
+    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const pallet = useListaDeEmpaqueStore(state => state.pallet);
+    const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
+
     const [isTablet, setIsTablet] = useState<boolean>(false);
     useEffect(() => {
         setIsTablet(anchoDevice >= 721);
@@ -33,105 +35,59 @@ export default function Informacion(props: propsType): React.JSX.Element {
     };
     return (
         <>
-            {pallet === -1 ?
-                (<View style={styles.scrollStyle}>
+            <View style={styles.scrollStyle}>
+                {contenedor && pallet !== null && contenedor.pallets[pallet] &&
                     <FlatList
-                        data={cajasSinPallet}
+                        data={contenedor.pallets[pallet].EF1}
                         renderItem={({ item, index }) => (
-                            <View style={styles.container} key={index + index}>
+                            <View style={styles.container}>
                                 <View style={styles.containerHeader}>
                                     <View key={index + 'view2'}>
-                                        <Text style={styles.textHeaders}>{item.lote.enf}</Text>
+                                        <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item?.lote?.enf || 'N/A'}</Text>
                                     </View>
-                                    <View key={item.lote.enf + 'view3'}>
+                                    <View >
                                         <View style={styles.view3} key={index + 'view4'}>
-                                            <Text key={index + 'nombrPredioHeader'} style={styles.textHeaders}>
+                                            <Text key={index + 'nombrPredioHeader'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
                                                 Nombre Predio:{' '}
                                             </Text>
-                                            <Text key={index + 'nombrPredio'} style={styles.textHeaders}>
-                                                {item.lote.predio}
+                                            <Text key={index + 'nombrPredio'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
+                                                {item?.lote?.predio || 'N/A'}
                                             </Text>
                                         </View>
                                     </View>
                                 </View>
                                 <TouchableOpacity
-                                    style={seleccion.includes(index) ? styles.touchablePress : styles.touchable}
+                                    style={isTablet ? seleccion.includes(index) ? styles.touchablePress : styles.touchable
+                                        : seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable
+                                    }
                                     onPress={() => handleSeleccion(index)}>
                                     <View style={styles.view3}>
                                         <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
-                                        <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.cajas ?? ''}</Text>
+                                        <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.cajas}</Text>
                                     </View>
-                                    <View style={styles.view4}>
+                                    <View style={isTablet ? styles.view4 : stylesCel.view4}>
                                         <View style={styles.view3}>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.tipoCaja ?? ''}</Text>
+                                            <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
+                                            <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.tipoCaja}</Text>
                                         </View>
                                         <View style={styles.view3}>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>Calibre: </Text>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.calibre ?? ''}</Text>
+                                            <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calibre: </Text>
+                                            <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>
+                                                {item.calibre}
+                                            </Text>
                                         </View>
                                         <View style={styles.view3}>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>Calidad: </Text>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.calidad ?? ''}</Text>
+                                            <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calidad: </Text>
+                                            <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>
+                                                {calidadData(tipoFrutas, item.calidad)?.nombre || 'N/A'}
+                                            </Text>
                                         </View>
                                     </View>
                                 </TouchableOpacity>
                             </View>
-                        )} />
-
-                </View>)
-                : (
-                    <View style={styles.scrollStyle}>
-                        {contenedor &&
-                        <FlatList
-                            data={contenedor.pallets[pallet].EF1}
-                            renderItem={({ item, index }) => (
-                                <View style={styles.container}>
-                                    <View style={styles.containerHeader}>
-                                        <View key={index + 'view2'}>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.lote.enf}</Text>
-                                        </View>
-                                        <View >
-                                            <View style={styles.view3} key={index + 'view4'}>
-                                                <Text key={index + 'nombrPredioHeader'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
-                                                    Nombre Predio:{' '}
-                                                </Text>
-                                                <Text key={index + 'nombrPredio'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
-                                                    {item.lote.predio}
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <TouchableOpacity
-                                        style={isTablet ? seleccion.includes(index) ? styles.touchablePress : styles.touchable
-                                            : seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable
-                                        }
-                                        onPress={() => handleSeleccion(index)}>
-                                        <View style={styles.view3}>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
-                                            <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.cajas}</Text>
-                                        </View>
-                                        <View style={isTablet ? styles.view4 : stylesCel.view4}>
-                                            <View style={styles.view3}>
-                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{'Tipo Caja:'} </Text>
-                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.tipoCaja}</Text>
-                                            </View>
-                                            <View style={styles.view3}>
-                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calibre: </Text>
-                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.calibre}</Text>
-                                            </View>
-                                            <View style={styles.view3}>
-                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calidad: </Text>
-                                                <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>{item.calidad}</Text>
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                        />}
-
-                    </View>
-                )}
+                        )}
+                    />}
+            </View>
         </>
     );
 }
@@ -143,7 +99,7 @@ const styles = StyleSheet.create({
         elevation: 10,
         shadowColor: '#52006A',
         flex: 1,
-        width:"100%",
+        width: "100%",
     },
     container: {
         margin: 5,

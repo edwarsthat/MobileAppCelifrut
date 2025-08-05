@@ -17,22 +17,14 @@ const useTipoFrutaStore = create<FrutaStore>((set) => ({
     cargarFruta: async (url: string): Promise<void> => {
         set({ isLoading: true, error: null });
         try {
-            const request = {
-                action: "get_data_tipoFruta2",
-            };
-            const response = await fetch(`${url}/data/get_data_tipoFruta2`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(request),
-            });
-            const data = await response.json();
 
+            const response = await fetch(`${url}/dataSys/get_data_tipoFruta2`);
+            const data = await response.json();
             if (data.status !== 200) {
                 throw new Error('Error al cargar los tipos de fruta');
             }
-            set({ tiposFruta: data, isLoading: false });
+            console.log('Tipos de fruta store:', data.data);
+            set({ tiposFruta: data.data, isLoading: false });
         } catch (error) {
             set({ error: error instanceof Error ? error.message : 'Error desconocido', isLoading: false });
         }

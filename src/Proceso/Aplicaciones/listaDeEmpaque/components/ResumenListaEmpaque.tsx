@@ -1,12 +1,16 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions, Switch } from "react-native";
 import HorizontalLine from "../../../../components/HorizontalLine";
-import { contenedoresContext, contenedorSeleccionadoContext } from "../ListaDeEmpaque";
 import { obtenerResumen } from "../controller/resumenes";
+import { contenedoresType } from "../../../../../types/contenedoresType";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 
-export default function ResumenListaEmpaque(): React.JSX.Element {
-    const contenedores = useContext(contenedoresContext);
-    const numeroContenedor = useContext(contenedorSeleccionadoContext);
+type propsType = {
+    contenedores: contenedoresType[]
+};
+
+export default function ResumenListaEmpaque({ contenedores }: propsType): React.JSX.Element {
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const [cajasTotal, setCajasTotal] = useState<number>(0);
     const [kilosTotal, setKilosTotal] = useState<number>(0);
     const [cajasCalidad, setCajasCalidad] = useState<object>();
@@ -17,10 +21,9 @@ export default function ResumenListaEmpaque(): React.JSX.Element {
     const toggleSwitch = () => setSoloHoy(previousState => !previousState);
     useEffect(() => {
         let cont;
-        if (numeroContenedor === undefined || numeroContenedor === "") {
+        if (contenedor === null) {
             cont = contenedores;
         } else {
-            const contenedor = contenedores?.find(c => c._id === numeroContenedor);
             cont = [contenedor];
         }
         const resumen = obtenerResumen(cont, soloHoy);
@@ -41,7 +44,7 @@ export default function ResumenListaEmpaque(): React.JSX.Element {
             setCajasCalibre(cajas_por_calibre);
             setkilosCalibre(kilos_por_calibre);
         }
-    }, [numeroContenedor, contenedores, soloHoy]);
+    }, [contenedor, contenedores, soloHoy]);
     return (
         <View style={styles.container1}>
             <View style={styles.container2}>

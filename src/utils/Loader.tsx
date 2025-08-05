@@ -15,9 +15,10 @@ export default function Loader({ url }: propsType): null {
     useEffect(() => {
         const loadData = async () => {
             try {
+                console.log('Cargando tipos de fruta desde:', url);
                 setLoading(true);
                 if (!tiposFruta.length) {
-                    cargarFruta(url);
+                    await cargarFruta(url);
                 }
             } catch (error) {
                 if(error instanceof Error) {

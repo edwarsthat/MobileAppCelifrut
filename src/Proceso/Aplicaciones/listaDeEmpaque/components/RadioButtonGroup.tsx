@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
 type RadioButtonGroupProps = {
-    options: string[];
+    options: { _id: string; name: string }[];
     value: string;
     onSelect: (val: string) => void;
     label?: string;
@@ -15,10 +15,10 @@ export default function RadioButtonGroup({ options, value, onSelect, label, opti
             {label && <Text>{label}</Text>}
             <View style={styles.viewCalidad}>
                 {options.map((option, idx) => (
-                    <TouchableOpacity key={option + idx} onPress={() => onSelect(option)}>
+                    <TouchableOpacity key={option._id + idx} onPress={() => onSelect(option._id)}>
                         <View style={styles.radioButton}>
-                            <View style={styles.radio}>{value === option ? <View style={styles.radioBg} /> : null}</View>
-                            <Text>{option}{optionSuffix}</Text>
+                            <View style={styles.radio}>{value === option._id ? <View style={styles.radioBg} /> : null}</View>
+                            <Text>{option.name}{optionSuffix}</Text>
                         </View>
                     </TouchableOpacity>
                 ))}

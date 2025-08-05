@@ -1,8 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Modal, Button, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
-import { contenedoresContext, contenedorSeleccionadoContext } from "../ListaDeEmpaque";
-import { contenedoresType } from "../../../../../types/contenedoresType";
 import { ModalOpciones } from "./ModalOpciones";
+import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 
 type propsType = {
     openModalEditar: boolean
@@ -10,10 +9,7 @@ type propsType = {
     modificarItems: (item: any) => void
 }
 export default function ModalModificarItem(props: propsType): React.JSX.Element {
-    const idContenedor = useContext(contenedorSeleccionadoContext);
-    const contenedor: contenedoresType | undefined = useContext(contenedoresContext,)
-        .find(item => item._id === idContenedor);
-
+    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const [modalCalidad, setModalCalidad] = useState<boolean>(false);
     const [modalCalibre, setModalCalibre] = useState<boolean>(false);
     const [modalTipoCaja, setModalTipoCaja] = useState<boolean>(false);

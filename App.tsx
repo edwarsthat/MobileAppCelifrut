@@ -149,75 +149,77 @@ function App(): React.JSX.Element {
     <envContext.Provider value={env}>
       <stackContext.Provider value={stack} >
         <deviceWidth.Provider value={anchoDevice}>
-            <SafeAreaView style={styles.container}>
-              <StatusBar
-                barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-                backgroundColor={backgroundStyle.backgroundColor}
-              />
-              {
-                !isLogin ?
-                  <>
-                    <Loader url={env.url} />
-                    <Text>V-{version}</Text>
-                    <Login
-                      obtenerPermisos={obtenerPermisos}
-                      setIslogin={setIslogin} />
-                  </>
-                  :
-                  <View style={styles.container}>
-                    {(section !== '66b6707777549ed0672a9029')
-                      ? <Header
-                        seleccionWindow={seleccionWindow}
-                        setLote={setLote}
-                        section={section} />
-                      : null}
-                    {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === 'Proceso' && <ProcesoMenu permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === 'Calidad' && <Calidad permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === 'Comercial' && <Comercial permisos={permisos} seleccionWindow={seleccionWindow} />}
+          <SafeAreaView style={styles.container}>
+            <StatusBar
+              barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+              backgroundColor={backgroundStyle.backgroundColor}
+            />
+            {
+              !isLogin ?
+                <>
+
+                  <Text>V-{version}</Text>
+                  <Login
+                    obtenerPermisos={obtenerPermisos}
+                    setIslogin={setIslogin} />
+                </>
+                :
+                <View style={styles.container}>
+                  <Loader url={env.url} />
+
+                  {(section !== '66b6707777549ed0672a9029')
+                    ? <Header
+                      seleccionWindow={seleccionWindow}
+                      setLote={setLote}
+                      section={section} />
+                    : null}
+                  {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === 'Proceso' && <ProcesoMenu permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === 'Calidad' && <Calidad permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === 'Comercial' && <Comercial permisos={permisos} seleccionWindow={seleccionWindow} />}
 
 
-                    {/* Calidad */}
-                    {/* ingresos formularios */}
-                    {section === "Calidad/ingresos_formularios" && <IngresosFormulariosCalidad permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === "Calidad/ingresos_calidad" && <IngresosCalidad permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {/* Calidad */}
+                  {/* ingresos formularios */}
+                  {section === "Calidad/ingresos_formularios" && <IngresosFormulariosCalidad permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === "Calidad/ingresos_calidad" && <IngresosCalidad permisos={permisos} seleccionWindow={seleccionWindow} />}
 
-                    {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
-                    {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
-                    {section === "66f8228c2d9d7eec9ff11d51" && <IngresarFormularioCalidad />}
+                  {section === "66b6701177549ed0672a9022" && <IngresoClasificacionCalidad />}
+                  {section === "66c5130bb51eef12da89050e" && <IngresoHigienePersonal />}
+                  {section === "66f8228c2d9d7eec9ff11d51" && <IngresarFormularioCalidad />}
 
-                    {/* Aplicaciones */}
+                  {/* Aplicaciones */}
 
-                    {section === "Proceso/Aplicaciones" && <Aplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === "Proceso/historiales_aplicaciones" && <HistorialAplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === "Proceso/Aplicaciones" && <Aplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === "Proceso/historiales_aplicaciones" && <HistorialAplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
 
-                    {section === '66b6705a77549ed0672a9026' && <FotosCalidad lote={lote} />}
-                    {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
-                    {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
-                    {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
+                  {section === '66b6705a77549ed0672a9026' && <FotosCalidad lote={lote} />}
+                  {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
+                  {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
+                  {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}
 
-                    {/* Historiales aplicaciones */}
-                    {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
-                    {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
-                    {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
+                  {/* Historiales aplicaciones */}
+                  {section === '66b6708677549ed0672a902a' && <HistorialDescarteLavadoProceso />}
+                  {section === '66b6708f77549ed0672a902b' && <HistorialDescarteEnceradoProceso />}
+                  {section === '66b6709877549ed0672a902c' && <HistorialFotosCalidad />}
 
-                    {/* comercial */}
-                    {section === "Comercial/Proveedores" && <Proveedores permisos={permisos} seleccionWindow={seleccionWindow} />}
-                    {section === '66b670ca77549ed0672a9030' && <InfoProveedores />}
+                  {/* comercial */}
+                  {section === "Comercial/Proveedores" && <Proveedores permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {section === '66b670ca77549ed0672a9030' && <InfoProveedores />}
 
-                    {/* inventario y logistica */}
-                    {section === "Inventario y Logística/inventarios" && <Inventarios permisos={permisos} seleccionWindow={seleccionWindow} />}
+                  {/* inventario y logistica */}
+                  {section === "Inventario y Logística/inventarios" && <Inventarios permisos={permisos} seleccionWindow={seleccionWindow} />}
 
-                    {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
-                    {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
-                    {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}
+                  {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
+                  {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
+                  {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}
 
-                  </View>
-              }
-              <LoadingModal visible={loading} />
+                </View>
+            }
+            <LoadingModal visible={loading} />
 
-            </SafeAreaView>
+          </SafeAreaView>
         </deviceWidth.Provider>
       </stackContext.Provider>
     </envContext.Provider>

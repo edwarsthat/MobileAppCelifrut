@@ -1,10 +1,11 @@
-/* eslint-disable prettier/prettier */
+import { tiposFrutasType } from "./tiposFrutas";
+
 export type predioType = {
     _id: string,
     enf: string,
     nombrePredio: string,
     predio: string,
-    tipoFruta: string
+    tipoFruta: tiposFrutasType
 };
 
 

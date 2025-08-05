@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
 import { Socket, io } from "socket.io-client";
 import Header from "./components/Header";
@@ -28,10 +28,6 @@ let socket: Socket;
 type propsType = {
     setSection: (e: string) => void
 }
-
-
-export const itemSeleccionContext = createContext<number[]>([]);
-
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
@@ -139,7 +135,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             const token = await obtenerAccessToken();
             const request = { data: { action: 'get_proceso_aplicaciones_listaEmpaque_contenedores' }, token: token };
             const response = await socketRequest(socket, request);
-            console.log(response);
             setContenedores(response.data);
         } catch (err) {
             if (err instanceof Error) {
@@ -213,6 +208,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarDeleteItems(request.data);
+            console.log(request);
             await socketRequest(socket, request);
             Alert.alert("Eliminado con exito");
             // console.log(response);
@@ -430,7 +426,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
 
             {showResumen ?
                 <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
-                    <ResumenListaEmpaque />
+                    <ResumenListaEmpaque contenedores={contenedores} />
                 </View>
                 :
                 <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
@@ -448,6 +444,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             }
             {isTablet &&
                 <Footer
+                    contenedores={contenedores}
                     modificarItems={modificarItems}
                     moverItem={moverItem}
                     restarItem={restarItem}

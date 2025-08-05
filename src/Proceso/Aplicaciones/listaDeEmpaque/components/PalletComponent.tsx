@@ -3,6 +3,8 @@ import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
 import { PalletAsyncData } from "../types/types";
 import { getPalletButtonStyle } from "../utils/pallets";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { calidadData } from "../../../../utils/functions";
+import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 
 type propsType = {
@@ -23,9 +25,10 @@ function PalletComponent({
 
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const pallet = useListaDeEmpaqueStore(state => state.pallet);
+    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
 
     const palletData = useMemo(
-        () => contenedor?.pallets?.[pallet] ?? null,
+        () => contenedor?.pallets?.[numeroPallet] ?? null,
         [contenedor, pallet]
     );
 
@@ -64,7 +67,7 @@ function PalletComponent({
                         styles
                     ),
                 ]}
-                onPress={() => handleClickPallet(Number(pallet))}
+                onPress={() => handleClickPallet(Number(numeroPallet))}
                 onLongPress={longPressHandle}
             >
                 <View style={styles.headerRow}>
@@ -94,13 +97,13 @@ function PalletComponent({
                         Tipo Caja: {palletData?.settings?.tipoCaja ?? 'N/A'}
                     </Text>
                     <Text style={styles.textDetalle}>
-                        Calidad: {palletData?.settings?.calidad ?? 'N/A'}
+                        Calidad: {calidadData(tipoFrutas, palletData?.settings?.calidad)?.nombre ?? 'N/A'}
                     </Text>
                 </View>
 
             </TouchableOpacity>
             <Text style={styles.fonts}>
-                Pallet {pallet === -1 ? 'sin pallet' : pallet + 1}
+                Pallet {numeroPallet + 1}
             </Text>
         </View>
     );

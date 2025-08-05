@@ -6,6 +6,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RadioButtonGroup from "./RadioButtonGroup";
 import { INITIAL_CONFIG_PALLET } from "../constants/configs";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
+import { getCalidadesFrutas } from "../../../../utils/functions";
 
 type propsType = {
     openModal: boolean;
@@ -30,7 +32,7 @@ const colors = [
 ];
 
 export default function SettingsPallets(props: propsType): React.JSX.Element {
-
+    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const pallet = useListaDeEmpaqueStore(state => state.pallet);
     const anchoDevice = useContext(deviceWidth);
@@ -141,21 +143,21 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                         <ScrollView style={styles.modal}>
                             <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
                             <RadioButtonGroup
-                                options={contenedor?.infoContenedor.tipoCaja || []}
+                                options={contenedor?.infoContenedor.tipoCaja.map(item => ({ _id: item, name: item })) || [{ _id: '', name: '' }]}
                                 value={config.tipoCaja}
                                 onSelect={(value) => setConfig((prev) => ({ ...prev, tipoCaja: value }))}
                                 label="Tipo de Caja"
                                 styles={styles} />
 
                             <RadioButtonGroup
-                                options={contenedor?.infoContenedor.calidad || []}
+                                options={getCalidadesFrutas(contenedor, tipoFrutas).map(item => ({ _id: item?._id, name: item?.nombre })) || [{ _id: '', name: '' }]}
                                 value={config.calidad}
                                 onSelect={(value) => setConfig((prev) => ({ ...prev, calidad: value }))}
                                 label="Calidad"
                                 styles={styles} />
 
                             <RadioButtonGroup
-                                options={contenedor?.infoContenedor.calibres || []}
+                                options={contenedor?.infoContenedor.calibres.map(item => ({ _id: item, name: item })) || [{ _id: '', name: '' }]}
                                 value={config.calibre}
                                 onSelect={(value) => setConfig((prev) => ({ ...prev, calibre: value }))}
                                 label="Calibre"
