@@ -1,19 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, Text, View, StyleSheet, Button, Alert } from "react-native";
 import FormInput from "../../../UI/components/FormInput";
 import { sumarDatos } from "./func/functions";
 import { datosPredioType } from "./types/types";
-import useEnvContext from "../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../utils/auth";
 import useForm from "../../../hooks/useForm";
 import { FormState, labelsForm, formInit, FormCategory, formSchema } from "./validations/validations";
 import { useAppStore } from "../../../stores/useAppStore";
 import useTipoFrutaStore from "../../../stores/useTipoFrutaStore";
+import { useSocketStore } from "../../../stores/useSocketStore";
 
 export default function DescarteLavado(): React.JSX.Element {
-    const { url } = useEnvContext();
     const tiposFrutas = useTipoFrutaStore((state) => state.tiposFruta);
-
+    const lastMessage = useSocketStore((state) => state.lastMessage);
+    const socketRequest = useSocketStore(state => state.sendRequest);
     const setLoading = useAppStore((state) => state.setLoading);
     const loading = useAppStore((state) => state.loading);
 
@@ -24,25 +24,24 @@ export default function DescarteLavado(): React.JSX.Element {
         tipoFruta: "",
         nombrePredio: "",
     });
-    const fetchWithTimeout = (direccion: string, options: object, timeout = 5000): any => {
-        return Promise.race([
-            fetch(direccion, options),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Request timed out")), timeout)
-            ),
-        ]);
-    };
+
     const obtenerLote = async () => {
         try {
             setLoading(true);
-            const requestENF = await fetch(`${url}/variablesDeProceso/predioProcesoDescarte`);
-            const responseServerPromise = await requestENF.json();
-            const response: datosPredioType = responseServerPromise.response;
+            const token = await getCredentials();
+            const request = {
+                token: token,
+                data: { action: "get_proceso_aplicaciones_descarteLavado" },
+            };
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al obtener el lote: ${response.message}`);
+            }
             setDatosPredio({
-                _id: response._id,
-                enf: response.enf,
-                tipoFruta: response.tipoFruta,
-                nombrePredio: response.nombrePredio,
+                _id: response.data._id,
+                enf: response.data.enf,
+                tipoFruta: response.data.tipoFruta,
+                nombrePredio: response.data.nombrePredio,
             });
         } catch (err) {
             if (err instanceof Error) {
@@ -52,6 +51,16 @@ export default function DescarteLavado(): React.JSX.Element {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        if (lastMessage?.event === 'predio_vaciado') {
+            obtenerLote();
+            Alert.alert("El predio ha sido vaciado. Se actualizará la información.");
+        }
+    }, [lastMessage]);
+    useEffect(() => {
+        obtenerLote();
+    }, []);
+
     const handleChange = (name: keyof FormState, value: number, type: keyof FormCategory): void => {
         setFormState({
             ...formState,
@@ -65,30 +74,21 @@ export default function DescarteLavado(): React.JSX.Element {
 
     const guardarDatos = async (): Promise<any> => {
         try {
+            if (datosPredio.enf === "") {
+                throw new Error("Recargue el predio que se está vaciando");
+            }
             const isValid = validateForm(formSchema);
             if (!isValid) {
                 return;
             }
-            if (datosPredio.enf === "") {
-                throw new Error("Recargue el predio que se está vaciando");
-            }
             setLoading(true);
             const data = sumarDatos(formState, datosPredio, tiposFrutas);
-            const request = {
-                action: "put_proceso_aplicaciones_descarteLavado",
-                _id: datosPredio._id,
-                data: data,
-            };
             const token = await getCredentials();
-            const responseJSON = await fetchWithTimeout(`${url}/proceso2/put_proceso_aplicaciones_descarteLavado`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `${token}`,
-                },
-                body: JSON.stringify(request),
-            });
-            const response = await responseJSON.json();
+            const request = {
+                token: token,
+                data: { action: "put_proceso_aplicaciones_descarteLavado", data: data, _id: datosPredio._id },
+            };
+            const response = await socketRequest(request);
             if (response.status !== 200) {
                 throw new Error(`Error guardando los datos ${response.message}`);
             }
@@ -100,12 +100,6 @@ export default function DescarteLavado(): React.JSX.Element {
             }
         } finally {
             setLoading(false);
-            setDatosPredio({
-                _id: "",
-                enf: "",
-                tipoFruta: "",
-                nombrePredio: "",
-            });
         }
     };
 
@@ -119,11 +113,6 @@ export default function DescarteLavado(): React.JSX.Element {
                 <Text>Numero de lote:</Text>
                 <Text>{datosPredio.nombrePredio}</Text>
                 <Text>{datosPredio.enf}</Text>
-                <Button
-                    color="#49659E"
-                    title="Cargar predio"
-                    onPress={obtenerLote}
-                />
                 {Object.keys(labelsForm).map(item => (
                     <View style={styles.containerForm} key={item}>
                         <Text style={styles.textInputs}>{labelsForm[item as keyof typeof labelsForm]}</Text>

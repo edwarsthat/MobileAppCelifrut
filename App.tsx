@@ -55,6 +55,9 @@ import Proveedores from './src/menu/comercial/Proveedores';
 import InfoProveedores from './src/comercial/proveedores/InfoProveedores';
 import Loader from './src/utils/Loader';
 import { useAppStore } from './src/stores/useAppStore';
+import { useSocketStore } from './src/stores/useSocketStore';
+import * as Keychain from 'react-native-keychain';
+import { obtenerAccessToken } from './src/utils/auth';
 
 type envContexttype = {
   url: string,
@@ -83,6 +86,9 @@ function App(): React.JSX.Element {
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
   const [version, setVersion] = useState<string>('');
   const [stack, setStack] = useState<string[]>(['menu']);
+
+  const connectSocket = useSocketStore((state) => state.connect);
+  const disconnectSocket = useSocketStore((state) => state.disconnect);
 
   //estado lote seleccionado para las diferentes aplicaciones
   const [lote, setLote] = useState<lotesType>();
@@ -127,6 +133,24 @@ function App(): React.JSX.Element {
     setAnchoDevice(width);
     setVersion(DeviceInfo.getVersion());
   }, []);
+
+    useEffect(() => {
+    const connectIfNeeded = async () => {
+      if (isLogin) {
+        const credentials = await Keychain.getGenericPassword();
+        if (!credentials) {
+            throw new Error("Error no hay token de validadcion");
+        }
+        const token = await obtenerAccessToken();
+        if (token) {
+          connectSocket(env.url, token);
+        }
+      } else {
+        disconnectSocket();
+      }
+    };
+    connectIfNeeded();
+  }, [isLogin]);
 
 
   const backgroundStyle = {

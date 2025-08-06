@@ -13,7 +13,7 @@ export const labels = {
 
 export const sumarDatos = (datos: FormState, lote: datosPredioType, tipoFrutas: tiposFrutasType[]): Record<string, number> => {
     let mult;
-    const tipoFruta = tipoFrutas.find(item => item.tipoFruta === lote.tipoFruta);
+    const tipoFruta = tipoFrutas.find(item => item._id === lote.tipoFruta);
     if (tipoFruta) {
         mult = tipoFruta.valorPromedio;
     } else {

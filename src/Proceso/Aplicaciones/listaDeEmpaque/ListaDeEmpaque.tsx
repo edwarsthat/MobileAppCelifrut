@@ -1,79 +1,44 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
-import { Socket, io } from "socket.io-client";
 import Header from "./components/Header";
 import { predioType, ResponseItem } from "../../../../types/predioType";
 import { contenedoresType } from "../../../../types/contenedoresType";
 import Pallets from "./components/Pallets";
 import { itemType, settingsType } from "./types/types";
-import { obtenerAccessToken, socketRequest } from "./controller/request";
+import { obtenerAccessToken } from "./controller/request";
 import Footer from "./components/Footer";
 import Informacion from "./components/Informacion";
 import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
-import useEnvContext from "../../../hooks/useEnvContext";
-import { getCredentials } from "../../../../utils/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppContext } from "../../../hooks/useAppContext";
 import { validarAddItem, validarDeleteItems, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
 import useGetCatalogs from "../../../hooks/useGetCatalogs";
-// import { cuartosFriosType } from "../../../../types/catalogs";
-// import { validarEnviarCuartoFrioRequest } from "./controller/valiadations";
-// import { ZodError } from "zod";
-// import { getErrorMessages } from "../../../utils/errorsUtils";
+
 import { useAppStore } from "../../../stores/useAppStore";
 import { useListaDeEmpaqueStore } from "./store/useListaDeEmpaqueStore";
-
-let socket: Socket;
+import { useSocketStore } from "../../../stores/useSocketStore";
 
 type propsType = {
     setSection: (e: string) => void
 }
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
-    const { url } = useEnvContext();
     const { obtenerCuartosFrios, cuartosFrios } = useGetCatalogs();
     const { anchoDevice } = useAppContext();
     const setLoading = useAppStore((state) => state.setLoading);
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const seleccinarContenedor = useListaDeEmpaqueStore(state => state.seleccionarContenedor);
     const pallet = useListaDeEmpaqueStore(state => state.pallet);
     const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
     const setSeleccion = useListaDeEmpaqueStore(state => state.setSeleccion);
+    const socketRequest = useSocketStore(state => state.sendRequest);
+    const lastMessage = useSocketStore((state) => state.lastMessage);
 
     const [contenedores, setContenedores] = useState<contenedoresType[]>([]);
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
     const [isTablet, setIsTablet] = useState<boolean>(false);
     const [showResumen, setShowResumen] = useState<boolean>(false);
 
-    const createSocketConnection = useCallback(async () => {
-        try {
-            const token = await getCredentials();
-            socket = io(`${url}/`, {
-                auth: {
-                    token: token,
-                },
-                rejectUnauthorized: false,
-            });
-            socket.on('connect', () => {
-                console.log(`Conectado a ${url}/`);
-            });
-            socket.on('connect_error', (error) => {
-                Alert.alert(`Error en la conexion del socket: ${error}`);
-            });
-            socket.on('servidor', () => {
-                obtenerPredioProcesando();
-            });
-            socket.on('predio_vaciado', () => {
-                obtenerPredioProcesando();
-            });
-            socket.on("listaempaque_update", () => {
-                obtenerContenedores();
-            });
-        } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(`${err.message}`);
-            }
-        }
-    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -81,33 +46,50 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 setLoading(true);
                 await obtenerCuartosFrios();
                 setIsTablet(anchoDevice >= 721);
-                createSocketConnection();
                 await obtenerPredioProcesando();
                 await obtenerContenedores();
             } catch (error) {
                 console.log(error);
-
                 Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
-
-        return () => {
-            if (socket) {
-                socket.disconnect();
+    }, [anchoDevice]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                console.log("Last message in Lista de Empaque", lastMessage.event);
+                if (lastMessage?.event === 'predio_vaciado') {
+                    obtenerPredioProcesando();
+                } else if (lastMessage?.event === 'listaempaque_update') {
+                    console.log("Actualizando lista de empaque");
+                    obtenerContenedores();
+                }
+            } catch (error) {
+                console.log(error);
+                Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
+            } finally {
+                setLoading(false);
             }
         };
-    }, [anchoDevice, createSocketConnection]);
+        fetchData();
+    }, [lastMessage]);
+    useEffect(() => {
+        const cont = contenedores.find(c => c._id === contenedor?._id);
+        if (cont) {
+            seleccinarContenedor(cont);
+        }
+    }, [contenedores]);
 
     const obtenerPredioProcesando = async () => {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
             const request = { data: { action: 'get_proceso_aplicaciones_listaEmpaque_lotes' }, token: token };
-            const response = await socketRequest(socket, request);
+            const response = await socketRequest(request);
             if (response.status !== 200) {
                 return Alert.alert(response.status + " Error obteniendo los predios");
             }
@@ -134,8 +116,12 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(true);
             const token = await obtenerAccessToken();
             const request = { data: { action: 'get_proceso_aplicaciones_listaEmpaque_contenedores' }, token: token };
-            const response = await socketRequest(socket, request);
-            setContenedores(response.data);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                return Alert.alert(response.status + " Error obteniendo los contenedores");
+            }
+            const newObjt = JSON.parse(JSON.stringify(response.data));
+            setContenedores(newObjt);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -157,7 +143,10 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            await socketRequest(socket, request);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al guardar la configuración del pallet: ${response.message}`);
+            }
             Alert.alert("Guardado con exito ");
         } catch (err) {
             if (err instanceof Error) {
@@ -181,10 +170,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarAddItem(request.data);
-            await socketRequest(socket, request);
-            // setContenedoresProvider(response.data);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al agregar el item: ${response.message}`);
+            }
             Alert.alert("Guardado con exito ");
-            // console.log(response);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -208,10 +198,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarDeleteItems(request.data);
-            console.log(request);
-            await socketRequest(socket, request);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al eliminar los items: ${response.message}`);
+            }
             Alert.alert("Eliminado con exito");
-            // console.log(response);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -236,7 +227,10 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarRestarItem(request.data);
-            await socketRequest(socket, request);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al restar el item: ${response.message}`);
+            }
             Alert.alert("Restado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -271,9 +265,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarMoverItem(request.data);
-            await socketRequest(socket, request);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al mover el item: ${response.message}`);
+            }
             Alert.alert("Se movió con exito");
-
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert(err.message);
@@ -299,7 +295,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            await socketRequest(socket, request);
+            await socketRequest(request);
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -321,7 +317,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            await socketRequest(socket, request);
+            await socketRequest(request);
 
             const len = contenedor?.pallets.length;
             if (len) {
@@ -356,7 +352,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarModificarItem(request.data);
-            await socketRequest(socket, request);
+            await socketRequest(request);
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {
