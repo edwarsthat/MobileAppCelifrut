@@ -42,8 +42,8 @@ function PalletComponent({
         return Object.values(palletData.listaLiberarPallet).every(val => val === true);
     }, [palletData]);
 
-    const longPressHandle = () => {
-        handleClickPallet(Number(pallet));
+    const longPressHandle = (e: number) => {
+        handleClickPallet(e);
         openPalletSettings();
     };
 
@@ -68,7 +68,7 @@ function PalletComponent({
                     ),
                 ]}
                 onPress={() => handleClickPallet(Number(numeroPallet))}
-                onLongPress={longPressHandle}
+                onLongPress={() => longPressHandle(Number(numeroPallet))}
             >
                 <View style={styles.headerRow}>
                     <Image

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Modal, Button, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { ModalOpciones } from "./ModalOpciones";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { getCalidadesFrutas } from "../../../../utils/functions";
+import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
     openModalEditar: boolean
@@ -10,11 +12,13 @@ type propsType = {
 }
 export default function ModalModificarItem(props: propsType): React.JSX.Element {
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
     const [modalCalidad, setModalCalidad] = useState<boolean>(false);
     const [modalCalibre, setModalCalibre] = useState<boolean>(false);
     const [modalTipoCaja, setModalTipoCaja] = useState<boolean>(false);
 
     const [calidad, setCalidad] = useState<string>('Calidad');
+    const [calidadName, setCalidadName] = useState<string>('Calidad');
     const [calibre, setCalibre] = useState<string>('Calibre');
     const [tipoCaja, setTipoCaja] = useState<string>('Tipo de caja');
     const handleCalidad = () => {
@@ -39,12 +43,14 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
         props.setOpenModalEditar(false);
         setCalibre('Calibre');
         setCalidad('Calidad');
+        setCalidadName('Calidad');
         setTipoCaja('Tipo de caja');
     };
     const handleCancel = () => {
         props.setOpenModalEditar(false);
         setCalibre('Calibre');
         setCalidad('Calidad');
+        setCalidadName('Calidad');
         setTipoCaja('Tipo de caja');
     };
     return (
@@ -61,7 +67,7 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
                             <TouchableOpacity
                                 onPress={handleCalidad}
                                 style={styles.buttonContenedores}>
-                                <Text>{calidad}</Text>
+                                <Text>{calidadName}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={handleCalibre}
@@ -77,7 +83,7 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
                         </View>
                         <View style={styles.viewButtonsModal}>
                             <Button title="Editar" onPress={handleModificar} />
-                            <Button title="Cancelar" onPress={handleCancel}  />
+                            <Button title="Cancelar" onPress={handleCancel} />
                         </View>
                     </View>
                 </View>
@@ -85,30 +91,31 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
             {/* //opciones calidad */}
             <ModalOpciones
                 visible={modalCalidad}
-                data={contenedor?.infoContenedor.calidad || []}
+                data={getCalidadesFrutas(contenedor, tipoFrutas).map(item => ({ _id: item?._id, name: item?.nombre })) || [{ _id: '', name: '' }]}
                 onSelect={(item) => {
                     setModalCalidad(false);
-                    setCalidad(item);
+                    setCalidad(item._id);
+                    setCalidadName(item.name);
                 }}
                 styles={styles}
             />
             {/* opciones calibre */}
             <ModalOpciones
                 visible={modalCalibre}
-                data={contenedor?.infoContenedor.calibres || []}
+                data={contenedor?.infoContenedor.calibres.map(item => ({ _id: item, name: item })) || [{ _id: '', name: '' }]}
                 onSelect={(item) => {
                     setModalCalibre(false);
-                    setCalibre(item);
+                    setCalibre(item._id);
                 }}
                 styles={styles}
             />
             {/* opciones tipo de caja */}
             <ModalOpciones
                 visible={modalTipoCaja}
-                data={contenedor?.infoContenedor.tipoCaja || []}
+                data={contenedor?.infoContenedor.tipoCaja.map(item => ({ _id: item, name: item })) || [{ _id: '', name: '' }]}
                 onSelect={(item) => {
                     setModalTipoCaja(false);
-                    setTipoCaja(item);
+                    setTipoCaja(item._id);
                 }}
                 styles={styles}
             />

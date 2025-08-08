@@ -140,7 +140,7 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
             <View style={isTablet ? styles.centerModal : stylesCel.centerModal}>
                 <View style={isTablet ? styles.viewModal : stylesCel.viewModal}>
                     {props.isTablet &&
-                        <ScrollView style={styles.modal}>
+                        <ScrollView style={[styles.modal, styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
                             <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
                             <RadioButtonGroup
                                 options={contenedor?.infoContenedor.tipoCaja.map(item => ({ _id: item, name: item })) || [{ _id: '', name: '' }]}
@@ -169,10 +169,8 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                             </View>
                         </ScrollView>
                     }
-                    <ScrollView>
-                        <View style={styles.modal}>
-                            <Text style={styles.tituloModal}>Liberacion pallets</Text>
-                        </View>
+                    <ScrollView style={[styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
+                        <Text style={styles.tituloModal}>Liberacion pallets</Text>
                         <View style={isTablet ? styles.contenedorLiberacionPallet : stylesCel.contenedorLiberacionPallet}>
                             <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, rotulado: !prevConfig.rotulado }))}>
                                 <View style={styles.radioButton}>
@@ -221,10 +219,8 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
                         </View>
                     </ScrollView>
                     {props.isTablet &&
-                        <ScrollView>
-                            <View style={styles.modalCajas}>
-                                <Text style={styles.tituloModal}>Cajas ya contadas</Text>
-                            </View>
+                        <ScrollView style={[styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
+                            <Text style={styles.tituloModal}>Cajas ya contadas</Text>
                             <TextInput
                                 onChangeText={handleCajasContadas}
                                 keyboardType="numeric"
@@ -262,51 +258,72 @@ export default function SettingsPallets(props: propsType): React.JSX.Element {
 const styles = StyleSheet.create({
     centerModal: {
         flex: 1,
-        alignItems: 'flex-start',
-        marginTop: '10%',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: '100%',
+        padding: 16,
+        backgroundColor: 'rgba(0,0,0,0.4)', // overlay semitransparente
     },
     modalInput: {
-        width: 100,
+        width: 160,
+        height: 44,
         borderWidth: 1,
-        borderRadius: 10,
-        borderColor: '#7D9F3A',
-        backgroundColor: '#F5F5F5',
+        borderRadius: 12,
+        borderColor: '#CBD5E1',
+        backgroundColor: '#F8FAFC',
+        paddingHorizontal: 12,
+        color: '#0F172A',
     },
     viewModal: {
         display: 'flex',
-        backgroundColor: 'white',
-        width: '90%',
+        backgroundColor: '#FFFFFF',
+        width: '92%',
+        maxWidth: 1200,
         flexDirection: 'row',
         borderRadius: 20,
-        alignItems: 'flex-start',
-        paddingBottom: 20,
-        paddingTop: 10,
-        marginLeft: '5%',
-        gap: 50,
-        shadowColor: '#52006A',
-        elevation: 20,
+        alignItems: 'stretch',
+        padding: 16,
+        gap: 32,
+        alignSelf: 'center',
+        // sombra coherente
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        elevation: 12,
     },
     modal: {
         display: 'flex',
         flexWrap: 'wrap',
         flexDirection: 'column',
-        width: 300,
-        padding: 20,
-        borderRightColor: '#999999',
-        borderRightWidth: 1,
+        width: 340,
+        padding: 0,
     },
     modalCajas: {
         display: 'flex',
         flexDirection: 'column',
-        width: 200,
-        padding: 20,
-        borderRightColor: '#999999',
-        borderRightWidth: 1,
+        width: 260,
+        padding: 0,
+        // removed vertical divider to usar card con borde
+    },
+    sectionCard: {
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        borderRadius: 16,
+        backgroundColor: '#FFFFFF',
+        overflow: 'hidden',
+    },
+    sectionCardInner: {
+        padding: 16,
+    },
+    sectionStretch: {
+        alignSelf: 'stretch',
     },
     tituloModal: {
         fontSize: 20,
         fontWeight: 'bold',
+        color: '#334155',
+        marginBottom: 8,
     },
     containerConfigurarPallet: {
         display: 'flex',
@@ -319,57 +336,59 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: 8,
     },
     radio: {
-        width: 30,
-        height: 30,
-        borderColor: '#0074D9',
-        borderWidth: 3,
-        borderRadius: 15,
+        width: 24,
+        height: 24,
+        borderColor: '#8B9E39',
+        borderWidth: 2,
+        borderRadius: 12,
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
     },
     radioBg: {
-        width: 20,
-        height: 20,
-        borderRadius: 10,
-        backgroundColor: '#0074D9',
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        backgroundColor: '#8B9E39',
     },
     viewCalidad: {
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 20,
+        gap: 16,
     },
     containerButtonsModal: {
         display: 'flex',
         flexDirection: 'row',
-        gap: 10,
+        gap: 12,
         justifyContent: 'center',
         alignContent: 'center',
-        marginTop: 15,
+        marginTop: 16,
     },
     contenedorLiberacionPallet: {
         display: 'flex',
         flexDirection: 'column',
-        gap: 15,
+        gap: 16,
+        padding: 16,
     },
     viewButtonsLiberacionPallet: {
         display: 'flex',
         flexDirection: 'row',
         gap: 20,
         justifyContent: 'center',
-        paddingTop: 35,
+        paddingVertical: 24,
     },
     viewColorSelectContainer: {
-        gap: 20,
-        width: 200,
+        gap: 16,
+        width: 260,
         justifyContent: 'center',
         alignContent: 'center',
-        borderRightColor: '#999999',
-        borderRightWidth: 1,
+        padding: 16,
+        borderRightColor: 'transparent',
+        borderRightWidth: 0,
 
     },
     viewColorSelectCirculos: {
@@ -386,37 +405,49 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: 20,
         marginHorizontal: 5,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
     selectedCircle: {
         borderWidth: 3,
-        borderColor: 'black',
+        borderColor: '#8B9E39',
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.12,
+        shadowRadius: 4,
     },
     selectedText: {
-        marginTop: 20,
-        fontSize: 16,
-        fontWeight: 'bold',
+        marginTop: 12,
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#334155',
     },
 });
 
 const stylesCel = StyleSheet.create({
     centerModal: {
         flex: 1,
-        alignItems: 'flex-start',
+        alignItems: 'center',
         justifyContent: 'center',
-        alignContent: 'center',
+        padding: 12,
+        backgroundColor: 'rgba(0,0,0,0.4)',
     },
     viewModal: {
         alignItems: 'flex-start',
         justifyContent: 'center',
-        width: '100%',
+        width: '94%',
+        alignSelf: 'center',
         backgroundColor: 'white',
         flexDirection: 'column',
-        borderRadius: 20,
-        paddingBottom: 20,
-        paddingTop: 10,
-        gap: 50,
-        shadowColor: '#52006A',
-        elevation: 20,
+        borderRadius: 16,
+        padding: 16,
+        gap: 24,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.18,
+        shadowRadius: 8,
+        elevation: 12,
     },
 
     contenedorLiberacionPallet: {
@@ -424,15 +455,15 @@ const stylesCel = StyleSheet.create({
         justifyContent: 'center',
         width: '100%',
         flexDirection: 'column',
-        gap: 15,
-        padding: 20,
+        gap: 14,
+        padding: 16,
     },
     viewButtonsLiberacionPallet: {
         alignItems: 'flex-start',
         justifyContent: 'center',
         width: '100%',
         flexDirection: 'row',
-        gap: 20,
-        paddingTop: 35,
+        gap: 16,
+        paddingVertical: 24,
     },
 });

@@ -295,7 +295,10 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            await socketRequest(request);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al liberar el pallet: ${response.message}`);
+            }
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -317,16 +320,16 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 },
                 token: token,
             };
-            await socketRequest(request);
-
+            const response = await socketRequest(request);
+            if( response.status !== 200) {
+                throw new Error(`Error al cerrar el contenedor: ${response.message}`);
+            }
             const len = contenedor?.pallets.length;
             if (len) {
                 for (let i = 0; i < len; i++) {
                     await AsyncStorage.removeItem(`${contenedor._id}:${i}`);
                 }
             }
-
-
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {
@@ -352,7 +355,10 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             validarModificarItem(request.data);
-            await socketRequest(request);
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al modificar items: ${response.message}`);
+            }
             Alert.alert("Guardado con exito");
         } catch (err) {
             if (err instanceof Error) {

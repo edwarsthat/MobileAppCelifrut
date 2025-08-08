@@ -4,6 +4,9 @@ import { predioType } from "../../../../../types/predioType";
 import { cuartosFriosType } from "../../../../../types/catalogs";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { useAppStore } from "../../../../stores/useAppStore";
+import { useSocketStore } from "../../../../stores/useSocketStore";
+import { obtenerAccessToken } from "../../../../utils/auth";
 
 type propsType = {
     cuartosFrios: cuartosFriosType[];
@@ -20,10 +23,13 @@ export default function Header({
     contenedores, setSection, isTablet, loteVaciando, showResumen, cerrarContenendor, handleShowResumen,
 }: propsType): React.JSX.Element {
 
+    const setLoading = useAppStore(state => state.setLoading);
+    const loading = useAppStore(state => state.loading);
     const contenedor = useListaDeEmpaqueStore((state) => state.contenedor);
     const seleccionarContenedor = useListaDeEmpaqueStore((state) => state.seleccionarContenedor);
     const loteSeleccionado = useListaDeEmpaqueStore((state) => state.loteSeleccionado);
     const seleccionarLote = useListaDeEmpaqueStore((state) => state.seleccionarLote);
+    const socketRequest = useSocketStore(state => state.sendRequest);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalPrediosVisible, setModalPrediosVisible] = useState<boolean>(false);
@@ -48,6 +54,33 @@ export default function Header({
             },
         ]);
     };
+    const handleAddPallet = async () => {
+        try {
+            setLoading(true);
+            const token = await obtenerAccessToken();
+
+            const request = {
+                data: {
+                    action: "put_proceso_add_pallet_listaempaque",
+                    _id: contenedor?._id,
+                },
+                token: token,
+
+            };
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error("No se pudo agregar el pallet. Intente nuevamente.");
+            }
+            Alert.alert("Éxito", "Pallet agregado correctamente.");
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error("Error adding pallet:", error);
+                Alert.alert("Error", error.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <SafeAreaView style={styles.container}>
             <TouchableOpacity onPress={backMainMenu}>
@@ -68,7 +101,7 @@ export default function Header({
                             color="#7D9F3A"
                         />
                         {/* <Button title="Enviar Cuartos Frios" onPress={() => setModalCuartosFriosVisible(true)} color="#7D9F3A" /> */}
-                        {/* <Button title="Agregar pallet" color="#7D9F3A" /> */}
+                        <Button disabled={loading} title="Agregar pallet" color="#7D9F3A" onPress={handleAddPallet} />
                     </>
 
                 }
@@ -88,7 +121,7 @@ export default function Header({
                         </Text>
                         <Image
                             source={
-                                loteSeleccionado && loteSeleccionado.tipoFruta === 'Limon'
+                                loteSeleccionado && loteSeleccionado.tipoFruta.tipoFruta === 'Limon'
                                     ? require('../../../../../assets/limon.jpg')
                                     : require('../../../../../assets/naranja.jpg')
                             }

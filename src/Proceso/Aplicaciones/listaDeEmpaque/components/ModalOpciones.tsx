@@ -1,10 +1,12 @@
 import React from "react";
 import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
 
+export type OptionItem = { _id: string; name: string };
+
 type ModalOpcionesProps = {
     visible: boolean;
-    data: string[];
-    onSelect: (item: string) => void;
+    data: OptionItem[];
+    onSelect: (item: OptionItem) => void;
     onClose?: () => void;
     styles: { [key: string]: any };
 };
@@ -25,10 +27,10 @@ export function ModalOpciones({ visible, data, onSelect, onClose, styles }: Moda
                                     if (onClose) { onClose(); }
                                 }}
                             >
-                                <Text style={styles.textList}>{item}</Text>
+                                <Text style={styles.textList}>{item.name}</Text>
                             </TouchableOpacity>
                         )}
-                        keyExtractor={item => item}
+                        keyExtractor={(item) => item._id}
                     />
                 </View>
             </View>

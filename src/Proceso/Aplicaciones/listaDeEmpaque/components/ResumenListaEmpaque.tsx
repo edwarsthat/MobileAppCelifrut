@@ -4,6 +4,8 @@ import HorizontalLine from "../../../../components/HorizontalLine";
 import { obtenerResumen } from "../controller/resumenes";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
+import { calidadData } from "../../../../utils/functions";
+import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
     contenedores: contenedoresType[]
@@ -11,6 +13,7 @@ type propsType = {
 
 export default function ResumenListaEmpaque({ contenedores }: propsType): React.JSX.Element {
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
     const [cajasTotal, setCajasTotal] = useState<number>(0);
     const [kilosTotal, setKilosTotal] = useState<number>(0);
     const [cajasCalidad, setCajasCalidad] = useState<object>();
@@ -78,12 +81,12 @@ export default function ResumenListaEmpaque({ contenedores }: propsType): React.
 
                         <View>
                             {cajasCalidad && Object.entries(cajasCalidad).map(([key, value]) => (
-                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} cajas  </Text>
+                                <Text key={key}> Calidad {calidadData(tipoFrutas, key)?.nombre + " ➜"}  {value.toLocaleString('es-CO')} cajas  </Text>
                             ))}
                             <HorizontalLine />
 
                             {kilosCalidad && Object.entries(kilosCalidad).map(([key, value]) => (
-                                <Text key={key}> Calidad {key + " ➜"}  {value.toLocaleString('es-CO')} Kg </Text>
+                                <Text key={key}> Calidad {calidadData(tipoFrutas, key)?.nombre + " ➜"}  {value.toLocaleString('es-CO')} Kg </Text>
                             ))}
                         </View>
                     </View>

@@ -178,30 +178,35 @@ export default function Footer(props: propsType): React.JSX.Element {
 
   return (
     <SafeAreaView style={[styles.baseContainer, isTablet ? styles.containerTablet : styles.containerMobile]}>
-      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
-        <Button title="Actualizar" onPress={clickActualizar} />
-      </View>
-      <View style={styles.viewTextInput}>
-        <TextInput
-          keyboardType="numeric"
-          style={[styles.textInputBase, isTablet ? styles.textInputTablet : styles.textInputMobile]}
-          value={String(cajas || '')}
-          onChange={e => setCajas(Number(e.nativeEvent.text))} />
-      </View>
-      <View>
-        <Button title="Sumar" onPress={clickSumar} />
-      </View>
-      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
-        <Button title="Restar" onPress={clickRestar} />
-      </View>
-      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
-        <Button title="Mover" onPress={ClickOpenMoverCajas} />
-      </View>
-      <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
-        <Button title="Editar" onPress={ClickOpenEditar} />
-      </View>
-      <View>
-        <Button title="Eliminar" onPress={clickEliminar} />
+      <View style={[styles.actionsBar, isTablet ? styles.actionsBarTablet : styles.actionsBarMobile]}>
+        <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
+          <Button title="Actualizar" onPress={clickActualizar} accessibilityLabel="Actualizar pallet con cajas acumuladas" />
+        </View>
+        <View style={styles.viewTextInput}>
+          <TextInput
+            keyboardType="numeric"
+            style={[styles.textInputBase, isTablet ? styles.textInputTablet : styles.textInputMobile]}
+            value={String(cajas || '')}
+            placeholder="Cantidad"
+            placeholderTextColor="#94A3B8"
+            accessibilityLabel="Ingresar cantidad de cajas"
+            onChange={e => setCajas(Number(e.nativeEvent.text))} />
+        </View>
+        <View>
+          <Button title="Sumar" onPress={clickSumar} accessibilityLabel="Sumar cajas al pallet" />
+        </View>
+        <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
+          <Button title="Restar" onPress={clickRestar} accessibilityLabel="Restar cajas del item seleccionado" />
+        </View>
+        <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
+          <Button title="Mover" onPress={ClickOpenMoverCajas} accessibilityLabel="Mover items a otro pallet" />
+        </View>
+        <View style={[styles.buttonContainer, !isTablet && styles.hidden]}>
+          <Button title="Editar" onPress={ClickOpenEditar} accessibilityLabel="Editar items seleccionados" />
+        </View>
+        <View>
+          <Button title="Eliminar" onPress={clickEliminar} accessibilityLabel="Eliminar items seleccionados" />
+        </View>
       </View>
 
       {/* Modal mover*/}
@@ -246,8 +251,8 @@ export default function Footer(props: propsType): React.JSX.Element {
                 style={styles.modalInput} />
             </View>}
             <View style={styles.viewButtonsModal}>
-              <Button title="Mover" onPress={clickMover} />
-              <Button title="Cancelar" onPress={() => setOpenModal(false)} />
+              <Button title="Mover" onPress={clickMover} accessibilityLabel="Confirmar mover items" />
+              <Button title="Cancelar" onPress={() => setOpenModal(false)} accessibilityLabel="Cerrar modal de mover" />
             </View>
           </View>
         </View>
@@ -288,26 +293,58 @@ export default function Footer(props: propsType): React.JSX.Element {
 const styles = StyleSheet.create({
   // Estilos base
   baseContainer: {
-    backgroundColor: '#8B9E39',
+    backgroundColor: 'transparent',
+    alignItems: 'stretch',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    width: '100%',
+  },
+
+  // Contenedor visual de acciones (card)
+  actionsBar: {
+    backgroundColor: '#8B9E39', // verde como el fondo anterior
+    borderRadius: 16,
+    padding: 12,
+    // sombra sutil
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    width: '100%',
+  },
+  actionsBarTablet: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    paddingVertical: 20,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  actionsBarMobile: {
+    flexDirection: 'column',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
 
   // Estilos para tablet
   containerTablet: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 40,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
   },
 
   // Estilos para móvil
   containerMobile: {
-    flexDirection: 'column',
+    alignItems: 'stretch',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
 
   buttonContainer: {
-    marginVertical: 5,
-    marginHorizontal: 10,
+    marginVertical: 6,
+    marginHorizontal: 8,
+    minWidth: 120,
   },
 
   hidden: {
@@ -315,53 +352,65 @@ const styles = StyleSheet.create({
   },
 
   viewTextInput: {
-    marginVertical: 10,
+    marginVertical: 6,
+    marginHorizontal: 8,
   },
 
   textInputBase: {
     backgroundColor: 'white',
     borderRadius: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     textAlign: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    color: '#0F172A',
+    height: 48,
+    fontSize: 16,
   },
 
   textInputTablet: {
-    width: 150,
-    height: 50,
+    width: 180,
+    height: 48,
   },
 
   textInputMobile: {
-    width: 120,
-    height: 40,
+    width: 160,
+    height: 44,
   },
 
   centerModal: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '10%',
+    paddingHorizontal: 16,
   },
 
   viewModalItem: {
-    width: 500,
-    height: 450,
+    width: '90%',
+    maxWidth: 560,
     backgroundColor: 'white',
-    borderRadius: 20,
-    elevation: 30,
-    shadowColor: 'black',
-    padding: 20,
+    borderRadius: 16,
+    elevation: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    padding: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   viewModalItems: {
-    width: 500,
-    height: 350,
+    width: '90%',
+    maxWidth: 560,
     backgroundColor: 'white',
-    borderRadius: 20,
-    elevation: 30,
-    shadowColor: 'black',
-    padding: 20,
+    borderRadius: 16,
+    elevation: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    padding: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -373,38 +422,40 @@ const styles = StyleSheet.create({
 
   textModalHeader: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: '600',
     textAlign: 'center',
+    color: '#334155',
   },
 
   modalInputView: {
     marginVertical: 10,
+    width: '100%',
   },
 
   modalInput: {
-    width: 350,
+    width: '100%',
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: '#7D9F3A',
-    backgroundColor: '#F5F5F5',
-    height: 40,
-    paddingHorizontal: 10,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#F8FAFC',
+    height: 44,
+    paddingHorizontal: 12,
   },
 
   viewButtonsModal: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     width: '100%',
-    marginTop: 30,
+    marginTop: 24,
   },
 
   buttonContenedores: {
-    width: 350,
+    width: '100%',
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: '#7D9F3A',
-    backgroundColor: '#F5F5F5',
-    height: 50,
+    borderColor: '#CBD5E1',
+    backgroundColor: '#F8FAFC',
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10,
@@ -413,11 +464,13 @@ const styles = StyleSheet.create({
   pressableStyle: {
     marginTop: 10,
     marginBottom: 10,
+    width: '100%',
+    maxHeight: 420,
   },
 
   textList: {
-    color: 'black',
-    fontSize: 20,
+    color: '#0F172A',
+    fontSize: 16,
     marginVertical: 10,
     textAlign: 'center',
   },

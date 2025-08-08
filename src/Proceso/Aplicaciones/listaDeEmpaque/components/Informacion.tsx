@@ -39,6 +39,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
                 {contenedor && pallet !== null && contenedor.pallets[pallet] &&
                     <FlatList
                         data={contenedor.pallets[pallet].EF1}
+                        contentContainerStyle={styles.listContent}
                         renderItem={({ item, index }) => (
                             <View style={styles.container}>
                                 <View style={styles.containerHeader}>
@@ -57,8 +58,8 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                     </View>
                                 </View>
                                 <TouchableOpacity
-                                    style={isTablet ? seleccion.includes(index) ? styles.touchablePress : styles.touchable
-                                        : seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable
+                                    style={isTablet ? (seleccion.includes(index) ? styles.touchablePress : styles.touchable)
+                                        : (seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable)
                                     }
                                     onPress={() => handleSeleccion(index)}>
                                     <View style={styles.view3}>
@@ -95,77 +96,96 @@ export default function Informacion(props: propsType): React.JSX.Element {
 const styles = StyleSheet.create({
     scrollStyle: {
         backgroundColor: '#FFE6FF',
-        padding: 5,
-        elevation: 10,
-        shadowColor: '#52006A',
+        padding: 12,
+        borderRadius: 16,
+        // sombra tipo card coherente con Footer
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 4,
         flex: 1,
         width: "100%",
+        // Márgenes para centrar un poco más la card
+        marginTop: 12,
+        marginRight: 12,
+    },
+    listContent: {
+        paddingBottom: 12,
     },
     container: {
-        margin: 5,
+        marginBottom: 12,
     },
     containerHeader: {
         display: 'flex',
         flexDirection: 'column',
         borderBottomWidth: 1,
-        borderColor: '#4D4D4D',
-        overflow: 'scroll',
+        borderColor: '#E2E8F0',
+        paddingBottom: 8,
+        marginBottom: 8,
     },
     textHeaders: {
-        fontSize: 10,
-        fontWeight: 'bold',
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#334155',
     },
     textHeaders2: {
-        fontSize: 8,
+        fontSize: 12,
+        color: '#334155',
     },
-    view3: { display: 'flex', flexDirection: 'row' },
+    view3: { display: 'flex', flexDirection: 'row', alignItems: 'center' },
     touchablePress: {
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         marginTop: 8,
-        padding: 5,
-        borderRadius: 8,
-        borderColor: 'red',
+        padding: 10,
+        borderRadius: 12,
+        borderColor: '#8B9E39',
         borderWidth: 2,
     },
     touchable: {
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         marginTop: 8,
-        padding: 5,
-        borderRadius: 8,
+        padding: 10,
+        borderRadius: 12,
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
-
-
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
 
-    view4: { display: 'flex', flexDirection: 'row', gap: 20, width: '100%' },
+    view4: { display: 'flex', flexDirection: 'row', gap: 16, width: '100%', flexWrap: 'wrap' },
 });
 
 const stylesCel = StyleSheet.create({
 
     textHeaders: {
-        fontSize: 10,
-        fontWeight: 'bold',
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#334155',
     },
-    view3: { display: 'flex', flexDirection: 'row' },
+    view3: { display: 'flex', flexDirection: 'row', alignItems: 'center' },
     touchablePress: {
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         marginTop: 8,
-        padding: 5,
-        borderRadius: 8,
-        borderColor: 'red',
+        padding: 10,
+        borderRadius: 12,
+        borderColor: '#8B9E39',
         borderWidth: 2,
-        flexWrap: 'wrap', width: '70%',
+        flexWrap: 'wrap',
+        width: '100%',
     },
     touchable: {
-        backgroundColor: 'white',
+        backgroundColor: '#FFFFFF',
         marginTop: 8,
-        padding: 5,
-        borderRadius: 8,
+        padding: 10,
+        borderRadius: 12,
         display: 'flex',
         flexDirection: 'column',
-        flexWrap: 'wrap', width: '70%',
+        flexWrap: 'wrap',
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
-    view4: { display: 'flex', flexDirection: 'row', gap: 10, width: '100%' },
+    view4: { display: 'flex', flexDirection: 'row', gap: 12, width: '100%', flexWrap: 'wrap' },
 });
