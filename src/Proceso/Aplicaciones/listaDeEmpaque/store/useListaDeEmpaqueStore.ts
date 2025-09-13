@@ -13,6 +13,12 @@ type ListaEmpaqueStates =  {
     setAnchoDeVista: (ancho: number) => void
     seleccion: number[]
     setSeleccion: (seleccion: number[]) => void
+    EF1_id: string[]
+    setEF1_id: (EF1_id: string[]) => void
+    cuartosFriosInventario: string[]
+    setCuartosFriosInventario: (cuartosFrios: string[]) => void
+    cuartosFrios: { _id: string, nombre: string }[]
+    setCuartosFrios: (cuartosFrios: { _id: string, nombre: string }[]) => void
 }
 
 export const useListaDeEmpaqueStore = create<ListaEmpaqueStates>((set) => ({
@@ -26,4 +32,10 @@ export const useListaDeEmpaqueStore = create<ListaEmpaqueStates>((set) => ({
     setAnchoDeVista: (ancho: number) => set({ anchoDeVista: ancho }),
     seleccion: [],
     setSeleccion: (seleccion: number[]) => set({ seleccion }),
+    EF1_id: [],
+    setEF1_id: (EF1_id: string[]) => set({ EF1_id }),
+    cuartosFriosInventario: [],
+    setCuartosFriosInventario: (cuartosFrios: string[]) => set({ cuartosFriosInventario: cuartosFrios }),
+    cuartosFrios: [],
+    setCuartosFrios: (cuartosFrios: { _id: string, nombre: string }[]) => set({ cuartosFrios }),
 }));

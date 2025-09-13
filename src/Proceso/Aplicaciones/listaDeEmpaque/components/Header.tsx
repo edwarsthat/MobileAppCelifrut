@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal, Alert } from "react-native";
 import { predioType } from "../../../../../types/predioType";
-import { cuartosFriosType } from "../../../../../types/catalogs";
 import { contenedoresType } from "../../../../../types/contenedoresType";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { useAppStore } from "../../../../stores/useAppStore";
@@ -9,7 +8,6 @@ import { useSocketStore } from "../../../../stores/useSocketStore";
 import { obtenerAccessToken } from "../../../../utils/auth";
 
 type propsType = {
-    cuartosFrios: cuartosFriosType[];
     setSection: (e: string) => void,
     isTablet: boolean
     contenedores: contenedoresType[]
@@ -17,10 +15,11 @@ type propsType = {
     showResumen: boolean,
     cerrarContenendor: () => void
     handleShowResumen: () => void
+    enviarCajasCuartoFrio: (cuartoFrio: any, idsItems: string[]) => Promise<void>;
 }
 
 export default function Header({
-    contenedores, setSection, isTablet, loteVaciando, showResumen, cerrarContenendor, handleShowResumen,
+    contenedores, setSection, isTablet, loteVaciando, showResumen, cerrarContenendor, handleShowResumen, enviarCajasCuartoFrio,
 }: propsType): React.JSX.Element {
 
     const setLoading = useAppStore(state => state.setLoading);
@@ -30,10 +29,12 @@ export default function Header({
     const loteSeleccionado = useListaDeEmpaqueStore((state) => state.loteSeleccionado);
     const seleccionarLote = useListaDeEmpaqueStore((state) => state.seleccionarLote);
     const socketRequest = useSocketStore(state => state.sendRequest);
+    const cuartosFrios = useListaDeEmpaqueStore(state => state.cuartosFrios);
+    const EF1_id = useListaDeEmpaqueStore(state => state.EF1_id);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalPrediosVisible, setModalPrediosVisible] = useState<boolean>(false);
-    // const [modalCuartosFriosVisible, setModalCuartosFriosVisible] = useState<boolean>(false);
+    const [modalCuartosFriosVisible, setModalCuartosFriosVisible] = useState<boolean>(false);
 
     const backMainMenu = (): void => {
         setSection("menu");
@@ -81,6 +82,7 @@ export default function Header({
             setLoading(false);
         }
     };
+
     return (
         <SafeAreaView style={styles.container}>
             <TouchableOpacity onPress={backMainMenu}>
@@ -100,7 +102,7 @@ export default function Header({
                             onPress={handleShowResumen}
                             color="#7D9F3A"
                         />
-                        {/* <Button title="Enviar Cuartos Frios" onPress={() => setModalCuartosFriosVisible(true)} color="#7D9F3A" /> */}
+                        <Button title="Enviar Cuartos Frios" onPress={() => setModalCuartosFriosVisible(true)} color="#7D9F3A" />
                         <Button disabled={loading} title="Agregar pallet" color="#7D9F3A" onPress={handleAddPallet} />
                     </>
 
@@ -196,35 +198,37 @@ export default function Header({
                 </View>
             </Modal>
 
-            {/* <Modal transparent={true} visible={modalCuartosFriosVisible} animationType="fade">
+            <Modal transparent={true} visible={modalCuartosFriosVisible} animationType="fade">
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
                         <FlatList
-                            data={props.cuartosFrios}
+                            data={cuartosFrios}
                             renderItem={({ item }) => (
                                 <TouchableOpacity
                                     style={[
                                         styles.selectionButton,
-                                        (idContenedor === item._id || loteSeleccionado?._id === item._id) && styles.selectedBorder,
                                     ]}
                                     onPress={async () => {
                                         setModalCuartosFriosVisible(false);
-                                        // await props.eviarPalletCuartoFrio(item);
+                                        await enviarCajasCuartoFrio(item, EF1_id);
                                     }}
                                 >
                                     <View style={styles.buttonTextPredio}>
                                         <Text style={styles.buttonText}>
                                             {`${item.nombre}`}
-                                        </Text> */}
-            {/* ... */}
-            {/* </View>
+                                        </Text>
+
+                                    </View>
                                 </TouchableOpacity>
                             )}
                             keyExtractor={item => item._id}
                         />
+                        <TouchableOpacity style={[styles.selectionButton]} onPress={() => setModalCuartosFriosVisible(false)}>
+                            <Text style={styles.buttonText}>Cerrar</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
-            </Modal> */}
+            </Modal>
 
 
         </SafeAreaView>

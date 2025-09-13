@@ -100,6 +100,7 @@ type Criterios = {
 }
 
 export type EF1Type = {
+  _id: string
   lote?: {
     enf?: string
     predio?: string

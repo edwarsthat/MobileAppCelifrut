@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { useAppContext } from "../../../../hooks/useAppContext";
 import { contenedoresType } from "../../../../../types/contenedoresType";
+// import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
   agregarItem: (item: itemType) => void;
@@ -23,6 +24,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   const pallet = useListaDeEmpaqueStore(state => state.pallet);
   const loteActual = useListaDeEmpaqueStore(state => state.loteSeleccionado);
   const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
+  // const tipoFruta = useTipoFrutaStore(state => state.tiposFruta);
 
   const [contenedorID, setContenedorID] = useState<string>("");
   const [entradaModalPallet, setEntradaModalPallet] = useState<string>('');
@@ -43,6 +45,10 @@ export default function Footer(props: propsType): React.JSX.Element {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
       if (!loteActual) { throw new Error("Seleccione un lote"); }
+      // const frutaPallet = tipoFruta.flatMap(f => f.calidades.filter(c => c._id === contenedor.pallets[pallet].settings.calidad));
+      // if (loteActual.tipoFruta._id !== frutaPallet[0]?._id) {
+      //   throw new Error("El tipo de fruta no coincide");
+      // }
 
       const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
       let cajas_input;
@@ -76,7 +82,12 @@ export default function Footer(props: propsType): React.JSX.Element {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
       if (!loteActual) { throw new Error("Seleccione un lote"); }
-
+      // const frutaPallet = tipoFruta.map(f => f.calidades.filter(c => c._id === contenedor.pallets[pallet].settings.calidad));
+      // console.log("frutapallet", frutaPallet)
+      // console.log("loteActual", loteActual)
+      // if (loteActual.tipoFruta._id !== frutaPallet[0]?._id) {
+      //   throw new Error("El tipo de fruta no coincide");
+      // }
       validarSumarDato(cajas, loteActual, pallet, contenedor);
       const item: itemType = {
         lote: loteActual._id,

@@ -6,21 +6,22 @@ import { PalletAsyncData, settingsType } from "../types/types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { useAppStore } from "../../../../stores/useAppStore";
+import { cuartosFriosType } from "../../../../../types/catalogs";
 
 type propsType = {
-
-    guardarPalletSettings: (settings: settingsType) => Promise<void>;
-    liberarPallet: (item: any) => void
+    guardarPalletSettings: (settings: settingsType, itemCalidad: any) => Promise<void>;
     isTablet: boolean
-
+    enviarCajasCuartoFrio: (cuarto: cuartosFriosType, items: string[]) => Promise<void>;
 };
 
 export default function Pallets({
-    isTablet, liberarPallet, guardarPalletSettings,
+    isTablet, guardarPalletSettings, enviarCajasCuartoFrio,
 }: propsType): React.JSX.Element {
     const setLoading = useAppStore(state => state.setLoading);
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const palletSeleccionado = useListaDeEmpaqueStore(state => state.seleccionarPallet);
+    const setSeleccion = useListaDeEmpaqueStore(state => state.setSeleccion);
+    const setEF1_id = useListaDeEmpaqueStore(state => state.setEF1_id);
 
     const [openModal, setOpenModal] = useState<boolean>(false);
     const [columnas, setColumnas] = useState<number>(1);
@@ -84,6 +85,8 @@ export default function Pallets({
     };
     const handleClickPallet = (e: number) => {
         palletSeleccionado(e);
+        setSeleccion([]);
+        setEF1_id([]);
     };
     return (
         <View style={styles.view1}>
@@ -106,7 +109,7 @@ export default function Pallets({
                 />
 
                 <SettingsPallets
-                    liberarPallet={liberarPallet}
+                    enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                     isTablet={isTablet}
                     guardarPalletSettings={guardarPalletSettings}
                     closeModal={closeModal}

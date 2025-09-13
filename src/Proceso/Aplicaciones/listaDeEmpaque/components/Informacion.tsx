@@ -15,6 +15,9 @@ export default function Informacion(props: propsType): React.JSX.Element {
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const pallet = useListaDeEmpaqueStore(state => state.pallet);
     const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
+    const setEF1_id = useListaDeEmpaqueStore(state => state.setEF1_id);
+    const EF1_id = useListaDeEmpaqueStore(state => state.EF1_id);
+    const inventarioCuartoFrio = useListaDeEmpaqueStore(state => state.cuartosFriosInventario);
 
     const [isTablet, setIsTablet] = useState<boolean>(false);
     useEffect(() => {
@@ -27,12 +30,17 @@ export default function Informacion(props: propsType): React.JSX.Element {
             let numerosAnteriores = [...seleccion];
             numerosAnteriores.splice(indice, 1);
             props.setSeleccion(numerosAnteriores);
+
         } else {
             let numerosAnteriores = [...seleccion];
             numerosAnteriores.push(index);
             props.setSeleccion(numerosAnteriores);
         }
     };
+    const isInCuartoFrio = (item: any) => {
+        return inventarioCuartoFrio.includes(item._id);
+    };
+
     return (
         <>
             <View style={styles.scrollStyle}>
@@ -58,10 +66,22 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                     </View>
                                 </View>
                                 <TouchableOpacity
-                                    style={isTablet ? (seleccion.includes(index) ? styles.touchablePress : styles.touchable)
-                                        : (seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable)
+                                    disabled={isInCuartoFrio(item)}
+                                    style={
+                                        isInCuartoFrio(item)
+                                            ? (isTablet ? styles.touchableCold : stylesCel.touchableCold)
+                                            : isTablet
+                                                ? (seleccion.includes(index) ? styles.touchablePress : styles.touchable)
+                                                : (seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable)
                                     }
-                                    onPress={() => handleSeleccion(index)}>
+                                    onPress={() => {
+                                        handleSeleccion(index);
+                                        setEF1_id(
+                                            EF1_id.includes(item._id)
+                                                ? EF1_id.filter(id => id !== item._id)
+                                                : [...EF1_id, item._id]
+                                        );
+                                    }}>
                                     <View style={styles.view3}>
                                         <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{'No. Cajas:'} </Text>
                                         <Text style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>{item.cajas}</Text>
@@ -153,6 +173,17 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#E2E8F0',
     },
+    touchableCold: {
+        backgroundColor: '#DBEAFE',
+        marginTop: 8,
+        padding: 10,
+        borderRadius: 12,
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        borderWidth: 1,
+        borderColor: '#60A5FA',
+    },
 
     view4: { display: 'flex', flexDirection: 'row', gap: 16, width: '100%', flexWrap: 'wrap' },
 });
@@ -186,6 +217,18 @@ const stylesCel = StyleSheet.create({
         width: '100%',
         borderWidth: 1,
         borderColor: '#E2E8F0',
+    },
+    touchableCold: {
+        backgroundColor: '#DBEAFE',
+        marginTop: 8,
+        padding: 10,
+        borderRadius: 12,
+        display: 'flex',
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        width: '100%',
+        borderWidth: 1,
+        borderColor: '#60A5FA',
     },
     view4: { display: 'flex', flexDirection: 'row', gap: 12, width: '100%', flexWrap: 'wrap' },
 });

@@ -12,18 +12,18 @@ import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppContext } from "../../../hooks/useAppContext";
 import { validarAddItem, validarDeleteItems, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
-import useGetCatalogs from "../../../hooks/useGetCatalogs";
 
 import { useAppStore } from "../../../stores/useAppStore";
 import { useListaDeEmpaqueStore } from "./store/useListaDeEmpaqueStore";
 import { useSocketStore } from "../../../stores/useSocketStore";
+import { obtenerItem } from "./controller/contenedores";
+import { cuartosFriosType } from "../../../../types/catalogs";
 
 type propsType = {
     setSection: (e: string) => void
 }
 
 export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
-    const { obtenerCuartosFrios, cuartosFrios } = useGetCatalogs();
     const { anchoDevice } = useAppContext();
     const setLoading = useAppStore((state) => state.setLoading);
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
@@ -33,6 +33,9 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const setSeleccion = useListaDeEmpaqueStore(state => state.setSeleccion);
     const socketRequest = useSocketStore(state => state.sendRequest);
     const lastMessage = useSocketStore((state) => state.lastMessage);
+    const setCuartosFriosInventario = useListaDeEmpaqueStore(state => state.setCuartosFriosInventario);
+    const setCuartosFrios = useListaDeEmpaqueStore(state => state.setCuartosFrios);
+    const setEF1_id = useListaDeEmpaqueStore(state => state.setEF1_id);
 
     const [contenedores, setContenedores] = useState<contenedoresType[]>([]);
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
@@ -44,10 +47,10 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                await obtenerCuartosFrios();
                 setIsTablet(anchoDevice >= 721);
                 await obtenerPredioProcesando();
                 await obtenerContenedores();
+                await obtenerInventarioCuartosFrios();
             } catch (error) {
                 console.log(error);
                 Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
@@ -130,7 +133,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const guardarPalletSettings = async (settings: settingsType) => {
+    const guardarPalletSettings = async (settings: settingsType, itemCalidad: any) => {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
@@ -139,7 +142,11 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             }
             const request = {
                 data: {
-                    action: 'put_proceso_aplicaciones_listaEmpaque_addSettings', _id: contenedor?._id, pallet: pallet, settings: settings,
+                    action: 'put_proceso_aplicaciones_listaEmpaque_addSettings',
+                    _id: contenedor?._id,
+                    pallet: pallet,
+                    settings: settings,
+                    itemCalidad: itemCalidad,
                 },
                 token: token,
             };
@@ -279,36 +286,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    const liberarPallet = async (item: any) => {
-        try {
-            setLoading(true);
-            if (!contenedor) {
-                return Alert.alert("No hay contenedor seleccionado");
-            }
-            const token = await obtenerAccessToken();
-            const request = {
-                data: {
-                    action: 'put_proceso_aplicaciones_listaEmpaque_liberarPallet',
-                    item: item,
-                    _id: contenedor?._id,
-                    pallet: pallet,
-                },
-                token: token,
-            };
-            const response = await socketRequest(request);
-            if (response.status !== 200) {
-                throw new Error(`Error al liberar el pallet: ${response.message}`);
-            }
-            Alert.alert("Guardado con exito");
-        } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(err.message);
-            }
-        } finally {
-            setSeleccion([]);
-            setLoading(false);
-        }
-    };
     const cerrarContenedor = async () => {
         try {
             setLoading(true);
@@ -369,46 +346,59 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-    // const enviarPalletCuartoFrio = async (data: cuartosFriosType) => {
-    //     try {
-    //         console.log("Eviar pallet cuarto frio", data);
-    //         setLoading(true);
-    //         const token = await obtenerAccessToken();
-    //         const cont = contenedoresProvider.find(contenedor => contenedor._id === idContenedor);
-    //         const request = {
-    //             data: {
-    //                 action: 'put_inventarios_pallet_eviarCuartoFrio',
-    //                 _id: cont?._id,
-    //                 pallet: palletSeleccionado,
-    //                 cuartoFrio: data,
-    //             },
-    //             token: token,
-    //         };
-    //         console.log(request);
-
-    //         // Validar usando Zod con manejo de errores
-    //         try {
-    //             validarEnviarCuartoFrioRequest().parse(request.data);
-    //         } catch (validationError) {
-    //             if (validationError instanceof ZodError) {
-    //                 const errorMessages = getErrorMessages(validationError);
-    //                 const firstErrorKey = Object.keys(errorMessages)[0];
-    //                 const firstErrorMessage = errorMessages[firstErrorKey as keyof typeof errorMessages];
-    //                 Alert.alert("Error de validación", firstErrorMessage);
-    //                 return; // Salir de la función sin hacer la petición
-    //             }
-    //             throw validationError; // Re-lanzar si no es un error de Zod
-    //         }
-    //         await socketRequest(socket, request);
-    //         Alert.alert("Guardado con exito ");
-    //     } catch (err) {
-    //         if (err instanceof Error) {
-    //             Alert.alert(err.message);
-    //         }
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+    const obtenerInventarioCuartosFrios = async () => {
+        try {
+            setLoading(true);
+            const token = await obtenerAccessToken();
+            const request = { data: { action: 'get_inventarios_cuartosFrios_listaEmpaque' }, token: token };
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                return Alert.alert(response.status + " Error obteniendo los cuartos frios");
+            }
+            console.log("Respuesta cuartos frios", response.data);
+            setCuartosFriosInventario(response.data.inventarioTotal);
+            setCuartosFrios(response.data.infoCuartos);
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert(err.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+    const enviarCajasCuartoFrio = async (cuarto: cuartosFriosType, seleccionItems: string[]) => {
+        try {
+            setLoading(true);
+            const token = await obtenerAccessToken();
+            const items = [];
+            if (!contenedor) { throw new Error("No hay contenedor seleccionado"); }
+            for (const id of seleccionItems) {
+                items.push(obtenerItem(contenedor, id));
+            }
+            const request = {
+                action: "put_inventarios_pallet_eviarCuartoFrio",
+                data: {
+                    seleccion: seleccionItems,
+                    cuartoFrio: cuarto._id,
+                    items: items,
+                },
+            };
+            const response = await socketRequest({ data: request, token: token });
+            if (response.status !== 200) {
+                throw new Error("No se pudo enviar el pallet al cuarto frío. Intente nuevamente.");
+            }
+            Alert.alert("Éxito", "Pallet enviado al cuarto frío correctamente.");
+            setEF1_id([]);
+            await obtenerInventarioCuartosFrios();
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error("Error adding pallet:", error);
+                Alert.alert("Error", error.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleShowResumen = () => {
         setShowResumen(!showResumen);
     };
@@ -416,7 +406,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
 
         <SafeAreaView style={styles.container}>
             <Header
-                cuartosFrios={cuartosFrios}
+                enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                 setSection={props.setSection}
                 isTablet={isTablet}
                 contenedores={contenedores}
@@ -434,8 +424,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
 
                     <Pallets
+                        enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                         isTablet={isTablet}
-                        liberarPallet={liberarPallet}
                         guardarPalletSettings={guardarPalletSettings}
                     />
 

@@ -7,6 +7,7 @@ export const INITIAL_CONFIG_PALLET = {
     enzunchado: false,
     estadoCajas: false,
     estiba: false,
+    cuartoFrio: '',
 };
 
 export const CONTENEDOR_VACIO = {
