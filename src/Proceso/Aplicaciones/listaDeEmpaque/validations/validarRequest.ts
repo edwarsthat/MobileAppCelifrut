@@ -103,3 +103,29 @@ export function validarModificarItem(request: object) {
         }
     }
 }
+export function validarEnviarCuartoFio(request: object) {
+    try {
+        const schema = z.object({
+            seleccion: z.array(z.string().min(1)),
+            cuartoFrio: z.string().min(1),
+            items: z.array(z.object({
+                _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
+                GGN: z.boolean(),
+                SISPAP: z.boolean(),
+                tipoFruta: z.string().regex(/^[0-9a-fA-F]{24}$/),
+                fecha: z.string().min(1),
+                calidad: z.string().regex(/^[0-9a-fA-F]{24}$/),
+                calibre: z.string().min(1),
+                tipoCaja: z.string(),
+                cajas: z.number().int().positive(),
+                lote: z.object({}).optional(),
+            })),
+        });
+        schema.parse(request);
+    } catch (err) {
+        if (err instanceof z.ZodError) {
+            const errors = getErrorMessages(err);
+            throw new Error(`Validation error: ${JSON.stringify(errors)}`);
+        }
+    }
+}

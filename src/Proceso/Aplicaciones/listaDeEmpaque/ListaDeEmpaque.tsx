@@ -11,7 +11,7 @@ import Informacion from "./components/Informacion";
 import ResumenListaEmpaque from "./components/ResumenListaEmpaque";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppContext } from "../../../hooks/useAppContext";
-import { validarAddItem, validarDeleteItems, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
+import { validarAddItem, validarDeleteItems, validarEnviarCuartoFio, validarModificarItem, validarMoverItem, validarRestarItem } from "./validations/validarRequest";
 
 import { useAppStore } from "../../../stores/useAppStore";
 import { useListaDeEmpaqueStore } from "./store/useListaDeEmpaqueStore";
@@ -298,7 +298,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             const response = await socketRequest(request);
-            if( response.status !== 200) {
+            if (response.status !== 200) {
                 throw new Error(`Error al cerrar el contenedor: ${response.message}`);
             }
             const len = contenedor?.pallets.length;
@@ -375,15 +375,19 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             for (const id of seleccionItems) {
                 items.push(obtenerItem(contenedor, id));
             }
+            const data = {
+                seleccion: seleccionItems,
+                cuartoFrio: cuarto._id,
+                items: items,
+            };
+            validarEnviarCuartoFio(data);
             const request = {
                 action: "put_inventarios_pallet_eviarCuartoFrio",
-                data: {
-                    seleccion: seleccionItems,
-                    cuartoFrio: cuarto._id,
-                    items: items,
-                },
+                data: data,
             };
             const response = await socketRequest({ data: request, token: token });
+            console.log(response);
+
             if (response.status !== 200) {
                 throw new Error("No se pudo enviar el pallet al cuarto frío. Intente nuevamente.");
             }

@@ -286,9 +286,9 @@ export default function SettingsPallets({
                             </>
                         ) : (
                             <>
-                                <ScrollView style={[styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
+                                <ScrollView style={stylesCel.scrollViewMobile} contentContainerStyle={stylesCel.scrollContentMobile}>
                                     <Text style={styles.tituloModal}>Liberacion pallets</Text>
-                                    <View style={isTabletState ? styles.contenedorLiberacionPallet : stylesCel.contenedorLiberacionPallet}>
+                                    <View style={stylesCel.contenedorLiberacionPallet}>
                                         <TouchableOpacity onPress={() => setConfig(prevConfig => ({ ...prevConfig, rotulado: !prevConfig.rotulado }))}>
                                             <View style={styles.radioButton}>
                                                 <View style={styles.radio}>
@@ -331,22 +331,10 @@ export default function SettingsPallets({
                                         </TouchableOpacity>
                                     </View>
                                 </ScrollView>
-                                <ScrollView style={[styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
-                                    <Text style={styles.tituloModal}>Enviar a Cuarto Frío</Text>
-                                    <RadioButtonGroup
-                                        options={cuartosFrios.map(item => ({ _id: item._id, name: item.nombre })) || [{ _id: '', name: '' }]}
-                                        value={config.tipoCaja}
-                                        onSelect={(value) => setConfig((prev) => ({ ...prev, tipoCaja: value }))}
-                                        label="Cuarto Frío"
-                                        styles={styles} />
-                                    <View style={styles.containerButtonsModal}>
-                                        <Button title="Enviar a Cuarto Frío" onPress={() => Alert.alert("Enviando a cuarto frío...")} />
-                                    </View>
-                                </ScrollView>
                             </>
                         )}
                     </View>
-                    <View style={styles.containerButtonsModal}>
+                    <View style={isTablet ? styles.containerButtonsModal : stylesCel.containerButtonsMobile}>
                         <Button title="Guardar2" onPress={guardarPalletSettingsHandle} />
                         <Button title="Cancelar" onPress={closeModal} />
                     </View>
@@ -547,20 +535,18 @@ const stylesCel = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.4)',
     },
     viewModal: {
-        alignItems: 'flex-start',
-        justifyContent: 'center',
         width: '94%',
+        maxHeight: '80%',
         alignSelf: 'center',
         backgroundColor: 'white',
         flexDirection: 'column',
         borderRadius: 16,
-        padding: 16,
-        gap: 24,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.18,
         shadowRadius: 8,
         elevation: 12,
+        overflow: 'hidden',
     },
 
     contenedorLiberacionPallet: {
@@ -578,5 +564,22 @@ const stylesCel = StyleSheet.create({
         flexDirection: 'row',
         gap: 16,
         paddingVertical: 24,
+    },
+    scrollViewMobile: {
+        flexShrink: 1,
+    },
+    scrollContentMobile: {
+        padding: 16,
+        paddingBottom: 0,
+    },
+    containerButtonsMobile: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        padding: 16,
+        paddingTop: 12,
+        gap: 16,
+        borderTopWidth: 1,
+        borderTopColor: '#E2E8F0',
+        backgroundColor: '#F8FAFC',
     },
 });
