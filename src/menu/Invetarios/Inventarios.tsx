@@ -11,6 +11,7 @@ type propsType = {
 export default function Inventarios(props: propsType): React.JSX.Element {
     const fruta_sin_procesar = useRef(new Animated.Value(1)).current;
     const orden_vaceo = useRef(new Animated.Value(1)).current;
+    const inventario_cuartos_frios = useRef(new Animated.Value(1)).current;
 
     const [permisos, setPermisos] = useState<string[]>();
 
@@ -58,6 +59,19 @@ export default function Inventarios(props: propsType): React.JSX.Element {
                     <Animated.View style={[styles.button, { transform: [{ scale: orden_vaceo }] }]}>
                         <Icon name="dropbox" size={24} color="#fff" />
                         <Text style={styles.text}>Orden de vaceo</Text>
+                    </Animated.View>
+                </TouchableWithoutFeedback>
+            )}
+
+            {permisos?.includes('Inventario Cuartos Fríos') && (
+                <TouchableWithoutFeedback
+                    onPress={() => props.seleccionWindow("68c86c1799dddf63af97548e")}
+                    onPressIn={() => handlePressIn(inventario_cuartos_frios)}
+                    onPressOut={() => handlePressOut(inventario_cuartos_frios)}
+                >
+                    <Animated.View style={[styles.button, { transform: [{ scale: inventario_cuartos_frios }] }]}>
+                        <Icon name="dropbox" size={24} color="#fff" />
+                        <Text style={styles.text}>Inventario Cuartos Fríos</Text>
                     </Animated.View>
                 </TouchableWithoutFeedback>
             )}

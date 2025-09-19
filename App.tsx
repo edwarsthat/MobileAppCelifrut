@@ -58,6 +58,7 @@ import { useAppStore } from './src/stores/useAppStore';
 import { useSocketStore } from './src/stores/useSocketStore';
 import * as Keychain from 'react-native-keychain';
 import { obtenerAccessToken } from './src/utils/auth';
+import CuartosFrios from './src/inventarioYlogistica/inventarios/cuartosFrios/CuartosFrios';
 
 type envContexttype = {
   url: string,
@@ -238,6 +239,7 @@ function App(): React.JSX.Element {
                   {section === "66b66e8d77549ed0672a9015" && <InventarioFrutaSinProcesar />}
                   {section === "66b66eb677549ed0672a9017" && <InventarioDesverdizado />}
                   {section === "66b66ece77549ed0672a9018" && <OrdenVaceo />}
+                  {section === "68c86c1799dddf63af97548e" && <CuartosFrios />}
 
                 </View>
             }
