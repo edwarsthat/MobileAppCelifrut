@@ -192,7 +192,7 @@ export default function Header({
                                     </View>
                                 </TouchableOpacity>
                             )}
-                            keyExtractor={item => item._id}
+                            keyExtractor={(item, idx) => item._id + idx }
                         />
                     </View>
                 </View>
