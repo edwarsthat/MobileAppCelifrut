@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
@@ -23,6 +22,8 @@ console.log('Construyendo APK...');
 execSync('cd android && gradlew assembleRelease', { stdio: 'inherit' });
 
 const serverPath = path.join(__dirname, '..', '..', '..', 'Servidor', 'server', 'updates', 'mobile');
+// const serverPath = 'D:\\trabajo\\Celifrut\\Server\\server_gestor_exportacion\\updates\\mobile';
+
 const apkSource = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk');
 const apkDestination = path.join(serverPath, `Celifrut_v${version}.apk`);
 const apkLatest = path.join(serverPath, 'latest.yml');
