@@ -3,8 +3,9 @@ import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
 import { PalletAsyncData } from "../types/types";
 import { getPalletButtonStyle } from "../utils/pallets";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
-import { calidadData } from "../../../../utils/functions";
-import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
+// import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
+import { palletsType } from "../../../../../types/contenedores/palletsType";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
 
 
 type propsType = {
@@ -12,6 +13,9 @@ type propsType = {
     openPalletSettings: () => void;
     palletsAsyncData: PalletAsyncData;
     numeroPallet: number;
+    pallet: palletsType;
+    itemsPallet: itemPalletType[];
+
 };
 
 export default React.memo(PalletComponent);
@@ -21,33 +25,39 @@ function PalletComponent({
     handleClickPallet,
     openPalletSettings,
     palletsAsyncData,
+    pallet,
+    itemsPallet,
 }: propsType): React.JSX.Element {
 
-    const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
-    const pallet = useListaDeEmpaqueStore(state => state.pallet);
-    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
-
-    const palletData = useMemo(
-        () => contenedor?.pallets?.[numeroPallet] ?? null,
-        [contenedor, pallet]
-    );
+    // const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
+    const palletSeleccionado = useListaDeEmpaqueStore(state => state.pallet);
+    // const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
 
     const totalCajas = useMemo(
-        () => palletData?.EF1?.reduce((acu, item) => acu + item.cajas, 0) ?? 0,
-        [palletData]
+        () => {
+            const cajasEnPallet = itemsPallet
+                .filter(item => item.pallet === pallet._id)
+                .reduce((acc, item) => acc + item.cajas, 0);
+            return cajasEnPallet;
+        },
+        [itemsPallet]
     );
 
     const palletFree = useMemo(() => {
-        if (!palletData?.listaLiberarPallet) { return false; }
-        return Object.values(palletData.listaLiberarPallet).every(val => val === true);
-    }, [palletData]);
+        if (!pallet.rotulado) { return false; }
+        if (!pallet.paletizado) { return false; }
+        if (!pallet.enzunchado) { return false; }
+        if (!pallet.estadoCajas) { return false; }
+        if (!pallet.estiba) { return false; }
+        return true;
+    }, [pallet]);
 
     const longPressHandle = (e: number) => {
         handleClickPallet(e);
         openPalletSettings();
     };
 
-    if (!palletData) {
+    if (!pallet) {
         return (
             <View style={styles.palletContainer}>
                 <Text>Pallet no encontrado</Text>
@@ -61,14 +71,14 @@ function PalletComponent({
                 style={[
                     styles.palletButtonBase,
                     getPalletButtonStyle(
-                        Number(pallet) === numeroPallet,
+                        Number(palletSeleccionado) === Number(pallet.numeroPallet),
                         palletFree,
                         palletsAsyncData?.selectedColor,
                         styles
                     ),
                 ]}
-                onPress={() => handleClickPallet(Number(numeroPallet))}
-                onLongPress={() => longPressHandle(Number(numeroPallet))}
+                onPress={() => handleClickPallet(Number(pallet.numeroPallet))}
+                onLongPress={() => longPressHandle(Number(pallet.numeroPallet))}
             >
                 <View style={styles.headerRow}>
                     <Image
@@ -76,7 +86,7 @@ function PalletComponent({
                         style={styles.image}
                     />
                     <Text style={styles.textCalibre}>
-                        {palletData?.settings?.calibre ?? ''}
+                        {pallet.calibre ?? ''}
                     </Text>
                 </View>
 
@@ -87,23 +97,23 @@ function PalletComponent({
                         {palletsAsyncData?.cajasContadas !== '' && (
                             <>
                                 {" | "}
-                                {totalCajas - Number(palletsAsyncData?.cajasContadas || 0)}
+                                {/* {totalCajas - Number(palletsAsyncData?.cajasContadas || 0)} */}
                             </>
                         )}
                     </Text>
 
                     {/* tipoCaja y calidad */}
                     <Text style={styles.textDetalle}>
-                        Tipo Caja: {palletData?.settings?.tipoCaja ?? 'N/A'}
+                        Tipo Caja: {pallet?.tipoCaja ?? 'N/A'}
                     </Text>
                     <Text style={styles.textDetalle}>
-                        Calidad: {calidadData(tipoFrutas, palletData?.settings?.calidad)?.nombre ?? 'N/A'}
+                        Calidad: {pallet?.calidad?.nombre ?? 'N/A'}
                     </Text>
                 </View>
 
             </TouchableOpacity>
             <Text style={styles.fonts}>
-                Pallet {numeroPallet + 1}
+                Pallet {numeroPallet}
             </Text>
         </View>
     );

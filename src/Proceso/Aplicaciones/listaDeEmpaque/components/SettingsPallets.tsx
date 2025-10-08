@@ -6,11 +6,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import RadioButtonGroup from "./RadioButtonGroup";
 import { INITIAL_CONFIG_PALLET } from "../constants/configs";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
-import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
-import { getCalidadesFrutas } from "../../../../utils/functions";
 import { cuartosFriosType } from "../../../../../types/catalogs";
+import { palletsType } from "../../../../../types/contenedores/palletsType";
 
 type propsType = {
+    pallets: palletsType[]
     openModal: boolean;
     closeModal: () => void;
     guardarPalletSettings: (settings: settingsType, itemCalidad: any) => Promise<void>;
@@ -32,11 +32,11 @@ const colors = [
 ];
 
 export default function SettingsPallets({
-    openModal, guardarPalletSettings, isTablet, closeModal, enviarCajasCuartoFrio,
+    openModal, guardarPalletSettings, isTablet, closeModal, enviarCajasCuartoFrio, pallets
 }: propsType): React.JSX.Element {
-    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
+
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
-    const pallet = useListaDeEmpaqueStore(state => state.pallet);
+    const palletSeleccionado = useListaDeEmpaqueStore(state => state.pallet);
     const cuartosFrios = useListaDeEmpaqueStore(state => state.cuartosFrios);
     const anchoDevice = useContext(deviceWidth);
     const [isTabletState, setIsTablet] = useState<boolean>(false);
@@ -45,18 +45,20 @@ export default function SettingsPallets({
     useEffect(() => {
         setIsTablet(anchoDevice >= 721);
         getCajasContadas();
-        if (pallet !== -1 && contenedor) {
-            const infoLiberacion = contenedor.pallets[pallet].listaLiberarPallet;
-            const infoPallet = contenedor.pallets[pallet].settings;
+        if (palletSeleccionado !== -1 && contenedor) {
+            const infoPallet = pallets.find(p => p.numeroPallet === (palletSeleccionado));
+            if(!infoPallet) {
+                return;
+            }
             setConfig(prevConfig => ({
                 ...prevConfig,
-                rotulado: infoLiberacion.rotulado,
-                paletizado: infoLiberacion.paletizado,
-                enzunchado: infoLiberacion.enzunchado,
-                estadoCajas: infoLiberacion.estadoCajas,
-                estiba: infoLiberacion.estiba,
+                rotulado: infoPallet?.rotulado,
+                paletizado: infoPallet?.paletizado,
+                enzunchado: infoPallet?.enzunchado,
+                estadoCajas: infoPallet?.estadoCajas,
+                estiba: infoPallet?.estiba,
                 calibre: infoPallet?.calibre || '',
-                calidad: infoPallet?.calidad || '',
+                calidad: infoPallet?.calidad._id || '',
                 tipoCaja: infoPallet?.tipoCaja || '',
             }));
         } else {
@@ -72,7 +74,7 @@ export default function SettingsPallets({
                 tipoCaja: '',
             }));
         }
-    }, [openModal, contenedor, pallet, anchoDevice]);
+    }, [openModal, contenedor, palletSeleccionado, anchoDevice]);
 
     const [selectedColor, setSelectedColor] = useState<string | null>(null);
     const [config, setConfig] = useState(INITIAL_CONFIG_PALLET);
@@ -80,9 +82,8 @@ export default function SettingsPallets({
 
     const handleCajasContadas = async (e: string) => {
         try {
-            console.log(`${contenedor?._id}:${pallet}`, e);
-
-            await AsyncStorage.setItem(`${contenedor?._id}:${pallet}`, e);
+            console.log(`${contenedor?._id}:${palletSeleccionado}`, e);
+            await AsyncStorage.setItem(`${contenedor?._id}:${palletSeleccionado}`, e);
             setCajasContadas(e);
         } catch (err) {
             if (err instanceof Error) {
@@ -92,19 +93,18 @@ export default function SettingsPallets({
     };
     const handleColorPallet = async (color: string) => {
         try {
-            console.log(`${contenedor?._id}:${pallet}:color`, color);
-            await AsyncStorage.setItem(`${contenedor?._id}:${pallet}:color`, color);
+            console.log(`${contenedor?._id}:${palletSeleccionado}:color`, color);
+            await AsyncStorage.setItem(`${contenedor?._id}:${palletSeleccionado}:color`, color);
             setSelectedColor(color);
         } catch (err) {
             if (err instanceof Error) {
                 Alert.alert("Error configurando el color del pallet");
             }
         }
-
     };
     const getCajasContadas = async () => {
         try {
-            const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
+            const value = await AsyncStorage.getItem(`${contenedor?._id}:${palletSeleccionado}`);
             if (value) {
                 setCajasContadas(value);
 
@@ -146,7 +146,8 @@ export default function SettingsPallets({
     const handleEnviarPalletCuartoFrio = async () => {
         try {
             const idsItems = [];
-            for (const item of contenedor?.pallets[pallet].EF1 || []) {
+
+            for (const item of pallets || []) {
                 idsItems.push(item._id);
             }
             const cuartoFrioSeleccionado = cuartosFrios.find(cf => cf._id === config.cuartoFrio);
@@ -172,7 +173,7 @@ export default function SettingsPallets({
                             <>
                                 <View style={styles.column}>
                                     <ScrollView style={[styles.modal, styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
-                                        <Text style={styles.tituloModal}>Configurar Pallet {pallet + 1}</Text>
+                                        <Text style={styles.tituloModal}>Configurar Pallet {palletSeleccionado + 1}</Text>
                                         <RadioButtonGroup
                                             options={contenedor?.infoContenedor.tipoCaja.map(item => ({ _id: item, name: item })) || [{ _id: '', name: '' }]}
                                             value={config.tipoCaja}
@@ -181,7 +182,7 @@ export default function SettingsPallets({
                                             styles={styles} />
 
                                         <RadioButtonGroup
-                                            options={getCalidadesFrutas(contenedor, tipoFrutas).map(item => ({ _id: item?._id, name: item?.nombre })) || [{ _id: '', name: '' }]}
+                                            options={contenedor?.infoContenedor?.calidad?.map(item => ({ _id: item._id, name: item.nombre })) || [{ _id: '', name: '' }]}
                                             value={config.calidad}
                                             onSelect={(value) => setConfig((prev) => ({ ...prev, calidad: value }))}
                                             label="Calidad"

@@ -7,7 +7,7 @@ export function validarAddItem(request: object) {
         // Schema principal para validar req.data
         const schema = z.object({
             _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
-            pallet: z.number().int().nonnegative(),
+            pallet: z.string().regex(/^[0-9a-fA-F]{24}$/),
             action: z.literal('put_proceso_aplicaciones_listaEmpaque_agregarItem'),
             item: z.object({
                 cajas: z.number().int().positive(),
@@ -32,7 +32,7 @@ export function validarDeleteItems(request: object) {
         const schema = z.object({
             _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
             pallet: z.number().int().nonnegative(),
-            seleccion: z.array(z.number().int().nonnegative()),
+            seleccion: z.array(z.string().min(1)),
         });
         schema.parse(request);
     } catch (err) {

@@ -7,15 +7,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { useAppStore } from "../../../../stores/useAppStore";
 import { cuartosFriosType } from "../../../../../types/catalogs";
+import { palletsType } from "../../../../../types/contenedores/palletsType";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
 
 type propsType = {
     guardarPalletSettings: (settings: settingsType, itemCalidad: any) => Promise<void>;
-    isTablet: boolean
+    isTablet: boolean;
     enviarCajasCuartoFrio: (cuarto: cuartosFriosType, items: string[]) => Promise<void>;
+    pallets: palletsType[];
+    itemsPallet: itemPalletType[];
 };
 
 export default function Pallets({
-    isTablet, guardarPalletSettings, enviarCajasCuartoFrio,
+    isTablet, guardarPalletSettings, enviarCajasCuartoFrio, pallets, itemsPallet,
 }: propsType): React.JSX.Element {
     const setLoading = useAppStore(state => state.setLoading);
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
@@ -28,7 +32,7 @@ export default function Pallets({
 
     const [palletsAsyncData, setPalletsAsyncData] = useState<({ [key: number]: PalletAsyncData })>({});
 
-    const data = contenedor?.pallets.map((_, idx) => idx) || [];
+    // const data = contenedor?.pallets.map((_, idx) => idx) || [];
 
     useEffect(() => {
         if (isTablet) {
@@ -44,12 +48,13 @@ export default function Pallets({
             try {
                 setLoading(true);
                 // Construimos todas las promesas de lectura
+                if (!pallets) { return; }
                 if (!contenedor) { return; }
 
                 const results = await Promise.all(
-                    contenedor.pallets.map(async (palletNumber, index) => {
-                        const value = await AsyncStorage.getItem(`${contenedor._id}:${index}`);
-                        const color = await AsyncStorage.getItem(`${contenedor._id}:${index}:color`);
+                    pallets.map(async (palletNumber, index) => {
+                        const value = await AsyncStorage.getItem(`${contenedor._id}:${index + 1}:cajasContadas`);
+                        const color = await AsyncStorage.getItem(`${contenedor._id}:${index + 1}:color`);
                         return {
                             pallet: index,
                             cajasContadas: value ?? '',
@@ -87,6 +92,11 @@ export default function Pallets({
         palletSeleccionado(e);
         setSeleccion([]);
         setEF1_id([]);
+        const palletInfo = pallets.find(p => p.numeroPallet === e);
+        if (!palletInfo) {
+            Alert.alert("Error", "Pallet no encontrado");
+            return;
+        }
     };
     return (
         <View style={styles.view1}>
@@ -94,14 +104,16 @@ export default function Pallets({
 
                 <FlatList
                     key={columnas}
-                    data={data}
+                    data={pallets}
                     keyExtractor={(item) => item.toString()}
                     initialNumToRender={20}
                     renderItem={({ item, index }) => (
                         <PalletComponent
+                            pallet={item}
                             palletsAsyncData={palletsAsyncData[index] || { cajasContadas: '', selectedColor: '#FFFFFF' }}
-                            numeroPallet={item}
+                            numeroPallet={Number(item.numeroPallet)}
                             handleClickPallet={handleClickPallet}
+                            itemsPallet={itemsPallet}
                             openPalletSettings={openPalletSettings}
                         />
                     )}
@@ -109,6 +121,7 @@ export default function Pallets({
                 />
 
                 <SettingsPallets
+                    pallets={pallets}
                     enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                     isTablet={isTablet}
                     guardarPalletSettings={guardarPalletSettings}

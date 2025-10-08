@@ -1,4 +1,4 @@
-import { contenedoresType } from "../../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 
 export function obtenerItem(contenedor:contenedoresType, _idItem:string){
     for (const pallet of contenedor.pallets) {

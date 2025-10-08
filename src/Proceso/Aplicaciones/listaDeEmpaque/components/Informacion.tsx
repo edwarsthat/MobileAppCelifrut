@@ -2,16 +2,17 @@ import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, FlatList } from "react-native";
 import { deviceWidth } from "../../../../../App";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
-import { calidadData } from "../../../../utils/functions";
-import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
+import { palletsType } from "../../../../../types/contenedores/palletsType";
 
 type propsType = {
-    setSeleccion: (data: number[]) => void;
+    setSeleccion: (data: string[]) => void;
+    itemsPallet: itemPalletType[];
+    pallets: palletsType[];
 };
 
 export default function Informacion(props: propsType): React.JSX.Element {
     const anchoDevice = useContext(deviceWidth);
-    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const pallet = useListaDeEmpaqueStore(state => state.pallet);
     const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
@@ -24,7 +25,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
         setIsTablet(anchoDevice >= 721);
     }, [anchoDevice]);
 
-    const handleSeleccion = (index: number) => {
+    const handleSeleccion = (index: string) => {
         if (seleccion.includes(index)) {
             const indice = seleccion.findIndex(i => i === index);
             let numerosAnteriores = [...seleccion];
@@ -40,13 +41,20 @@ export default function Informacion(props: propsType): React.JSX.Element {
     const isInCuartoFrio = (item: any) => {
         return inventarioCuartoFrio.includes(item._id);
     };
-
+    const palletId = props.pallets.find(p => p.numeroPallet === pallet);
+    if (!palletId) {
+        return (
+            <View style={styles.scrollStyle}>
+                <Text >Seleccione un pallet para ver su información</Text>
+            </View>
+        );
+    }
     return (
         <>
             <View style={styles.scrollStyle}>
-                {contenedor && pallet !== null && contenedor.pallets[pallet] &&
+                {contenedor && pallet !== null && props.itemsPallet.length > 0 &&
                     <FlatList
-                        data={contenedor.pallets[pallet].EF1}
+                        data={props.itemsPallet.filter(item => item.pallet === palletId._id)}
                         contentContainerStyle={styles.listContent}
                         renderItem={({ item, index }) => (
                             <View style={styles.container}>
@@ -60,7 +68,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                                 Nombre Predio:{' '}
                                             </Text>
                                             <Text key={index + 'nombrPredio'} style={isTablet ? styles.textHeaders : stylesCel.textHeaders}>
-                                                {item?.lote?.predio || 'N/A'}
+                                                {item?.lote?.predio?.PREDIO || 'N/A'}
                                             </Text>
                                         </View>
                                     </View>
@@ -71,11 +79,11 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                         isInCuartoFrio(item)
                                             ? (isTablet ? styles.touchableCold : stylesCel.touchableCold)
                                             : isTablet
-                                                ? (seleccion.includes(index) ? styles.touchablePress : styles.touchable)
-                                                : (seleccion.includes(index) ? stylesCel.touchablePress : stylesCel.touchable)
+                                                ? (seleccion.includes(item._id) ? styles.touchablePress : styles.touchable)
+                                                : (seleccion.includes(item._id) ? stylesCel.touchablePress : stylesCel.touchable)
                                     }
                                     onPress={() => {
-                                        handleSeleccion(index);
+                                        handleSeleccion(item._id);
                                         setEF1_id(
                                             EF1_id.includes(item._id)
                                                 ? EF1_id.filter(id => id !== item._id)
@@ -100,7 +108,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
                                         <View style={styles.view3}>
                                             <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>Calidad: </Text>
                                             <Text style={isTablet ? styles.textHeaders2 : stylesCel.textHeaders}>
-                                                {calidadData(tipoFrutas, item.calidad)?.nombre || 'N/A'}
+                                                {item.calidad.nombre || 'N/A'}
                                             </Text>
                                         </View>
                                     </View>

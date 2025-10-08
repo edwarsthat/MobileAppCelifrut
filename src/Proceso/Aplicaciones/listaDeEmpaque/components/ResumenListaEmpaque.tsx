@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Dimensions, Switch } from "react-native";
 import HorizontalLine from "../../../../components/HorizontalLine";
 import { obtenerResumen } from "../controller/resumenes";
-import { contenedoresType } from "../../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { calidadData } from "../../../../utils/functions";
 import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";

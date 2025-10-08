@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { contenedoresType } from "../../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { predioType } from "../../../../../types/predioType";
 
 type ListaEmpaqueStates =  {
@@ -11,8 +11,8 @@ type ListaEmpaqueStates =  {
     seleccionarPallet: (pallet: number) => void
     anchoDeVista: number
     setAnchoDeVista: (ancho: number) => void
-    seleccion: number[]
-    setSeleccion: (seleccion: number[]) => void
+    seleccion: string[]
+    setSeleccion: (seleccion: string[]) => void
     EF1_id: string[]
     setEF1_id: (EF1_id: string[]) => void
     cuartosFriosInventario: string[]
@@ -31,7 +31,7 @@ export const useListaDeEmpaqueStore = create<ListaEmpaqueStates>((set) => ({
     anchoDeVista: 0,
     setAnchoDeVista: (ancho: number) => set({ anchoDeVista: ancho }),
     seleccion: [],
-    setSeleccion: (seleccion: number[]) => set({ seleccion }),
+    setSeleccion: (seleccion: string[]) => set({ seleccion }),
     EF1_id: [],
     setEF1_id: (EF1_id: string[]) => set({ EF1_id }),
     cuartosFriosInventario: [],

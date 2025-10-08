@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
 import Header from "./components/Header";
 import { predioType, ResponseItem } from "../../../../types/predioType";
-import { contenedoresType } from "../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../types/contenedores/contenedoresType";
 import Pallets from "./components/Pallets";
 import { itemType, settingsType } from "./types/types";
 import { obtenerAccessToken } from "./controller/request";
@@ -18,6 +18,8 @@ import { useListaDeEmpaqueStore } from "./store/useListaDeEmpaqueStore";
 import { useSocketStore } from "../../../stores/useSocketStore";
 import { obtenerItem } from "./controller/contenedores";
 import { cuartosFriosType } from "../../../../types/catalogs";
+import { palletsType } from "../../../../types/contenedores/palletsType";
+import { itemPalletType } from "../../../../types/contenedores/itemsPallet";
 
 type propsType = {
     setSection: (e: string) => void
@@ -38,6 +40,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const setEF1_id = useListaDeEmpaqueStore(state => state.setEF1_id);
 
     const [contenedores, setContenedores] = useState<contenedoresType[]>([]);
+    const [pallets, setPallets] = useState<palletsType[]>([]);
+    const [itemsPallet, setItemsPallet] = useState<itemPalletType[]>([]);
     const [loteVaciando, setLoteVaciando] = useState<predioType[]>();
     const [isTablet, setIsTablet] = useState<boolean>(false);
     const [showResumen, setShowResumen] = useState<boolean>(false);
@@ -52,7 +56,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 await obtenerContenedores();
                 await obtenerInventarioCuartosFrios();
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
             } finally {
                 setLoading(false);
@@ -64,15 +68,18 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                console.log("Last message in Lista de Empaque", lastMessage.event);
                 if (lastMessage?.event === 'predio_vaciado') {
-                    obtenerPredioProcesando();
+                    await obtenerPredioProcesando();
                 } else if (lastMessage?.event === 'listaempaque_update') {
-                    console.log("Actualizando lista de empaque");
-                    obtenerContenedores();
+                    await obtenerContenedores();
+                    if (contenedor?._id) {
+                        await obtenerPallets(contenedor?._id || "");
+                        await obtenerItemsPallet(contenedor?._id || "");
+                    }
+
                 }
             } catch (error) {
-                console.log(error);
+                console.error(error);
                 Alert.alert('Error', 'No se pudieron obtener los datos iniciales');
             } finally {
                 setLoading(false);
@@ -133,6 +140,44 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
+    const obtenerPallets = async (id: string) => {
+        try {
+            setLoading(true);
+            const token = await obtenerAccessToken();
+            const request = { data: { action: 'get_proceso_aplicaciones_listaEmpaque_pallets', contenedor: id }, token: token };
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al obtener los pallets: ${response.message}`);
+            }
+            setPallets(response.data);
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert(err.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+    const obtenerItemsPallet = async (id: string) => {
+        try {
+            setLoading(true);
+            const token = await obtenerAccessToken();
+            const request = { data: { action: 'get_proceso_aplicaciones_listaEmpaque_itemsPallet', contenedor: id }, token: token };
+            const response = await socketRequest(request);
+            if (response.status !== 200) {
+                throw new Error(`Error al obtener los items del pallet: ${response.message}`);
+            }
+            console.log("Items del pallet obtenidos: ", response.data);
+            setItemsPallet(response.data);
+        } catch (err) {
+            if (err instanceof Error) {
+                Alert.alert(err.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const guardarPalletSettings = async (settings: settingsType, itemCalidad: any) => {
         try {
             setLoading(true);
@@ -140,11 +185,14 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             if (!contenedor) {
                 return Alert.alert("No hay contenedor seleccionado");
             }
+            const palletItem = pallets.find(p => p.numeroPallet === Number(pallet));
+            if (!pallet) {
+                return Alert.alert("No hay pallet seleccionado");
+            }
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_addSettings',
-                    _id: contenedor?._id,
-                    pallet: pallet,
+                    _id: palletItem?._id,
                     settings: settings,
                     itemCalidad: itemCalidad,
                 },
@@ -167,15 +215,17 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
+            const palletInfo = pallets.find(p => p.numeroPallet === Number(pallet));
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_agregarItem',
                     _id: contenedor?._id,
-                    pallet: pallet,
+                    pallet: palletInfo?._id,
                     item: item,
                 },
                 token: token,
             };
+            console.log("Request agregar item: ", request);
             validarAddItem(request.data);
             const response = await socketRequest(request);
             if (response.status !== 200) {
@@ -194,6 +244,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const eliminarItem = async () => {
         try {
             setLoading(true);
+
             const token = await obtenerAccessToken();
             const request = {
                 data: {
@@ -301,7 +352,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             if (response.status !== 200) {
                 throw new Error(`Error al cerrar el contenedor: ${response.message}`);
             }
-            const len = contenedor?.pallets.length;
+            const len = contenedor?.pallets;
             if (len) {
                 for (let i = 0; i < len; i++) {
                     await AsyncStorage.removeItem(`${contenedor._id}:${i}`);
@@ -355,7 +406,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             if (response.status !== 200) {
                 return Alert.alert(response.status + " Error obteniendo los cuartos frios");
             }
-            console.log("Respuesta cuartos frios", response.data);
             setCuartosFriosInventario(response.data.inventarioTotal);
             setCuartosFrios(response.data.infoCuartos);
         } catch (err) {
@@ -386,7 +436,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 data: data,
             };
             const response = await socketRequest({ data: request, token: token });
-            console.log(response);
 
             if (response.status !== 200) {
                 throw new Error("No se pudo enviar el pallet al cuarto frío. Intente nuevamente.");
@@ -410,6 +459,8 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
 
         <SafeAreaView style={styles.container}>
             <Header
+                obtenerItemsPallet={obtenerItemsPallet}
+                obtenerPallets={obtenerPallets}
                 enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                 setSection={props.setSection}
                 isTablet={isTablet}
@@ -428,18 +479,23 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
 
                     <Pallets
+                        itemsPallet={itemsPallet}
+                        pallets={pallets}
                         enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                         isTablet={isTablet}
                         guardarPalletSettings={guardarPalletSettings}
                     />
 
                     {isTablet &&
-                        <Informacion setSeleccion={setSeleccion} />}
+                        <Informacion pallets={pallets} itemsPallet={itemsPallet} setSeleccion={setSeleccion} />}
 
                 </View>
+
             }
             {isTablet &&
                 <Footer
+                    palletsItems={itemsPallet}
+                    pallets={pallets}
                     contenedores={contenedores}
                     modificarItems={modificarItems}
                     moverItem={moverItem}

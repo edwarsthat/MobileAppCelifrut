@@ -1,9 +1,10 @@
 
 import { create } from 'zustand';
-import { tiposFrutasType } from '../../types/tiposFrutas';
+import { tiposFrutasType, calidadesType } from '../../types/tiposFrutas';
 
 type FrutaStore = {
     tiposFruta: tiposFrutasType[];
+    calidadesExport: calidadesType[];
     isLoading: boolean;
     error: string | null;
     cargarFruta: (url: string) => Promise<void>;
@@ -11,6 +12,7 @@ type FrutaStore = {
 
 const useTipoFrutaStore = create<FrutaStore>((set) => ({
     tiposFruta: [],
+    calidadesExport: [],
     isLoading: false,
     error: null,
 
@@ -23,8 +25,7 @@ const useTipoFrutaStore = create<FrutaStore>((set) => ({
             if (data.status !== 200) {
                 throw new Error('Error al cargar los tipos de fruta');
             }
-            console.log('Tipos de fruta store:', data.data);
-            set({ tiposFruta: data.data, isLoading: false });
+            set({ tiposFruta: data.data.tipoFrutas, calidadesExport: data.data.calidadesExport, isLoading: false });
         } catch (error) {
             set({ error: error instanceof Error ? error.message : 'Error desconocido', isLoading: false });
         }

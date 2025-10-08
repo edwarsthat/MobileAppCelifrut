@@ -1,31 +1,32 @@
 
 import { z } from "zod";
-import { contenedoresType } from "../../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { predioType } from "../../../../../types/predioType";
+import { palletsType } from "../../../../../types/contenedores/palletsType";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
 
-export const validarActualizarPallet = (cajas: number, loteActual: predioType, pallet: number, contenedor: contenedoresType) => {
+export const validarActualizarPallet = (cajas: number, loteActual: predioType, pallet: palletsType, palletItems: itemPalletType[]) => {
     if (isNaN(cajas)) { throw new Error('Ingrese el numero de cajas'); }
     if (cajas <= 0) { throw new Error('Ingrese el numero de cajas'); }
     if (loteActual.enf === '') { throw new Error('Seleccione un lote'); }
-    if (pallet === -1) { throw new Error('Pallet no permitido'); }
-    const cajasActual = cajas - Number(contenedor?.pallets[pallet].EF1.reduce((acu, item) => (acu += item.cajas), 0));
+    const cajasActual = cajas - Number(palletItems.reduce((acu, item) => (acu += item.cajas), 0));
     if (cajasActual < 1) { throw new Error('Error en el numero de cajas'); }
 
-    if (contenedor.pallets[pallet].settings.tipoCaja === '') { throw new Error('Error configure el pallet'); }
-    if (contenedor.pallets[pallet].settings.calibre === '') { throw new Error('Error configure el pallet'); }
-    if (contenedor.pallets[pallet].settings.calidad === '') { throw new Error('Error configure el pallet'); }
+    if (pallet.tipoCaja === '') { throw new Error('Error configure el pallet'); }
+    if (pallet.calibre === '') { throw new Error('Error configure el pallet'); }
+    if (pallet.calidad._id === '') { throw new Error('Error configure el pallet'); }
     return cajasActual;
 };
-export const validarSumarDato = (cajas: number, loteActual: predioType, pallet: number, contenedor: contenedoresType) => {
+export const validarSumarDato = (cajas: number, loteActual: predioType, pallet: number, pallets: palletsType) => {
     if (isNaN(cajas)) { throw new Error('Ingrese el numero de cajas'); }
     if (cajas <= 0) { throw new Error('Ingrese el numero de cajas'); }
     if (loteActual.enf === '') { throw new Error('Seleccione un lote'); }
     if (pallet === -1) { throw new Error('Pallet no permitido'); }
-    if (contenedor.pallets[pallet].settings.tipoCaja === '') { throw new Error('Error configure el pallet'); }
-    if (contenedor.pallets[pallet].settings.calibre === '') { throw new Error('Error configure el pallet'); }
-    if (contenedor.pallets[pallet].settings.calidad === '') { throw new Error('Error configure el pallet'); }
+    if (pallets.tipoCaja === '') { throw new Error('Error configure el pallet'); }
+    if (pallets.calibre === '') { throw new Error('Error configure el pallet'); }
+    if (pallets.calidad._id === '') { throw new Error('Error configure el pallet'); }
 };
-export const validarEliminar = (cajas: number, seleccion: number[]) => {
+export const validarEliminar = (cajas: number, seleccion: string[]) => {
     if (isNaN(cajas)) { throw new Error('Ingrese el numero de cajas'); }
     if (seleccion.length === 0) { throw new Error('Seleccione el item que desea eliminar'); }
 };

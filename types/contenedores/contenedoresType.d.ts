@@ -1,9 +1,10 @@
-import { clienteType } from "./clientesType";
+import { clienteType } from "../clientesType";
+import { calidadesType, tiposFrutasType } from "../tiposFrutas";
 
 export type contenedoresType = {
   _id: string
   numeroContenedor: number
-  pallets: palletType[]
+  pallets: number
   infoContenedor: infoContendorType
   infoTractoMula?: formularioInspeccionMulaType
   infoExportacion?: InfoExportacionType
@@ -14,22 +15,7 @@ export type contenedoresType = {
   __v?: number
 }
 
-export type palletType = {
-  EF1: EF1Type[]
-  settings: {
-    tipoCaja: string
-    calidad: string
-    calibre: string
-  }
-  cajasTotal: number
-  listaLiberarPallet: {
-    "rotulado": boolean,
-    "paletizado": boolean,
-    "enzunchado": boolean,
-    "estadoCajas": boolean,
-    "estiba": boolean
-  }
-}
+
 
 type InsumosSchemaType = {
   any: Map<string, number>;
@@ -45,9 +31,9 @@ export type infoContendorType = {
   fechaFinalizado: string
   fechaSalida: string
   ultimaModificacion: string
-  tipoFruta: string
+  tipoFruta: tiposFrutasType[]
   tipoCaja: string[]
-  calidad: string[]
+  calidad: calidadesType[]
   cerrado: boolean
   observaciones: string
   sombra: string

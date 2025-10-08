@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SafeAreaView, FlatList, StyleSheet, TouchableOpacity, Image, View, Button, Text, Modal, Alert } from "react-native";
 import { predioType } from "../../../../../types/predioType";
-import { contenedoresType } from "../../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { useAppStore } from "../../../../stores/useAppStore";
 import { useSocketStore } from "../../../../stores/useSocketStore";
@@ -16,10 +16,21 @@ type propsType = {
     cerrarContenendor: () => void
     handleShowResumen: () => void
     enviarCajasCuartoFrio: (cuartoFrio: any, idsItems: string[]) => Promise<void>;
+    obtenerPallets: (id: string) => Promise<void>;
+    obtenerItemsPallet: (id: string) => Promise<void>;
 }
 
 export default function Header({
-    contenedores, setSection, isTablet, loteVaciando, showResumen, cerrarContenendor, handleShowResumen, enviarCajasCuartoFrio,
+    contenedores,
+    setSection,
+    isTablet,
+    loteVaciando,
+    showResumen,
+    cerrarContenendor,
+    handleShowResumen,
+    enviarCajasCuartoFrio,
+    obtenerPallets,
+    obtenerItemsPallet,
 }: propsType): React.JSX.Element {
 
     const setLoading = useAppStore(state => state.setLoading);
@@ -152,9 +163,11 @@ export default function Header({
                                         styles.selectionButton,
                                         (contenedor?._id === item._id || loteSeleccionado?._id === item._id) && styles.selectedBorder,
                                     ]}
-                                    onPress={() => {
+                                    onPress={async () => {
                                         seleccionarContenedor(item);
                                         setModalVisible(false);
+                                        await obtenerPallets(item._id);
+                                        await obtenerItemsPallet(item._id);
                                     }}
                                 >
                                     <Text style={styles.buttonText}>
@@ -192,7 +205,7 @@ export default function Header({
                                     </View>
                                 </TouchableOpacity>
                             )}
-                            keyExtractor={(item, idx) => item._id + idx }
+                            keyExtractor={(item, idx) => item._id + idx}
                         />
                     </View>
                 </View>
@@ -211,6 +224,7 @@ export default function Header({
                                     onPress={async () => {
                                         setModalCuartosFriosVisible(false);
                                         await enviarCajasCuartoFrio(item, EF1_id);
+                                        await obtenerItemsPallet(contenedor?._id || "");
                                     }}
                                 >
                                     <View style={styles.buttonTextPredio}>

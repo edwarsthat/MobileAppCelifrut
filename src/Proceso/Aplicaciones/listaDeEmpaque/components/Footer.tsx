@@ -6,7 +6,9 @@ import ModalModificarItem from "./ModalModificarItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { useAppContext } from "../../../../hooks/useAppContext";
-import { contenedoresType } from "../../../../../types/contenedoresType";
+import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
+import { palletsType } from "../../../../../types/contenedores/palletsType";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
 // import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
@@ -16,6 +18,8 @@ type propsType = {
   moverItem: (item: any) => void;
   modificarItems: (e: any) => void;
   contenedores: contenedoresType[];
+  pallets: palletsType[];
+  palletsItems: itemPalletType[];
 };
 
 export default function Footer(props: propsType): React.JSX.Element {
@@ -45,10 +49,10 @@ export default function Footer(props: propsType): React.JSX.Element {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
       if (!loteActual) { throw new Error("Seleccione un lote"); }
-      // const frutaPallet = tipoFruta.flatMap(f => f.calidades.filter(c => c._id === contenedor.pallets[pallet].settings.calidad));
-      // if (loteActual.tipoFruta._id !== frutaPallet[0]?._id) {
-      //   throw new Error("El tipo de fruta no coincide");
-      // }
+      const palletInfo = props.pallets.find(p => p.numeroPallet === pallet);
+      if (!palletInfo) {
+        return Alert.alert("Pallet no definido");
+      }
 
       const value = await AsyncStorage.getItem(`${contenedor?._id}:${pallet}`);
       let cajas_input;
@@ -59,14 +63,14 @@ export default function Footer(props: propsType): React.JSX.Element {
         cajas_input = cajas;
       }
 
-      const cajasActual = validarActualizarPallet(cajas_input, loteActual, pallet, contenedor);
+      const cajasActual = validarActualizarPallet(cajas_input, loteActual, palletInfo, props.palletsItems.filter(item => item.pallet === palletInfo._id));
 
       const item = {
         lote: loteActual?._id,
         cajas: cajasActual,
-        tipoCaja: contenedor?.pallets[pallet].settings.tipoCaja,
-        calibre: String(contenedor?.pallets[pallet].settings.calibre),
-        calidad: String(contenedor?.pallets[pallet].settings.calidad),
+        tipoCaja: palletInfo.tipoCaja,
+        calibre: palletInfo.calibre,
+        calidad: String(palletInfo.calidad._id),
         tipoFruta: loteActual?.tipoFruta._id || "",
         fecha: new Date(),
       };
@@ -82,19 +86,18 @@ export default function Footer(props: propsType): React.JSX.Element {
     try {
       if (!contenedor) { throw new Error("contenedor undefinide"); }
       if (!loteActual) { throw new Error("Seleccione un lote"); }
-      // const frutaPallet = tipoFruta.map(f => f.calidades.filter(c => c._id === contenedor.pallets[pallet].settings.calidad));
-      // console.log("frutapallet", frutaPallet)
-      // console.log("loteActual", loteActual)
-      // if (loteActual.tipoFruta._id !== frutaPallet[0]?._id) {
-      //   throw new Error("El tipo de fruta no coincide");
-      // }
-      validarSumarDato(cajas, loteActual, pallet, contenedor);
+      const palletInfo = props.pallets.find(p => p.numeroPallet === pallet);
+      if (!palletInfo) {
+        return Alert.alert("Pallet no definido");
+      }
+      validarSumarDato(cajas, loteActual, pallet, palletInfo);
+
       const item: itemType = {
         lote: loteActual._id,
         cajas: cajas,
-        tipoCaja: contenedor?.pallets[pallet].settings.tipoCaja,
-        calibre: String(contenedor?.pallets[pallet].settings.calibre),
-        calidad: String(contenedor?.pallets[pallet].settings.calidad),
+        tipoCaja: palletInfo.tipoCaja,
+        calibre: String(palletInfo.calibre),
+        calidad: String(palletInfo.calidad._id),
         fecha: new Date(),
         tipoFruta: loteActual.tipoFruta._id,
       };
@@ -294,10 +297,10 @@ export default function Footer(props: propsType): React.JSX.Element {
         </View>
       </Modal>
 
-      <ModalModificarItem
+      {/* <ModalModificarItem
         modificarItems={props.modificarItems}
         setOpenModalEditar={setOpenModalEditar}
-        openModalEditar={openModalEditar} />
+        openModalEditar={openModalEditar} /> */}
     </SafeAreaView>
   );
 }
