@@ -135,8 +135,11 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
   const clickRestar = () => {
     try {
+      if(seleccion.length > 1) { throw new Error("Seleccione solo un item para restar cajas"); }
+      const itemPallet = props.palletsItems.find(p => p._id === seleccion[0]);
+      if(!itemPallet) { throw new Error("Item no encontrado"); }
       if (!contenedor) { throw new Error("Seleccione contenedor"); }
-      validarResta(contenedor, cajas, seleccion, pallet);
+      validarResta(itemPallet, cajas, seleccion, pallet);
       props.restarItem(cajas);
       setCajas(0);
     } catch (err) {
@@ -159,22 +162,12 @@ export default function Footer(props: propsType): React.JSX.Element {
   };
   const clickMover = () => {
     try {
-      if (!contenedor) { throw new Error("contenedor undefinide"); }
+      if (!contenedor) { throw new Error("contenedor undefined"); }
       const contenedor2 = props.contenedores.find(c => c._id === contenedorID) || "";
-      validarMoverItem(
-        Number(entradaModalCajas),
-        seleccion,
-        pallet,
-        contenedor._id,
-        contenedorID,
-        entradaModalPallet,
-        contenedor,
-        contenedor2
-      );
-
+      if (!contenedor2) { throw new Error("Seleccione un contenedor"); }
       const item = {
         contenedor: contenedorID,
-        pallet: Number(entradaModalPallet) - 1,
+        pallet: Number(entradaModalPallet),
         numeroCajas: Number(entradaModalCajas),
       };
       props.moverItem(item);

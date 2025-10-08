@@ -46,8 +46,6 @@ export function validarRestarItem(request: object) {
     try {
         const schema = z.object({
             _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
-            pallet: z.number().int().nonnegative(),
-            seleccion: z.number().int().nonnegative(),
             cajas: z.number().int().positive(),
         });
         schema.parse(request);

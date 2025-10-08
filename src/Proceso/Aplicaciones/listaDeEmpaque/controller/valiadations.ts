@@ -30,51 +30,19 @@ export const validarEliminar = (cajas: number, seleccion: string[]) => {
     if (isNaN(cajas)) { throw new Error('Ingrese el numero de cajas'); }
     if (seleccion.length === 0) { throw new Error('Seleccione el item que desea eliminar'); }
 };
-export const validarResta = (contenedor: contenedoresType, cajas: number, seleccion: number[], pallet: number) => {
+export const validarResta = (itemPallet: itemPalletType, cajas: number, seleccion: string[], pallet: number) => {
     if (isNaN(cajas)) { throw new Error('Ingrese el numero de cajas'); }
     if (cajas === 0) { throw new Error('Ingrese el numero de cajas'); }
     if (seleccion.length === 0) { throw new Error('Seleccione el item al que desea restar cajas'); }
     if (seleccion.length > 1) { throw new Error('Seleccione solo un item'); }
     if (pallet !== -1) {
-        const itemCaja = contenedor?.pallets[pallet].EF1[seleccion[0]].cajas;
+        const itemCaja = itemPallet.cajas;
         if (itemCaja) {
             if (Number(cajas) > itemCaja) {
                 throw new Error('Error en el numero de cajas');
             }
         }
     }
-};
-export const validarMoverItem = (
-    cajasModal: number,
-    seleccion: number[],
-    pallet: number,
-    idContendor: string,
-    contenedorID: string,
-    entradaModalPallet: string,
-    contenedor: contenedoresType,
-    contenedor2: contenedoresType | string
-) => {
-    if (idContendor === "") { throw new Error('Seleccione un contenedor'); }
-    if (contenedorID !== "") {
-        if (entradaModalPallet === '') { throw new Error('Ingrese el pallet al que desea mover las cajas'); }
-    }
-    if (typeof contenedor2 === "object") {
-        if (
-            contenedor2 &&
-            contenedor2.pallets &&
-            Number(entradaModalPallet) > contenedor2.pallets.length
-        ) {
-            throw new Error('Error en el pallet');
-        }
-    }
-    if (seleccion.length === 1 && pallet !== -1) {
-        const validarNcajas =
-            contenedor.pallets[pallet].EF1[seleccion[0]].cajas >= cajasModal;
-        if (!validarNcajas) {
-            throw new Error("Error en el numero de cajas que desea pasar");
-        }
-    }
-
 };
 
 // Función para validar el request de enviar pallet a cuarto frío

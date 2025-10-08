@@ -273,13 +273,14 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
     const restarItem = async (item: any) => {
         try {
             setLoading(true);
+            const palletItem = itemsPallet.find(p => p._id === seleccion[0]);
+            console.log("Pallet item a restar: ", palletItem?._id);
+            if (!palletItem) { throw new Error("Item no encontrado"); }
             const token = await obtenerAccessToken();
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_restarItem',
-                    _id: contenedor?._id,
-                    pallet: pallet,
-                    seleccion: seleccion[0],
+                    _id: palletItem._id,
                     cajas: item,
                 },
                 token: token,
@@ -307,12 +308,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_moverItems',
-                    contenedor1: {
-                        _id: contenedor?._id,
-                        numeroContenedor: contenedor?.numeroContenedor,
-                        pallet: pallet,
-                        seleccionado: seleccion,
-                    },
+                    seleccionado: seleccion,
                     contenedor2: {
                         _id: cont2 ? cont2._id : "",
                         numeroContenedor: cont2 ? cont2.numeroContenedor : "",
