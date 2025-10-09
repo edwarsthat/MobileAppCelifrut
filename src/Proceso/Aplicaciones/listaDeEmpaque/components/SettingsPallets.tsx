@@ -32,7 +32,7 @@ const colors = [
 ];
 
 export default function SettingsPallets({
-    openModal, guardarPalletSettings, isTablet, closeModal, enviarCajasCuartoFrio, pallets
+    openModal, guardarPalletSettings, isTablet, closeModal, enviarCajasCuartoFrio, pallets,
 }: propsType): React.JSX.Element {
 
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);

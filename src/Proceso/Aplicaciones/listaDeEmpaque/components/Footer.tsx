@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, SafeAreaView, StyleSheet, Button, TextInput, Alert, Modal, Text, TouchableOpacity, FlatList } from "react-native";
-import { validarActualizarPallet, validarEliminar, validarMoverItem, validarResta, validarSumarDato } from "../controller/valiadations";
+import { validarActualizarPallet, validarEliminar, validarResta, validarSumarDato } from "../controller/valiadations";
 import { itemType } from "../types/types";
 import ModalModificarItem from "./ModalModificarItem";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,6 +9,7 @@ import { useAppContext } from "../../../../hooks/useAppContext";
 import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { palletsType } from "../../../../../types/contenedores/palletsType";
 import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
+import { useAppStore } from "../../../../stores/useAppStore";
 // import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
@@ -28,6 +29,7 @@ export default function Footer(props: propsType): React.JSX.Element {
   const pallet = useListaDeEmpaqueStore(state => state.pallet);
   const loteActual = useListaDeEmpaqueStore(state => state.loteSeleccionado);
   const seleccion = useListaDeEmpaqueStore(state => state.seleccion);
+  const loading = useAppStore(state => state.loading);
   // const tipoFruta = useTipoFrutaStore(state => state.tiposFruta);
 
   const [contenedorID, setContenedorID] = useState<string>("");
@@ -258,7 +260,7 @@ export default function Footer(props: propsType): React.JSX.Element {
                 style={styles.modalInput} />
             </View>}
             <View style={styles.viewButtonsModal}>
-              <Button title="Mover" onPress={clickMover} accessibilityLabel="Confirmar mover items" />
+              <Button title="Mover" onPress={clickMover} disabled={loading} accessibilityLabel="Confirmar mover items" />
               <Button title="Cancelar" onPress={() => setOpenModal(false)} accessibilityLabel="Cerrar modal de mover" />
             </View>
           </View>
@@ -290,10 +292,10 @@ export default function Footer(props: propsType): React.JSX.Element {
         </View>
       </Modal>
 
-      {/* <ModalModificarItem
+      <ModalModificarItem
         modificarItems={props.modificarItems}
         setOpenModalEditar={setOpenModalEditar}
-        openModalEditar={openModalEditar} /> */}
+        openModalEditar={openModalEditar} />
     </SafeAreaView>
   );
 }

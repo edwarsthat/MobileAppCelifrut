@@ -16,7 +16,6 @@ import { validarAddItem, validarDeleteItems, validarEnviarCuartoFio, validarModi
 import { useAppStore } from "../../../stores/useAppStore";
 import { useListaDeEmpaqueStore } from "./store/useListaDeEmpaqueStore";
 import { useSocketStore } from "../../../stores/useSocketStore";
-import { obtenerItem } from "./controller/contenedores";
 import { cuartosFriosType } from "../../../../types/catalogs";
 import { palletsType } from "../../../../types/contenedores/palletsType";
 import { itemPalletType } from "../../../../types/contenedores/itemsPallet";
@@ -371,8 +370,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_modificarItems',
-                    _id: contenedor?._id,
-                    pallet: pallet,
                     seleccion: seleccion,
                     data: data,
                 },
@@ -416,15 +413,9 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
         try {
             setLoading(true);
             const token = await obtenerAccessToken();
-            const items = [];
-            if (!contenedor) { throw new Error("No hay contenedor seleccionado"); }
-            for (const id of seleccionItems) {
-                items.push(obtenerItem(contenedor, id));
-            }
             const data = {
                 seleccion: seleccionItems,
                 cuartoFrio: cuarto._id,
-                items: items,
             };
             validarEnviarCuartoFio(data);
             const request = {

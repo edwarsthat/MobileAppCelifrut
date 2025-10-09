@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Modal, Button, View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { ModalOpciones } from "./ModalOpciones";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
-import { getCalidadesFrutas } from "../../../../utils/functions";
-import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
     openModalEditar: boolean
@@ -12,7 +10,6 @@ type propsType = {
 }
 export default function ModalModificarItem(props: propsType): React.JSX.Element {
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
-    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
     const [modalCalidad, setModalCalidad] = useState<boolean>(false);
     const [modalCalibre, setModalCalibre] = useState<boolean>(false);
     const [modalTipoCaja, setModalTipoCaja] = useState<boolean>(false);
@@ -91,7 +88,7 @@ export default function ModalModificarItem(props: propsType): React.JSX.Element 
             {/* //opciones calidad */}
             <ModalOpciones
                 visible={modalCalidad}
-                data={getCalidadesFrutas(contenedor, tipoFrutas).map(item => ({ _id: item?._id, name: item?.nombre })) || [{ _id: '', name: '' }]}
+                data={contenedor?.infoContenedor.calidad.map(item => ({ _id: item?._id, name: item?.nombre })) || [{ _id: '', name: '' }]}
                 onSelect={(item) => {
                     setModalCalidad(false);
                     setCalidad(item._id);

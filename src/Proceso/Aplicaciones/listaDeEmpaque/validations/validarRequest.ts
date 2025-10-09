@@ -59,12 +59,7 @@ export function validarRestarItem(request: object) {
 export function validarMoverItem(request: object) {
     try {
         const schema = z.object({
-            contenedor1: z.object({
-                _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
-                numeroContenedor: z.number().int().nonnegative(),
-                pallet: z.number().int().nonnegative(),
-                seleccionado: z.array(z.number().int().nonnegative()),
-            }),
+            seleccionado: z.array(z.string().min(1)),
             contenedor2: z.object({
                 _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
                 numeroContenedor: z.number().int().nonnegative(),
@@ -84,9 +79,7 @@ export function validarMoverItem(request: object) {
 export function validarModificarItem(request: object) {
     try {
         const schema = z.object({
-            _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
-            pallet: z.number().int().nonnegative(),
-            seleccion: z.array(z.number().int().nonnegative()),
+            seleccion: z.array(z.string().min(1)),
             data: z.object({
                 calibre: z.string().min(1),
                 calidad: z.string().min(1),
@@ -106,18 +99,6 @@ export function validarEnviarCuartoFio(request: object) {
         const schema = z.object({
             seleccion: z.array(z.string().min(1)),
             cuartoFrio: z.string().min(1),
-            items: z.array(z.object({
-                _id: z.string().regex(/^[0-9a-fA-F]{24}$/),
-                GGN: z.boolean(),
-                SISPAP: z.boolean(),
-                tipoFruta: z.string().regex(/^[0-9a-fA-F]{24}$/),
-                fecha: z.string().min(1),
-                calidad: z.string().regex(/^[0-9a-fA-F]{24}$/),
-                calibre: z.string().min(1),
-                tipoCaja: z.string(),
-                cajas: z.number().int().positive(),
-                lote: z.object({}).optional(),
-            })),
         });
         schema.parse(request);
     } catch (err) {

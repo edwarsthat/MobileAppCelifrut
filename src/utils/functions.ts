@@ -1,5 +1,5 @@
-// import { contenedoresType } from "../../types/contenedores/contenedoresType";
-// import { tiposFrutasType, calidadesType } from "../../types/tiposFrutas";
+import { contenedoresType } from "../../types/contenedores/contenedoresType";
+import { calidadesType } from "../../types/tiposFrutas";
 
 // export const calidadData = (tipoFruta: tiposFrutasType[], id: string): calidadesType | undefined => {
 //     return tipoFruta
@@ -7,12 +7,11 @@
 //         .find(cal => cal._id === id);
 // };
 
-export const getCalidadesFrutas = (contenedor: contenedoresType | null, tipoFrutas: tiposFrutasType[]): calidadesType[] => {
-    console.log("contenedor", "tipoFrutas");
-    // const dataCalidad = contenedor
-    //     ? tipoFrutas
-    //         .flatMap(tipoFruta => tipoFruta.calidades)
-    //         .filter(cal => contenedor.infoContenedor.calidad.includes(cal._id))
-    //     : [{ _id: '', descripcion: '', nombre: '' }];
-    // return dataCalidad;
+export const getCalidadesFrutas = (contenedor: contenedoresType | null, tipoFrutas: calidadesType[]): calidadesType[] => {
+    if (!contenedor) {
+        return [];
+    }
+    const calidadIds = contenedor.infoContenedor.calidad.map(cal => cal._id);
+    const dataCalidad = tipoFrutas.filter(cal => calidadIds.includes(cal._id));
+    return dataCalidad;
 };

@@ -1,6 +1,5 @@
 
 import { z } from "zod";
-import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { predioType } from "../../../../../types/predioType";
 import { palletsType } from "../../../../../types/contenedores/palletsType";
 import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
@@ -63,7 +62,5 @@ export const validarEnviarCuartoFrioRequest = (): z.ZodSchema => {
             invalid_type_error: "Escoja un pallet válido",
         }).int("Escoja un pallet válido").min(0, "Escoja un pallet válido"),
     });
-
-
 };
 
