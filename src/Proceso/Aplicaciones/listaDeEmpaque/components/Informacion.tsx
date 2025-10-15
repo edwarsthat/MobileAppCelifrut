@@ -54,7 +54,7 @@ export default function Informacion(props: propsType): React.JSX.Element {
             <View style={styles.scrollStyle}>
                 {contenedor && pallet !== null && props.itemsPallet.length > 0 &&
                     <FlatList
-                        data={props.itemsPallet.filter(item => item.pallet === palletId._id)}
+                        data={props.itemsPallet.filter(item => item.pallet._id === palletId._id)}
                         contentContainerStyle={styles.listContent}
                         renderItem={({ item, index }) => (
                             <View style={styles.container}>

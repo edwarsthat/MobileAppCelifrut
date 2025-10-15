@@ -4,16 +4,17 @@ import HorizontalLine from "../../../../components/HorizontalLine";
 import { obtenerResumen } from "../controller/resumenes";
 import { contenedoresType } from "../../../../../types/contenedores/contenedoresType";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
-import { calidadData } from "../../../../utils/functions";
 import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
 
 type propsType = {
     contenedores: contenedoresType[]
+    itemPallets: itemPalletType[]
 };
 
-export default function ResumenListaEmpaque({ contenedores }: propsType): React.JSX.Element {
+export default function ResumenListaEmpaque({ contenedores, itemPallets }: propsType): React.JSX.Element {
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
-    const tipoFrutas = useTipoFrutaStore(state => state.tiposFruta);
+    const tipoFrutas = useTipoFrutaStore(state => state.calidadesExport);
     const [cajasTotal, setCajasTotal] = useState<number>(0);
     const [kilosTotal, setKilosTotal] = useState<number>(0);
     const [cajasCalidad, setCajasCalidad] = useState<object>();
@@ -23,13 +24,17 @@ export default function ResumenListaEmpaque({ contenedores }: propsType): React.
     const [soloHoy, setSoloHoy] = useState<boolean>(false);
     const toggleSwitch = () => setSoloHoy(previousState => !previousState);
     useEffect(() => {
-        let cont;
-        if (contenedor === null) {
-            cont = contenedores;
-        } else {
-            cont = [contenedor];
+        const items = itemPallets.filter(item => item.contenedor._id === contenedor?._id);
+        if (items.length === 0) {
+            setCajasTotal(0);
+            setKilosTotal(0);
+            setCajasCalidad({});
+            setkilosCalidad({});
+            setCajasCalibre({});
+            setkilosCalibre({});
+            return;
         }
-        const resumen = obtenerResumen(cont, soloHoy);
+        const resumen = obtenerResumen(items, soloHoy);
         if (resumen !== null) {
             const {
                 kilos_por_calibre,
@@ -81,12 +86,12 @@ export default function ResumenListaEmpaque({ contenedores }: propsType): React.
 
                         <View>
                             {cajasCalidad && Object.entries(cajasCalidad).map(([key, value]) => (
-                                <Text key={key}> Calidad {calidadData(tipoFrutas, key)?.nombre + " ➜"}  {value.toLocaleString('es-CO')} cajas  </Text>
+                                <Text key={key}> Calidad {tipoFrutas.find(item => item._id === key)?.nombre + " ➜"}  {value.toLocaleString('es-CO')} cajas  </Text>
                             ))}
                             <HorizontalLine />
 
                             {kilosCalidad && Object.entries(kilosCalidad).map(([key, value]) => (
-                                <Text key={key}> Calidad {calidadData(tipoFrutas, key)?.nombre + " ➜"}  {value.toLocaleString('es-CO')} Kg </Text>
+                                <Text key={key}> Calidad {tipoFrutas.find(item => item._id === key)?.nombre + " ➜"}  {value.toLocaleString('es-CO')} Kg </Text>
                             ))}
                         </View>
                     </View>

@@ -105,22 +105,23 @@ export default function Pallets({
                 <FlatList
                     key={columnas}
                     data={pallets}
-                    keyExtractor={(item) => item.toString()}
+                    keyExtractor={(item) => item._id.toString()}
                     initialNumToRender={20}
                     renderItem={({ item, index }) => (
                         <PalletComponent
-                            pallet={item}
                             palletsAsyncData={palletsAsyncData[index] || { cajasContadas: '', selectedColor: '#FFFFFF' }}
                             numeroPallet={Number(item.numeroPallet)}
                             handleClickPallet={handleClickPallet}
-                            itemsPallet={itemsPallet}
                             openPalletSettings={openPalletSettings}
+                            pallet={item}
+                            itemsPallet={itemsPallet}
                         />
                     )}
                     numColumns={columnas}
                 />
 
                 <SettingsPallets
+                    itemsPallet={itemsPallet}
                     pallets={pallets}
                     enviarCajasCuartoFrio={enviarCajasCuartoFrio}
                     isTablet={isTablet}

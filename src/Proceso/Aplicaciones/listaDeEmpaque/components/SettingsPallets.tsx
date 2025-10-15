@@ -8,9 +8,11 @@ import { INITIAL_CONFIG_PALLET } from "../constants/configs";
 import { useListaDeEmpaqueStore } from "../store/useListaDeEmpaqueStore";
 import { cuartosFriosType } from "../../../../../types/catalogs";
 import { palletsType } from "../../../../../types/contenedores/palletsType";
+import { itemPalletType } from "../../../../../types/contenedores/itemsPallet";
 
 type propsType = {
     pallets: palletsType[]
+    itemsPallet: itemPalletType[]
     openModal: boolean;
     closeModal: () => void;
     guardarPalletSettings: (settings: settingsType, itemCalidad: any) => Promise<void>;
@@ -32,7 +34,7 @@ const colors = [
 ];
 
 export default function SettingsPallets({
-    openModal, guardarPalletSettings, isTablet, closeModal, enviarCajasCuartoFrio, pallets,
+    openModal, guardarPalletSettings, isTablet, closeModal, enviarCajasCuartoFrio, pallets, itemsPallet,
 }: propsType): React.JSX.Element {
 
     const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
@@ -47,18 +49,18 @@ export default function SettingsPallets({
         getCajasContadas();
         if (palletSeleccionado !== -1 && contenedor) {
             const infoPallet = pallets.find(p => p.numeroPallet === (palletSeleccionado));
-            if(!infoPallet) {
+            if (!infoPallet) {
                 return;
             }
             setConfig(prevConfig => ({
                 ...prevConfig,
-                rotulado: infoPallet?.rotulado,
-                paletizado: infoPallet?.paletizado,
-                enzunchado: infoPallet?.enzunchado,
-                estadoCajas: infoPallet?.estadoCajas,
-                estiba: infoPallet?.estiba,
+                rotulado: infoPallet?.rotulado || false,
+                paletizado: infoPallet?.paletizado || false,
+                enzunchado: infoPallet?.enzunchado || false,
+                estadoCajas: infoPallet?.estadoCajas || false,
+                estiba: infoPallet?.estiba || false,
                 calibre: infoPallet?.calibre || '',
-                calidad: infoPallet?.calidad._id || '',
+                calidad: infoPallet?.calidad?._id || '',
                 tipoCaja: infoPallet?.tipoCaja || '',
             }));
         } else {
@@ -146,14 +148,17 @@ export default function SettingsPallets({
     const handleEnviarPalletCuartoFrio = async () => {
         try {
             const idsItems = [];
-
-            for (const item of pallets || []) {
-                idsItems.push(item._id);
+            const palletInfo = pallets.find(p => p.numeroPallet === (palletSeleccionado));
+            for (const item of itemsPallet || []) {
+                if (item.pallet._id === palletInfo?._id) {
+                    idsItems.push(item._id);
+                }
             }
             const cuartoFrioSeleccionado = cuartosFrios.find(cf => cf._id === config.cuartoFrio);
             if (!cuartoFrioSeleccionado) {
                 throw new Error("No se ha seleccionado un cuarto frío válido.");
             }
+
             await enviarCajasCuartoFrio(cuartoFrioSeleccionado, idsItems);
             closeModal();
         } catch (err) {

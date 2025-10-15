@@ -1,10 +1,12 @@
 import { lotesType } from "../lotesType";
 import { calidadesType } from "../tiposFrutas";
+import { contenedoresType } from "./contenedoresType";
+import { palletsType } from "./palletsType";
 
 export type itemPalletType = {
     _id: string;
-    pallet: string;
-    contenedor: string;
+    pallet: palletsType;
+    contenedor: contenedoresType;
     lote: lotesType;
     tipoCaja: string;
     calibre: string;

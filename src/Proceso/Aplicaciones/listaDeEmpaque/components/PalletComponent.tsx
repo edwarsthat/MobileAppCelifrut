@@ -36,7 +36,7 @@ function PalletComponent({
     const totalCajas = useMemo(
         () => {
             const cajasEnPallet = itemsPallet
-                .filter(item => item.pallet === pallet._id)
+                .filter(item => item.pallet._id === pallet._id)
                 .reduce((acc, item) => acc + item.cajas, 0);
             return cajasEnPallet;
         },
@@ -97,7 +97,7 @@ function PalletComponent({
                         {palletsAsyncData?.cajasContadas !== '' && (
                             <>
                                 {" | "}
-                                {/* {totalCajas - Number(palletsAsyncData?.cajasContadas || 0)} */}
+                                {totalCajas - Number(palletsAsyncData?.cajasContadas || 0)}
                             </>
                         )}
                     </Text>

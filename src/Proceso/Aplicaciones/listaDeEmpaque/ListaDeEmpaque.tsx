@@ -166,7 +166,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             if (response.status !== 200) {
                 throw new Error(`Error al obtener los items del pallet: ${response.message}`);
             }
-            console.log("Items del pallet obtenidos: ", response.data);
+            console.log("Items del pallet obtenidos: ", response.data.length);
             setItemsPallet(response.data);
         } catch (err) {
             if (err instanceof Error) {
@@ -460,7 +460,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
 
             {showResumen ?
                 <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
-                    <ResumenListaEmpaque contenedores={contenedores} />
+                    <ResumenListaEmpaque itemPallets={itemsPallet} contenedores={contenedores} />
                 </View>
                 :
                 <View style={isTablet ? styles.palletsInfoContainer : stylesCel.palletsInfoContainer}>
