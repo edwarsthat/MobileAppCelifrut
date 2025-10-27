@@ -200,7 +200,7 @@ export default function SettingsPallets({
                                             label="Calibre"
                                             styles={styles} />
                                     </ScrollView>
-                                    <ScrollView style={[styles.sectionCard, styles.sectionStretch]} contentContainerStyle={styles.sectionCardInner}>
+                                    <ScrollView style={[styles.sectionCard, styles.sectionStretch, styles.scrollViewMaxHeight]} contentContainerStyle={styles.sectionCardInner}>
                                         <Text style={styles.tituloModal}>Cajas ya contadas</Text>
                                         <TextInput
                                             onChangeText={handleCajasContadas}
@@ -223,9 +223,9 @@ export default function SettingsPallets({
                                                     />
                                                 ))}
                                             </View>
-                                            {selectedColor && (
+                                            {/* {selectedColor && (
                                                 <Text style={styles.selectedText}>Color seleccionado: {selectedColor}</Text>
-                                            )}
+                                            )} */}
                                         </View>
                                     </ScrollView>
                                 </View>
@@ -422,6 +422,9 @@ const styles = StyleSheet.create({
     sectionStretch: {
         alignSelf: 'stretch',
     },
+    scrollViewMaxHeight: {
+        maxHeight: 400,
+    },
     tituloModal: {
         fontSize: 20,
         fontWeight: 'bold',
@@ -485,22 +488,19 @@ const styles = StyleSheet.create({
         paddingVertical: 24,
     },
     viewColorSelectContainer: {
-        gap: 16,
+        gap: 12,
         width: 260,
-        justifyContent: 'center',
-        alignContent: 'center',
+        justifyContent: 'flex-start',
+        alignContent: 'flex-start',
         padding: 16,
         borderRightColor: 'transparent',
         borderRightWidth: 0,
-
     },
     viewColorSelectCirculos: {
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginTop: 10,
         gap: 10,
-
     },
 
     colorCircle: {

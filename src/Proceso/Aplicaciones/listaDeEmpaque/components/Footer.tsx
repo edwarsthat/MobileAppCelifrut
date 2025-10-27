@@ -65,7 +65,7 @@ export default function Footer(props: propsType): React.JSX.Element {
         cajas_input = cajas;
       }
 
-      const cajasActual = validarActualizarPallet(cajas_input, loteActual, palletInfo, props.palletsItems.filter(item => item.pallet === palletInfo._id));
+      const cajasActual = validarActualizarPallet(cajas_input, loteActual, palletInfo, props.palletsItems.filter(item => item.pallet._id === palletInfo._id));
 
       const item = {
         lote: loteActual?._id,

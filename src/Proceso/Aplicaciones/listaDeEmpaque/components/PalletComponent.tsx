@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
 import { PalletAsyncData } from "../types/types";
 import { getPalletButtonStyle } from "../utils/pallets";
@@ -28,6 +28,8 @@ function PalletComponent({
     pallet,
     itemsPallet,
 }: propsType): React.JSX.Element {
+
+    useEffect(() => {}, [palletsAsyncData]);
 
     // const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const palletSeleccionado = useListaDeEmpaqueStore(state => state.pallet);

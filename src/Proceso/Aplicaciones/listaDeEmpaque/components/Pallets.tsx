@@ -52,11 +52,11 @@ export default function Pallets({
                 if (!contenedor) { return; }
 
                 const results = await Promise.all(
-                    pallets.map(async (palletNumber, index) => {
-                        const value = await AsyncStorage.getItem(`${contenedor._id}:${index + 1}:cajasContadas`);
-                        const color = await AsyncStorage.getItem(`${contenedor._id}:${index + 1}:color`);
+                    pallets.map(async (palletNumber) => {
+                        const value = await AsyncStorage.getItem(`${contenedor._id}:${palletNumber.numeroPallet}`);
+                        const color = await AsyncStorage.getItem(`${contenedor._id}:${palletNumber.numeroPallet}:color`);
                         return {
-                            pallet: index,
+                            pallet: Number(palletNumber.numeroPallet),
                             cajasContadas: value ?? '',
                             selectedColor: color ?? '#FFFFFF',
                         };
@@ -80,7 +80,7 @@ export default function Pallets({
         };
         fetchAllPalletsData();
         return () => { mounted = false; };
-    }, [contenedor]);
+    }, [contenedor, openModal]);
 
     const openPalletSettings = () => {
         setOpenModal(true);
@@ -107,9 +107,9 @@ export default function Pallets({
                     data={pallets}
                     keyExtractor={(item) => item._id.toString()}
                     initialNumToRender={20}
-                    renderItem={({ item, index }) => (
+                    renderItem={({ item }) => (
                         <PalletComponent
-                            palletsAsyncData={palletsAsyncData[index] || { cajasContadas: '', selectedColor: '#FFFFFF' }}
+                            palletsAsyncData={palletsAsyncData[item.numeroPallet] || { cajasContadas: '', selectedColor: '#FFFFFF' }}
                             numeroPallet={Number(item.numeroPallet)}
                             handleClickPallet={handleClickPallet}
                             openPalletSettings={openPalletSettings}
