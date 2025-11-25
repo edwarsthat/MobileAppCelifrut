@@ -1,23 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, Text, View, StyleSheet, Button, Alert } from "react-native";
-import FormInput from "../../../UI/components/FormInput";
-import { sumarDatos } from "./func/functions";
-import { datosPredioType } from "./types/types";
-import { getCredentials } from "../../../../utils/auth";
-import useForm from "../../../hooks/useForm";
-import { FormState, labelsForm, formInit, FormCategory, formSchema } from "./validations/validations";
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity } from "react-native";
+import { Picker } from '@react-native-picker/picker';
 import { useAppStore } from "../../../stores/useAppStore";
 import useTipoFrutaStore from "../../../stores/useTipoFrutaStore";
+import useForm from "../../../hooks/useForm";
+import { datosPredioType, formInit, formType, schemaForm } from "./validations";
+import { descartesType } from "../../../../types/tiposFrutas";
+import FormInput from "../../../UI/components/FormInput";
 import { useSocketStore } from "../../../stores/useSocketStore";
+import { getCredentials } from "../../../../utils/auth";
 
-export default function DescarteLavado(): React.JSX.Element {
-    const tiposFrutas = useTipoFrutaStore((state) => state.tiposFruta);
-    const lastMessage = useSocketStore((state) => state.lastMessage);
+export default function DescarteLavadoSistema(): JSX.Element {
+    const setLoading = useAppStore(state => state.setLoading);
+    const loading = useAppStore(state => state.loading);
+    const tiposFruta = useTipoFrutaStore(state => state.tiposFruta);
     const socketRequest = useSocketStore(state => state.sendRequest);
-    const setLoading = useAppStore((state) => state.setLoading);
-    const loading = useAppStore((state) => state.loading);
 
-    const { formState, setFormState, validateForm, formErrors, resetForm } = useForm<FormState>(formInit);
+    const [descartes, setDescartes] = useState<descartesType[]>([]);
+    const { formState, handleFieldChange, resetForm, formErrors, validateForm } = useForm<formType>(formInit);
+
     const [datosPredio, setDatosPredio] = useState<datosPredioType>({
         _id: "",
         enf: "",
@@ -25,78 +26,70 @@ export default function DescarteLavado(): React.JSX.Element {
         nombrePredio: "",
     });
 
-    const obtenerLote = async () => {
+    useEffect(() => {
+        obtenerLote();
+    }, []);
+
+    const obtenerLote = async (): Promise<void> => {
         try {
             setLoading(true);
             const token = await getCredentials();
-            const request = {
-                token: token,
-                data: { action: "get_proceso_aplicaciones_descarteLavado" },
-            };
-            const response = await socketRequest(request);
+            const response = await socketRequest({
+                token,
+                data: { action: "get_proceso_aplicaciones_descarteLavado" }
+            });
+
             if (response.status !== 200) {
-                throw new Error(`Error al obtener el lote: ${response.message}`);
+                throw new Error(`Code ${response.status}: ${response.message}`);
             }
+
             setDatosPredio({
                 _id: response.data._id,
-                enf: response.data.enf,
-                tipoFruta: response.data.tipoFruta,
-                nombrePredio: response.data.nombrePredio,
+                enf: response.data.loteId.enf,
+                tipoFruta: response.data.tipoFruta.tipoFruta,
+                nombrePredio: response.data.predio.PREDIO,
             });
+
+            const tipoFrutaFind = tiposFruta.find((item) => item._id === response.data.tipoFruta._id);
+            if (tipoFrutaFind) {
+                const descarteSeccion = tipoFrutaFind.descartes.filter((item) => item.seccion.includes("lavado"));
+                setDescartes(descarteSeccion as descartesType[]);
+            }
         } catch (err) {
             if (err instanceof Error) {
-                Alert.alert(`Error: ${err.message}`);
+                Alert.alert("Error", err.message);
             }
         } finally {
             setLoading(false);
         }
     };
-    useEffect(() => {
-        if (lastMessage?.event === 'predio_vaciado') {
-            obtenerLote();
-            Alert.alert("El predio ha sido vaciado. Se actualizará la información.");
-        }
-    }, [lastMessage]);
-    useEffect(() => {
-        obtenerLote();
-    }, []);
 
-    const handleChange = (name: keyof FormState, value: number, type: keyof FormCategory): void => {
-        setFormState({
-            ...formState,
-            [name]: {
-                ...formState[name],
-                [type]: value,
-            },
-        });
-
-    };
-
-    const guardarDatos = async (): Promise<any> => {
+    const guardarDatos = async (): Promise<void> => {
         try {
-            if (datosPredio.enf === "") {
-                throw new Error("Recargue el predio que se está vaciando");
-            }
-            const isValid = validateForm(formSchema);
-            if (!isValid) {
-                return;
-            }
             setLoading(true);
-            const data = sumarDatos(formState, datosPredio, tiposFrutas);
+            const result = validateForm(schemaForm);
+            if (!result) return;
+
             const token = await getCredentials();
             const request = {
-                token: token,
-                data: { action: "put_proceso_aplicaciones_descarteLavado", data: data, _id: datosPredio._id },
+                token,
+                data: {
+                    action: "put_proceso_aplicaciones_descarte",
+                    registroFrutaProcesada: datosPredio._id,
+                    data: formState,
+                    tipo: "LAVADO"
+                }
             };
+
             const response = await socketRequest(request);
             if (response.status !== 200) {
                 throw new Error(`Error guardando los datos ${response.message}`);
             }
-            Alert.alert("Guardado con exito");
+            Alert.alert("Éxito", "Guardado con exito");
             resetForm();
         } catch (err) {
             if (err instanceof Error) {
-                Alert.alert(`${err.name}: ${err.message}`);
+                Alert.alert("Error", `${err.name}: ${err.message}`);
             }
         } finally {
             setLoading(false);
@@ -104,84 +97,149 @@ export default function DescarteLavado(): React.JSX.Element {
     };
 
     return (
-        <ScrollView style={styles.constainerScroll}>
+        <ScrollView style={styles.container}>
+            <Text style={styles.headerTitle}>Descarte Lavado</Text>
 
-            <View style={styles.container}>
-                <Text style={styles.textInputs}>
-                    Descarte Lavado
-                </Text>
-                <Text>Numero de lote:</Text>
-                <Text>{datosPredio.nombrePredio}</Text>
-                <Text>{datosPredio.enf}</Text>
-                {Object.keys(labelsForm).map(item => (
-                    <View style={styles.containerForm} key={item}>
-                        <Text style={styles.textInputs}>{labelsForm[item as keyof typeof labelsForm]}</Text>
-                        <FormInput
-                            label="N° de canastillas"
-                            value={String(formState[item as keyof FormState].canastillas || '')}
-                            onChangeText={(value): void => handleChange(item as keyof FormState, Number(value), 'canastillas')}
-                            placeholder="N. de canastillas"
-                            type="numeric"
-                            error={formErrors[item as keyof FormState]}
-                        />
-                        <FormInput
-                            label="Kilos"
-                            value={String(formState[item as keyof FormState].kilos || '')}
-                            onChangeText={(value): void => handleChange(item as keyof FormState, Number(value), 'kilos')}
-                            placeholder="Kilos"
-                            type="numeric"
-                            error={formErrors[item as keyof FormState]}
-                        />
-                    </View>
-                ))}
-                <View style={styles.viewBotones}>
-                    <Button disabled={loading} title="Guardar" color="#49659E" onPress={guardarDatos} />
+            <View style={styles.card}>
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>Numero de lote:</Text>
+                    <Text style={styles.value}>{datosPredio.nombrePredio}</Text>
+                </View>
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>ENF:</Text>
+                    <Text style={styles.value}>{datosPredio.enf}</Text>
                 </View>
             </View>
 
+            <View style={styles.formContainer}>
+                <Text style={styles.inputLabel}>Tipo de descarte</Text>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={formState.descarte}
+                        onValueChange={(itemValue) => handleFieldChange("descarte", itemValue)}
+                        style={styles.picker}
+                    >
+                        <Picker.Item label="Seleccione un descarte" value="" />
+                        {descartes.map((item) => (
+                            <Picker.Item key={item._id} label={item.descripcion} value={item._id} />
+                        ))}
+                    </Picker>
+                </View>
+                {formErrors.descarte && <Text style={styles.errorText}>{formErrors.descarte}</Text>}
+
+                <FormInput
+                    label="Numero de canastillas"
+                    value={formState.canastillas}
+                    onChangeText={(text) => handleFieldChange("canastillas", text)}
+                    error={formErrors.canastillas}
+                    type="numeric"
+                    placeholder="0"
+                />
+
+                <FormInput
+                    label="Numero de kilos"
+                    value={formState.kilos}
+                    onChangeText={(text) => handleFieldChange("kilos", text)}
+                    error={formErrors.kilos}
+                    type="numeric"
+                    placeholder="0"
+                />
+
+                <TouchableOpacity
+                    style={[styles.button, loading && styles.buttonDisabled]}
+                    onPress={guardarDatos}
+                    disabled={loading}
+                >
+                    <Text style={styles.buttonText}>{loading ? "Guardando..." : "Guardar"}</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
-    );
+    )
 }
 
 const styles = StyleSheet.create({
-    constainerScroll: {
-        flex: 1,
-        backgroundColor: '#f0f2f5',
-        padding: 16,
-    },
     container: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 20,
-        marginTop: 20,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        marginBottom: 20,
+        flex: 1,
+        backgroundColor: '#f5f5f5',
+        padding: 15,
+        width: "100%",
     },
-    containerForm: {
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    card: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 20,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    infoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        marginTop: 20,
-        width: '100%',
+        marginBottom: 10,
     },
-    textInputs: {
+    label: {
         fontSize: 16,
-        fontWeight: "bold",
-        color: "#333", // Texto más oscuro
+        fontWeight: 'bold',
+        color: '#7f8c8d',
+    },
+    value: {
+        fontSize: 16,
+        color: '#2c3e50',
+    },
+    formContainer: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 15,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+    },
+    inputLabel: {
+        fontSize: 14,
+        color: '#2c3e50',
         marginBottom: 5,
     },
-    loader: {
-        marginTop: 250,
-        alignSelf: "center",
+    pickerContainer: {
+        borderWidth: 1,
+        borderColor: '#e1e8ed',
+        borderRadius: 6,
+        marginBottom: 5,
+        backgroundColor: '#f8f9fa',
     },
-    viewBotones: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        width: "90%",
+    picker: {
+        height: 50,
+        width: '100%',
+    },
+    errorText: {
+        color: '#E74C3C',
+        fontSize: 12,
+        marginBottom: 10,
+    },
+    button: {
+        backgroundColor: '#7EBA27',
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
         marginTop: 20,
+    },
+    buttonDisabled: {
+        backgroundColor: '#a5d6a7',
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

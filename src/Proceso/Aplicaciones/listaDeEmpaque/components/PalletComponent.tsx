@@ -29,7 +29,7 @@ function PalletComponent({
     itemsPallet,
 }: propsType): React.JSX.Element {
 
-    useEffect(() => {}, [palletsAsyncData]);
+    useEffect(() => { }, [palletsAsyncData]);
 
     // const contenedor = useListaDeEmpaqueStore(state => state.contenedor);
     const palletSeleccionado = useListaDeEmpaqueStore(state => state.pallet);
@@ -130,14 +130,14 @@ const styles = StyleSheet.create({
         margin: 8,
     },
     palletButtonBase: {
-        width: 110,
-        height: 120,
+        width: 130,
+        minHeight: 130,
         margin: 5,
         borderRadius: 10,
         elevation: 5,
         shadowColor: '#52006A',
-        padding: 8,
-        justifyContent: 'center',
+        padding: 10,
+        justifyContent: 'space-between',
     },
     palletNormal: {
         backgroundColor: 'white',
@@ -151,32 +151,37 @@ const styles = StyleSheet.create({
     headerRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 5,
+        marginBottom: 8,
+        width: '100%',
     },
     image: {
-        width: 40,
-        height: 40,
-        marginRight: 10,
+        width: 35,
+        height: 35,
+        marginRight: 8,
         resizeMode: 'contain',
     },
     textCalibre: {
         fontSize: 14,
         fontWeight: '600',
         color: '#333',
+        flex: 1,
+        flexWrap: 'wrap',
     },
     infoContainer: {
         flexDirection: 'column',
         alignItems: 'flex-start',
+        width: '100%',
     },
     textPalletCajas: {
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
         marginBottom: 5,
     },
     textDetalle: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#555',
+        marginBottom: 2,
     },
     fonts: {
         color: 'white',

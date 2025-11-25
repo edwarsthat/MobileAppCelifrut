@@ -102,13 +102,13 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             if (response.status !== 200) {
                 return Alert.alert(response.status + " Error obteniendo los predios");
             }
-            const predios = response.data.map((item: ResponseItem) => {
+            const predios = response.data.map((item: any) => {
                 return ({
-                    _id: item.documento._id,
-                    enf: item.documento.enf,
-                    nombrePredio: item.documento.predio.PREDIO,
-                    predio: item.documento.predio._id,
-                    tipoFruta: item.documento.tipoFruta,
+                    _id: item.loteId._id,
+                    enf: item.loteId.enf,
+                    tipoFruta: item.tipoFruta,
+                    nombrePredio: item.predio.PREDIO,
+                    predio: item.predio._id,
                 });
             });
             setLoteVaciando(predios);
@@ -176,7 +176,6 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(false);
         }
     };
-
     const guardarPalletSettings = async (settings: settingsType, itemCalidad: any) => {
         try {
             setLoading(true);
@@ -215,6 +214,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             setLoading(true);
             const token = await obtenerAccessToken();
             const palletInfo = pallets.find(p => p.numeroPallet === Number(pallet));
+            console.log("Item a agregar: ", item);
             const request = {
                 data: {
                     action: 'put_proceso_aplicaciones_listaEmpaque_agregarItem',

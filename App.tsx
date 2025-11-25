@@ -135,12 +135,12 @@ function App(): React.JSX.Element {
     setVersion(DeviceInfo.getVersion());
   }, []);
 
-    useEffect(() => {
+  useEffect(() => {
     const connectIfNeeded = async () => {
       if (isLogin) {
         const credentials = await Keychain.getGenericPassword();
         if (!credentials) {
-            throw new Error("Error no hay token de validadcion");
+          throw new Error("Error no hay token de validadcion");
         }
         const token = await obtenerAccessToken();
         if (token) {

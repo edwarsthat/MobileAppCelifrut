@@ -36,7 +36,7 @@ export default function Pallets({
 
     useEffect(() => {
         if (isTablet) {
-            setColumnas(6);
+            setColumnas(5);
         } else {
             setColumnas(2);
         }
