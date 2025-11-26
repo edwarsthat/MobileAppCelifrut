@@ -193,10 +193,7 @@ function App(): React.JSX.Element {
                   <Loader url={env.url} />
 
                   {(section !== '66b6707777549ed0672a9029')
-                    ? <Header
-                      seleccionWindow={seleccionWindow}
-                      setLote={setLote}
-                      section={section} />
+                    ? <Header seleccionWindow={seleccionWindow} />
                     : null}
                   {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
                   {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
@@ -219,7 +216,7 @@ function App(): React.JSX.Element {
                   {section === "Proceso/Aplicaciones" && <Aplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
                   {section === "Proceso/historiales_aplicaciones" && <HistorialAplicaciones permisos={permisos} seleccionWindow={seleccionWindow} />}
 
-                  {section === '66b6705a77549ed0672a9026' && <FotosCalidad lote={lote} />}
+                  {section === '66b6705a77549ed0672a9026' && <FotosCalidad />}
                   {section === '66b6706477549ed0672a9027' && <DescarteLavado />}
                   {section === '66b6706e77549ed0672a9028' && <DescarteEncerado />}
                   {section === '66b6707777549ed0672a9029' && <ListaDeEmpaque setSection={setSection} />}

@@ -1,97 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, Image, StyleSheet, View, Text, Alert, Modal, FlatList } from 'react-native';
-import useEnvContext from '../hooks/useEnvContext';
-import { lotesType } from '../../types/lotesType';
-import { useAppStore } from '../stores/useAppStore';
+import React from 'react';
+import { TouchableOpacity, Image, StyleSheet, View, Text, } from 'react-native';
 const logoImage = require('../../assets/logo_app.png');
 
 type propsType = {
     seleccionWindow: (e: string) => void
-    section: string
-    setLote: (e:lotesType) => void
 }
 
 export default function Header(props: propsType) {
-    const { url } = useEnvContext();
-    const setLoading = useAppStore((state) => state.setLoading);
-    const [lotes, setLotes] = useState<lotesType[] | null>(null);
-    const [lote, setLote] = useState<lotesType | null>(null);
-    const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (props.section === '66b6705a77549ed0672a9026') {
-            const obtenerDataPredios = async () => {
-                try {
-                    setLoading(true);
-                    const responseJSON = await fetch(`${url}/proceso/lotes-fotos-calidad/`, {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    const response = await responseJSON.json();
-                    if (response.status !== 200) {
-                        throw new Error(`Code ${response.status}: ${response.message}`);
-                    }
-                    setLotes(response.data);
-                } catch (err) {
-                    if (err instanceof Error) {
-                        console.log(err.name, err.message);
-                        Alert.alert('Error obteniendo los datos del servidor');
-                    }
-                } finally {
-                    setLoading(false);
-                }
-            };
-            obtenerDataPredios();
-        }
-    }, [props.section]);
     return (
         <View style={styles.headerContainer}>
-
             <TouchableOpacity style={styles.menuButton} onPress={(): void => props.seleccionWindow('menu')}>
                 <Text style={styles.menuText}>☰</Text>
             </TouchableOpacity>
-
-            {props.section === '66b6705a77549ed0672a9026' &&
-                <TouchableOpacity style={styles.botonLotes}
-                    onPress={() => setModalVisible(true)}
-                >
-                    <Text>{lote ? lote.enf + " " + lote.predio.PREDIO : 'Seleccione predio'}</Text>
-
-                </TouchableOpacity>
-            }
-
             <Image source={logoImage} style={styles.logo} />
-
             <View style={styles.placeholder} />
-            <Modal
-                transparent={true}
-                visible={modalVisible}
-                animationType="fade"
-                onRequestClose={() => {
-                    Alert.alert('Modal has been closed.');
-                    setModalVisible(!modalVisible);
-                }}>
-                <View style={styles.centerModal}>
-                    <View style={styles.viewModal}>
-
-                        <FlatList
-                            data={lotes}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    style={styles.pressableStyle}
-                                    onPress={() => {
-                                        setLote(item);
-                                        props.setLote(item);
-                                        setModalVisible(false);
-                                    }}>
-                                    <Text style={styles.textList}>{item.enf} -- {item.predio.PREDIO}</Text>
-                                </TouchableOpacity>)}
-                        />
-                    </View>
-                </View>
-            </Modal>
         </View>
     );
 }
@@ -110,7 +33,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 4,
         elevation: 5,
-        zIndex:100000,
+        zIndex: 100000,
         borderBottomWidth: 1,
         borderBottomColor: 'rgba(0, 0, 0, 0.1)',
     },

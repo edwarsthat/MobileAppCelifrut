@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity, Image, TextInput } from "react-native";
+import { View, Text, StyleSheet, Alert, TouchableOpacity, Image, TextInput, Modal, FlatList } from "react-native";
 import { Camera, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
 import { AppState } from 'react-native';
 import RNFS from 'react-native-fs';
@@ -7,13 +7,15 @@ import useEnvContext from "../../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../../utils/auth";
 import { lotesType } from "../../../../../types/lotesType";
 import { useAppStore } from "../../../../stores/useAppStore";
+import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
 
 type propsType = {
     lote: lotesType | undefined
 }
 
-export default function Camara(props:propsType): React.JSX.Element {
+export default function Camara(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
+    const tiposFrutas = useTipoFrutaStore((state) => state.tiposFruta);
     const setLoading = useAppStore((state) => state.setLoading);
     const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
@@ -26,6 +28,20 @@ export default function Camara(props:propsType): React.JSX.Element {
     const [showCamera, setShowCamera] = useState<boolean>(true);
     const [imageSource, setImageSource] = useState<string>('');
     const [nomnbreFoto, setNombreFoto] = useState<string>('');
+    const [defecto, setDefecto] = useState<string>('');
+    const [defectos, setDefectos] = useState<string[]>([]);
+    const [modalDefectoVisible, setModalDefectoVisible] = useState(false);
+
+
+    useEffect(() => {
+        const fruta = tiposFrutas.find((item) => item._id === props.lote?._id);
+        if (!fruta) {
+            return;
+        }
+        const d = fruta.defectos.map((item) => item);
+        setDefectos(d);
+
+    }, [props.lote]);
 
 
     useEffect(() => {
@@ -105,18 +121,18 @@ export default function Camara(props:propsType): React.JSX.Element {
         <View style={styles.container}>
             {showCamera ? (
                 <>
-                        <Camera
-                            key={key}
-                            style={StyleSheet.absoluteFill}
-                            device={device}
-                            isActive={showCamera}
-                            ref={camera}
-                            photo={true}
-                            format={format}
-                            photoQualityBalance="speed"
-                            pointerEvents="none"
-                            enableDepthData
-                        />
+                    <Camera
+                        key={key}
+                        style={StyleSheet.absoluteFill}
+                        device={device}
+                        isActive={showCamera}
+                        ref={camera}
+                        photo={true}
+                        format={format}
+                        photoQualityBalance="speed"
+                        pointerEvents="none"
+                        enableDepthData
+                    />
 
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.camButton} onPress={capturarFoto} />
@@ -142,9 +158,13 @@ export default function Camara(props:propsType): React.JSX.Element {
                                     Borrar
                                 </Text>
                             </TouchableOpacity>
-                            <TextInput
-                                style={styles.textInput}
-                                onChangeText={text => setNombreFoto(text)} />
+                            <TouchableOpacity
+                                style={styles.touchableButton}
+                                onPress={() => setModalDefectoVisible(true)}>
+                                <Text style={styles.textStyletouchable}>
+                                    Seleccion defecto
+                                </Text>
+                            </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={sendImage}
                                 style={styles.touchableSendImage}>
@@ -154,6 +174,30 @@ export default function Camara(props:propsType): React.JSX.Element {
                     </View>
                 </>
             )}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalDefectoVisible}
+                onRequestClose={() => setModalDefectoVisible(false)}
+            >
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Seleccione un defecto</Text>
+                        <FlatList
+                            data={defectos} // TODO: Add data here
+                            renderItem={({ item }) => <Text>{item}</Text>}
+                            keyExtractor={(item, index) => index.toString()}
+                            style={{ width: '100%', height: 200 }}
+                        />
+                        <TouchableOpacity
+                            style={[styles.button, styles.buttonClose]}
+                            onPress={() => setModalDefectoVisible(false)}
+                        >
+                            <Text style={styles.textStyle}>Cerrar</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -169,7 +213,7 @@ const styles = StyleSheet.create({
         paddingBottom: 50,
         height: '100%',
         elevation: 0,
-        zIndex:0,
+        zIndex: 0,
     },
     backButton: {
         backgroundColor: 'rgba(0,0,0,0.0)',
