@@ -8,6 +8,7 @@ import { getCredentials } from "../../../../../utils/auth";
 import { lotesType } from "../../../../../types/lotesType";
 import { useAppStore } from "../../../../stores/useAppStore";
 import useTipoFrutaStore from "../../../../stores/useTipoFrutaStore";
+import { useSocketStore } from "../../../../stores/useSocketStore";
 
 type propsType = {
     lote: lotesType | undefined
@@ -17,6 +18,7 @@ export default function Camara(props: propsType): React.JSX.Element {
     const { url } = useEnvContext();
     const tiposFrutas = useTipoFrutaStore((state) => state.tiposFruta);
     const setLoading = useAppStore((state) => state.setLoading);
+    const sendRequest = useSocketStore((state) => state.sendRequest);
     const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
     const appState = useRef(AppState.currentState);
@@ -27,18 +29,24 @@ export default function Camara(props: propsType): React.JSX.Element {
     const [key, setKey] = useState(Math.random());
     const [showCamera, setShowCamera] = useState<boolean>(true);
     const [imageSource, setImageSource] = useState<string>('');
-    const [nomnbreFoto, setNombreFoto] = useState<string>('');
-    const [defecto, setDefecto] = useState<string>('');
-    const [defectos, setDefectos] = useState<string[]>([]);
+    const [defecto, setDefecto] = useState<{
+        nombre: string,
+        key: string
+    }>({ key: '', nombre: 'Seleccione defecto' });
+    const [defectos, setDefectos] = useState<{
+        nombre: string,
+        key: string
+    }[]>([]);
     const [modalDefectoVisible, setModalDefectoVisible] = useState(false);
 
 
     useEffect(() => {
-        const fruta = tiposFrutas.find((item) => item._id === props.lote?._id);
+        const fruta = tiposFrutas.find((item) => item._id === props.lote?.tipoFruta?._id);
         if (!fruta) {
             return;
         }
-        const d = fruta.defectos.map((item) => item);
+        const d = fruta.descartesGenerales.map((item) => item);
+
         setDefectos(d);
 
     }, [props.lote]);
@@ -77,7 +85,8 @@ export default function Camara(props: propsType): React.JSX.Element {
             if (!props.lote) {
                 throw new Error("Seleccione un lote de la lista");
             }
-            if (nomnbreFoto === '') {
+            console.log("defecto", defecto);
+            if (defecto.key === '') {
                 throw new Error('Ingrese una descripcion de la foto');
             }
             setLoading(true);
@@ -85,20 +94,15 @@ export default function Camara(props: propsType): React.JSX.Element {
             //leer
             const data = await RNFS.readFile(`file://'${imageSource}`, 'base64');
             const request = {
-                action: 'ingresar_foto_calidad',
-                _id: props.lote._id,
-                fotoName: nomnbreFoto,
-                foto: data,
+                token,
+                data: {
+                    action: 'post_proceso_aplicaciones_fotoCalidad',
+                    _id: props.lote._id,
+                    foto: data,
+                    fotoName: defecto.key,
+                }
             };
-            const responseJSON = await fetch(`${url}/proceso/add-fotos-calidad`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    "Authorization": `${token}`,
-                },
-                body: JSON.stringify(request),
-            });
-            const response = await responseJSON.json();
+            const response = await sendRequest(request);
             if (response.status !== 200) {
                 throw new Error(`Code ${response.status}: ${response.message}`);
             }
@@ -162,7 +166,7 @@ export default function Camara(props: propsType): React.JSX.Element {
                                 style={styles.touchableButton}
                                 onPress={() => setModalDefectoVisible(true)}>
                                 <Text style={styles.textStyletouchable}>
-                                    Seleccion defecto
+                                    {defecto.nombre}
                                 </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
@@ -182,18 +186,28 @@ export default function Camara(props: propsType): React.JSX.Element {
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
-                        <Text style={styles.modalText}>Seleccione un defecto</Text>
+                        <Text style={styles.modalText}>{defecto.nombre}</Text>
                         <FlatList
-                            data={defectos} // TODO: Add data here
-                            renderItem={({ item }) => <Text>{item}</Text>}
-                            keyExtractor={(item, index) => index.toString()}
+                            data={defectos}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={{ padding: 10, borderBottomWidth: 1, borderBottomColor: '#eee' }}
+                                    onPress={() => {
+                                        setDefecto(item);
+                                        setModalDefectoVisible(false);
+                                    }}
+                                >
+                                    <Text>{item.nombre}</Text>
+                                </TouchableOpacity>
+                            )}
+                            keyExtractor={(item) => item.key}
                             style={{ width: '100%', height: 200 }}
                         />
                         <TouchableOpacity
                             style={[styles.button, styles.buttonClose]}
                             onPress={() => setModalDefectoVisible(false)}
                         >
-                            <Text style={styles.textStyle}>Cerrar</Text>
+                            <Text style={styles.textStyle}>Cancelar</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
