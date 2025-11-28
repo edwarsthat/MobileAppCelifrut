@@ -102,12 +102,10 @@ export default function DescarteLavadoSistema(): JSX.Element {
 
             <View style={styles.card}>
                 <View style={styles.infoRow}>
-                    <Text style={styles.label}>Numero de lote:</Text>
-                    <Text style={styles.value}>{datosPredio.nombrePredio}</Text>
+                    <Text style={styles.label}>Predio: {datosPredio.nombrePredio}</Text>
                 </View>
                 <View style={styles.infoRow}>
-                    <Text style={styles.label}>ENF:</Text>
-                    <Text style={styles.value}>{datosPredio.enf}</Text>
+                    <Text style={styles.label}>{datosPredio.enf}</Text>
                 </View>
             </View>
 
