@@ -39,9 +39,11 @@ export default function Header({
     const seleccionarContenedor = useListaDeEmpaqueStore((state) => state.seleccionarContenedor);
     const loteSeleccionado = useListaDeEmpaqueStore((state) => state.loteSeleccionado);
     const seleccionarLote = useListaDeEmpaqueStore((state) => state.seleccionarLote);
+    const seleccionarItem = useListaDeEmpaqueStore((state) => state.setSeleccion);
     const socketRequest = useSocketStore(state => state.sendRequest);
     const cuartosFrios = useListaDeEmpaqueStore(state => state.cuartosFrios);
     const EF1_id = useListaDeEmpaqueStore(state => state.EF1_id);
+    const seleccionarPallet = useListaDeEmpaqueStore((state) => state.seleccionarPallet);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [modalPrediosVisible, setModalPrediosVisible] = useState<boolean>(false);
@@ -168,6 +170,8 @@ export default function Header({
                                         setModalVisible(false);
                                         await obtenerPallets(item._id);
                                         await obtenerItemsPallet(item._id);
+                                        seleccionarPallet(-1)
+                                        seleccionarItem([])
                                     }}
                                 >
                                     <Text style={styles.buttonText}>
