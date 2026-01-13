@@ -10,7 +10,7 @@ const { ApkInstaller } = NativeModules;
 
 type propsType = {
     setIslogin: (e: boolean) => void
-    obtenerPermisos: (e:CargoType) => void
+    obtenerPermisos: (e: CargoType) => void
 }
 
 export default function Login(props: propsType): React.JSX.Element {
@@ -38,8 +38,9 @@ export default function Login(props: propsType): React.JSX.Element {
                     );
                 }
             } catch (err) {
+                console.error("[DEBUG] Error en checkForUpdates:", err);
                 if (err instanceof Error) {
-                    Alert.alert(err.message);
+                    Alert.alert("Error de Conexión", `No se pudo conectar al servidor en ${url}. Verifica que el celular y la PC estén en la misma red Wi-Fi.`);
                 }
             }
         };

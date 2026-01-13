@@ -97,12 +97,10 @@ function App(): React.JSX.Element {
   // Configuración para producción
   // const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
 
-  // Configuración para desarrollo local
-  const isEmulator = DeviceInfo.isEmulatorSync();
-  const localIP = isEmulator ? '10.0.2.2' : '192.168.20.81'; // Usa tu IP local si estás en dispositivo físico
+  // Configuración para desarrollo local (USB Cable)
+  const localIP = '127.0.0.1';
   const env = {
     url: `http://${localIP}:3010`,
-    // socketURL: `ws://${localIP}:3010`,
     socketURL: `http://${localIP}:3010`,
   };
 

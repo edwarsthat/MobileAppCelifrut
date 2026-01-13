@@ -19,30 +19,46 @@ fs.writeFileSync(gradlePath, gradleContent);
 
 //se crea la apk
 console.log('Construyendo APK...');
-execSync('cd android && gradlew assembleRelease', { stdio: 'inherit' });
+execSync('cd android && ./gradlew assembleRelease', { stdio: 'inherit' });
 
-const serverPath = path.join(__dirname, '..', '..', '..', 'Servidor', 'server', 'updates', 'mobile');
-// const serverPath = 'D:\\trabajo\\Celifrut\\Server\\server_gestor_exportacion\\updates\\mobile';
+// Ruta de salida local en el proyecto
+const outPath = path.join(__dirname, '..', 'out');
+
+// Crear la carpeta 'out' si no existe
+if (!fs.existsSync(outPath)) {
+    fs.mkdirSync(outPath, { recursive: true });
+    console.log('Carpeta "out" creada.');
+}
 
 const apkSource = path.join(__dirname, '..', 'android', 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk');
-const apkDestination = path.join(serverPath, `Celifrut_v${version}.apk`);
-const apkLatest = path.join(serverPath, 'latest.yml');
+const apkDestination = path.join(outPath, `Celifrut_v${version}.apk`);
+const apkLatest = path.join(outPath, 'latest.yml');
+
 let latest;
 try {
     if (fs.existsSync(apkLatest)) {
         const fileContents = fs.readFileSync(apkLatest, 'utf8');
         latest = yaml.load(fileContents);
     } else {
-        console.log('El archivo latest.yml no existe en la ruta especificada.');
+        console.log('El archivo latest.yml no existe, creando uno nuevo...');
+        latest = {
+            version: version,
+            apkPath: `Celifrut_v${version}.apk`,
+            releaseDate: new Date().toISOString()
+        };
     }
 } catch (error) {
     console.error('Error al leer o parsear el archivo:', error);
+    latest = {
+        version: version,
+        apkPath: `Celifrut_v${version}.apk`,
+        releaseDate: new Date().toISOString()
+    };
 }
-
 
 // Actualizar la información de la nueva versión
 latest.version = version;
-latest.apkPath = `Celifrut_v${version}.apk`; // Ruta del nuevo APK, relativa al servidor
+latest.apkPath = `Celifrut_v${version}.apk`;
 latest.releaseDate = new Date().toISOString();
 
 // Convertir el objeto a YAML
@@ -50,7 +66,7 @@ const yamlStr = yaml.dump(latest);
 
 // Guardar el contenido actualizado en latest.yml
 fs.writeFileSync(apkLatest, yamlStr, 'utf8');
+console.log(`Archivo latest.yml actualizado en: ${apkLatest}`);
 
 fs.copyFileSync(apkSource, apkDestination);
-
 console.log(`APK copiado y renombrado a: ${apkDestination}`);
