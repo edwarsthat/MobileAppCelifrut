@@ -419,7 +419,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
             };
             validarEnviarCuartoFio(data);
             const request = {
-                action: "put_inventarios_pallet_eviarCuartoFrio",
+                action: "put_proceso_pallet_eviarCuartoFrio",
                 data: data,
             };
             const response = await socketRequest({ data: request, token: token });
