@@ -99,6 +99,7 @@ function App(): React.JSX.Element {
 
   // Configuración para desarrollo local (USB Cable)
   // const localIP = '127.0.0.1';
+  // const localIP = '192.168.0.17';
   // const env = {
   //   url: `http://${localIP}:3010`,
   //   socketURL: `http://${localIP}:3010`,

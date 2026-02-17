@@ -49,7 +49,6 @@ export default function Login(props: propsType): React.JSX.Element {
     const handlelogin = async (): Promise<void> => {
         try {
             setLoading(true);
-            console.log(url);
 
             const responseJSON = await fetch(`${url}/login2`, {
                 method: 'POST',
@@ -101,7 +100,7 @@ export default function Login(props: propsType): React.JSX.Element {
             // Definir la ruta donde se guardará el archivo
             const downloadDest = `${RNFS.ExternalDirectoryPath}/${apkPath}`;
             const download = await RNFS.downloadFile({
-                fromUrl: `${url}/sistema/download_mobilApp/${apkPath}`,
+                fromUrl: `${url}/updates/mobile/${apkPath}`,
                 toFile: downloadDest,
                 background: true,
                 progressDivider: 1,

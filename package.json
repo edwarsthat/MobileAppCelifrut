@@ -1,6 +1,6 @@
 {
   "name": "MobileAppCelifrut",
-  "version": "1.10.3",
+  "version": "1.9.3",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
