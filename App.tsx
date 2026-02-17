@@ -65,15 +65,15 @@ type envContexttype = {
   socketURL: string
 }
 
-// export const envContext = createContext<envContexttype>({
-//   url: "https://operativo.celifrut.com",
-//   socketURL: "ws://operativo.celifrut.com",
-// });
-
 export const envContext = createContext<envContexttype>({
-  url: "http://127.0.0.1:3010", // Este valor será sobrescrito por el Provider
-  socketURL: "ws://127.0.0.1",
+  url: "https://operativo.celifrut.com",
+  socketURL: "ws://operativo.celifrut.com",
 });
+
+// export const envContext = createContext<envContexttype>({
+//   url: "http://127.0.0.1:3010", // Este valor será sobrescrito por el Provider
+//   socketURL: "ws://127.0.0.1",
+// });
 
 export const deviceWidth = createContext<number>(0);
 export const stackContext = createContext<string[]>([]);
@@ -95,14 +95,14 @@ function App(): React.JSX.Element {
   const [lote, setLote] = useState<lotesType>();
 
   // Configuración para producción
-  // const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
+  const env = { url: "https://operativo.celifrut.com", socketURL: "ws://operativo.celifrut.com" };
 
   // Configuración para desarrollo local (USB Cable)
-  const localIP = '127.0.0.1';
-  const env = {
-    url: `http://${localIP}:3010`,
-    socketURL: `http://${localIP}:3010`,
-  };
+  // const localIP = '127.0.0.1';
+  // const env = {
+  //   url: `http://${localIP}:3010`,
+  //   socketURL: `http://${localIP}:3010`,
+  // };
 
   useEffect(() => {
     const handleBackPress = (): boolean | any => {
