@@ -20,7 +20,6 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
         if (get().socket) { return; }
         const socket = io(url, {
             auth: { token },
-            rejectUnauthorized: false,
         });
 
         socket.on('connect', () => set({ connected: true, socket }));
