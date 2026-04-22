@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
 import Header from "./components/Header";
-import { predioType, ResponseItem } from "../../../../types/predioType";
+import { predioType } from "../../../../types/predioType";
 import { contenedoresType } from "../../../../types/contenedores/contenedoresType";
 import Pallets from "./components/Pallets";
 import { itemType, settingsType } from "./types/types";
@@ -344,6 +344,7 @@ export default function ListaDeEmpaque(props: propsType): React.JSX.Element {
                 token: token,
             };
             const response = await socketRequest(request);
+            console.log("response cerrar", response);
             if (response.status !== 200) {
                 throw new Error(`Error al cerrar el contenedor: ${response.message}`);
             }

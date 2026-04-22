@@ -52,7 +52,7 @@ export const useSocketStore = create<SocketStore>((set, get) => ({
             return new Promise((resolve, reject) => {
                 socket.emit("Desktop2", payload, (response: any) => {
                     if (response && response.error) {
-                        reject(response.error);
+                        reject(new Error(response.message || "Error del servidor"));
                     } else {
                         resolve(response);
                     }
