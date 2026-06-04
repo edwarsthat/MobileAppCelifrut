@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+
 import { View, Text, StyleSheet, Alert, TouchableOpacity, Image, TextInput, Modal, FlatList } from "react-native";
-import { Camera, useCameraDevice, useCameraFormat } from 'react-native-vision-camera';
+import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { AppState } from 'react-native';
-import RNFS from 'react-native-fs';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import useEnvContext from "../../../../hooks/useEnvContext";
 import { getCredentials } from "../../../../../utils/auth";
 import { lotesType } from "../../../../../types/lotesType";
@@ -19,12 +20,10 @@ export default function Camara(props: propsType): React.JSX.Element {
     const tiposFrutas = useTipoFrutaStore((state) => state.tiposFruta);
     const setLoading = useAppStore((state) => state.setLoading);
     const sendRequest = useSocketStore((state) => state.sendRequest);
-    const camera = useRef<Camera>(null);
     const device = useCameraDevice('back');
+    const { requestPermission } = useCameraPermission();
+    const cameraRef = useRef<Camera>(null);
     const appState = useRef(AppState.currentState);
-    const format = useCameraFormat(device, [
-        { photoResolution: { width: 250, height: 250 } },
-    ]);
     const [, setAppStateVisible] = useState(appState.current);
     const [key, setKey] = useState(Math.random());
     const [showCamera, setShowCamera] = useState<boolean>(true);
@@ -53,12 +52,7 @@ export default function Camara(props: propsType): React.JSX.Element {
 
 
     useEffect(() => {
-        getPermission();
-        async function getPermission() {
-            await Camera.requestCameraPermission();
-            //console.log(`Camera permission status: ${permission}`);
-        }
-        getPermission();
+        requestPermission();
         const subscription = AppState.addEventListener('change', nextAppState => {
             appState.current = nextAppState;
             setAppStateVisible(appState.current);
@@ -73,11 +67,10 @@ export default function Camara(props: propsType): React.JSX.Element {
     };
 
     const capturarFoto = async () => {
-        if (camera.current !== null) {
-            const photo = await camera.current.takePhoto();
-            setImageSource(photo.path);
-            setShowCamera(false);
-        }
+        if (!cameraRef.current) return;
+        const photo = await cameraRef.current.takePhoto();
+        setImageSource(photo.path);
+        setShowCamera(false);
     };
 
     const sendImage = async () => {
@@ -92,7 +85,7 @@ export default function Camara(props: propsType): React.JSX.Element {
             setLoading(true);
             const token = await getCredentials();
             //leer
-            const data = await RNFS.readFile(`file://'${imageSource}`, 'base64');
+            const data = await ReactNativeBlobUtil.fs.readFile(imageSource, 'base64');
             const request = {
                 token,
                 data: {
@@ -126,16 +119,13 @@ export default function Camara(props: propsType): React.JSX.Element {
             {showCamera ? (
                 <>
                     <Camera
+                        ref={cameraRef}
                         key={key}
                         style={StyleSheet.absoluteFill}
                         device={device}
                         isActive={showCamera}
-                        ref={camera}
                         photo={true}
-                        format={format}
-                        photoQualityBalance="speed"
                         pointerEvents="none"
-                        enableDepthData
                     />
 
                     <View style={styles.buttonContainer}>
@@ -148,7 +138,7 @@ export default function Camara(props: propsType): React.JSX.Element {
                         <Image
                             style={StyleSheet.absoluteFill}
                             source={{
-                                uri: `file://'${imageSource}`,
+                                uri: `file://${imageSource}`,
                             }}
                         />
                     ) : null}

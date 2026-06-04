@@ -122,9 +122,9 @@ function App(): React.JSX.Element {
       }
     };
 
-    BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
 
-    return () => BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+    return () => subscription.remove();
   }, [stack]);
 
   useEffect(() => {

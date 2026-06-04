@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View, Text, TextInput, Dimensions, Button, Alert, NativeModules, ActivityIndicator } from 'react-native';
 import * as Keychain from 'react-native-keychain';
 import DeviceInfo from 'react-native-device-info';
-import RNFS from 'react-native-fs';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 import { CargoType } from '../../types/cargosType';
 import useEnvContext from '../hooks/useEnvContext';
 import { useAppStore } from '../stores/useAppStore';
@@ -92,35 +92,31 @@ export default function Login(props: propsType): React.JSX.Element {
     const handleUser = (e: string) => {
         setUser(e.toLowerCase().trim());
     };
+    
     const downloadAndInstallUpdate = async (data: { apkPath: string }) => {
         try {
             setIsDownload(true);
             const { apkPath } = data;
 
-            // Definir la ruta donde se guardará el archivo
-            const downloadDest = `${RNFS.ExternalDirectoryPath}/${apkPath}`;
-            const download = await RNFS.downloadFile({
-                fromUrl: `${url}/updates/mobile/${apkPath}`,
-                toFile: downloadDest,
-                background: true,
-                progressDivider: 1,
-            });
+            const downloadDest = `${ReactNativeBlobUtil.fs.dirs.DocumentDir}/${apkPath}`;
 
-            const result = await download.promise;
+            const download = await ReactNativeBlobUtil.config({
+                path: downloadDest,
+            }).fetch('GET', `${url}/updates/mobile/${apkPath}`);
 
-            if (result.statusCode !== 200) {
-                throw new Error(`Error de descarga. Código de estado: ${result.statusCode}`);
+            if (download.respInfo.status !== 200) {
+                throw new Error(`Error de descarga. Código de estado: ${download.respInfo.status}`);
             }
 
-            // Iniciar la instalación usando el módulo nativo
             await ApkInstaller.installApk(downloadDest);
-
             console.log('Instalación iniciada');
-            setIsDownload(false);
+
         } catch (err) {
             if (err instanceof Error) {
-                Alert.alert(err.message);
+                Alert.alert('Error', err.message);
             }
+        } finally {
+            setIsDownload(false);
         }
     };
     return <View style={styles.container}>
