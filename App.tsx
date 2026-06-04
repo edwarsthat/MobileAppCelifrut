@@ -93,10 +93,10 @@ function App(): React.JSX.Element {
   // Descomenta solo UNA de las siguientes líneas:
 
   // -- PRODUCCIÓN --
-  // const BASE_URL = 'https://operativo.celifrut.com';
+  const BASE_URL = 'https://operativo.celifrut.com';
 
   // -- DESARROLLO (USB adb reverse) --
-  const BASE_URL = 'http://127.0.0.1:3010';
+  // const BASE_URL = 'http://127.0.0.1:3010';
 
   // -- DESARROLLO (red local Wi-Fi) --
   // const BASE_URL = 'http://192.168.0.17:3010';
