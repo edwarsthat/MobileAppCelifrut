@@ -1,201 +1,60 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { CargoType } from '../../types/cargosType';
-import { Animated, Text, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Icon2 from 'react-native-vector-icons/FontAwesome5';
-
+import { celifrut } from '../theme/celifrutTokens';
+import MenuGrid, { MenuItem, IconLib } from './components/MenuGrid';
 
 type propsType = {
     permisos: CargoType | undefined
     seleccionWindow: (e: string) => void
 }
 
+// Presentación de cada módulo (icono/descripción). La navegación usa la MISMA
+// clave de permiso de antes con props.seleccionWindow(key). 'navigate:false'
+// conserva que "Sistema" no tenía handler.
+type ModDef = { key: string; desc: string; lib: IconLib; icon: string; navigate: boolean };
+
+const MODULES: ModDef[] = [
+    { key: 'Inventario y Logística', desc: 'Stock, despachos y movimientos de fruta.', lib: 'feather', icon: 'box', navigate: true },
+    { key: 'Calidad', desc: 'Controles e inspección de producto.', lib: 'mci', icon: 'flask-outline', navigate: true },
+    { key: 'Sistema', desc: 'Usuarios, permisos y configuración.', lib: 'feather', icon: 'settings', navigate: false },
+    { key: 'Proceso', desc: 'Producción y trazabilidad en planta.', lib: 'feather', icon: 'play', navigate: true },
+    { key: 'Comercial', desc: 'Clientes, pedidos y ventas.', lib: 'mci', icon: 'storefront-outline', navigate: true },
+];
+
 export default function Menu(props: propsType): React.JSX.Element {
-    const inventario = useRef(new Animated.Value(1)).current;
-    const calidad = useRef(new Animated.Value(1)).current;
-    const sistema = useRef(new Animated.Value(1)).current;
-    const proceso = useRef(new Animated.Value(1)).current;
-    const comercial = useRef(new Animated.Value(1)).current;
-
-    const [permisos, setPermisos] = useState<string[]>();
-
-
-    useEffect(() => {
-        if (props.permisos) {
-            const perm = Object.keys(props.permisos);
-            setPermisos(perm);
-        }
-    }, [props.permisos]);
-
     if (props.permisos === undefined) {
         return (
-            <View>
-                <Text>No hay permisos...</Text>
+            <View style={styles.screenCenter}>
+                <Text style={styles.muted}>Cargando permisos…</Text>
             </View>
         );
     }
 
-    const handlePressIn = (scale: Animated.Value) => {
-        Animated.spring(scale, {
-            toValue: 0.9, // Reducir el tamaño al presionar
-            useNativeDriver: true,
-        }).start();
-    };
+    const permKeys = Object.keys(props.permisos);
+    const items: MenuItem[] = MODULES
+        .filter((m) => permKeys.includes(m.key))
+        .map((m) => ({
+            key: m.key,
+            label: m.key,
+            desc: m.desc,
+            lib: m.lib,
+            icon: m.icon,
+            onPress: m.navigate ? () => props.seleccionWindow(m.key) : undefined,
+        }));
 
-    const handlePressOut = (scale: Animated.Value) => {
-        Animated.spring(scale, {
-            toValue: 1, // Restaurar el tamaño original
-            useNativeDriver: true,
-        }).start();
-    };
     return (
-        <View style={styles.container}>
-            {permisos?.includes('Inventario y Logística') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("Inventario y Logística")}
-                    onPressIn={() => handlePressIn(inventario)}
-                    onPressOut={() => handlePressOut(inventario)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: inventario }] }]}>
-                        <Icon name="dropbox" size={24} color="#fff" />
-                        <Text style={styles.text}>Inventario y Logística</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-            {permisos?.includes('Calidad') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("Calidad")}
-                    onPressIn={() => handlePressIn(calidad)}
-                    onPressOut={() => handlePressOut(calidad)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: calidad }] }]}>
-                        <Icon name="flask" size={24} color="#fff" />
-                        <Text style={styles.text}>Calidad</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-            {permisos?.includes('Sistema') && (
-                <TouchableWithoutFeedback
-                    onPressIn={() => handlePressIn(sistema)}
-                    onPressOut={() => handlePressOut(sistema)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: sistema }] }]}>
-                        <Icon name="cog" size={24} color="#fff" />
-                        <Text style={styles.text}>Sistema</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-            {permisos?.includes('Proceso') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("Proceso")}
-                    onPressIn={() => handlePressIn(proceso)}
-                    onPressOut={() => handlePressOut(proceso)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: proceso }] }]}>
-                        <Icon name="play-circle-o" size={24} color="#fff" />
-                        <Text style={styles.text}>Proceso</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-
-            )}
-
-            {permisos?.includes('Comercial') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("Comercial")}
-                    onPressIn={() => handlePressIn(comercial)}
-                    onPressOut={() => handlePressOut(comercial)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: comercial }] }]}>
-                        <Icon2 name="store-alt" size={24} color="#fff" />
-                        <Text style={styles.text}>Comercial</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-
-            )}
-
-        </View>
+        <MenuGrid
+            eyebrow="MENÚ PRINCIPAL"
+            title="¿Qué vamos a gestionar hoy?"
+            subtitle="Selecciona un módulo para comenzar."
+            items={items}
+            showFooter
+        />
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1, // Hace que el contenedor ocupe todo el espacio disponible
-        alignItems: 'center', // Centra horizontalmente
-        backgroundColor: '#f5f5f5', // Fondo opcional para visualizar el centrado
-        width: '100%',
-    },
-    button: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#7D9F3A',
-        gap: 9,
-        padding: 15,
-        borderRadius: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 3,
-        elevation: 5,
-        width: '95%',
-        marginTop: 10,
-    },
-    text: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
+    screenCenter: { flex: 1, width: '100%', backgroundColor: celifrut.cream, alignItems: 'center', justifyContent: 'center' },
+    muted: { color: celifrut.fg3, fontSize: 14 },
 });
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: '#f4f4f8', // Fondo claro para el menú
-//         padding: 16,
-//         width: '100%',
-//         justifyContent: 'center',
-//     },
-//     container2:{
-//         alignItems:'center',
-//     },
-//     areaButtonsStyle: {
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         width: 250,
-//         height: 50,
-//         borderRadius: 10,
-//         marginTop: 15,
-//         backgroundColor: '#7D9F3A',
-//     },
-//     textAreaButtonStyle: {
-//         color: 'white',
-//         fontWeight: 'bold',
-//         fontSize: 18,
-//     },
-//     elementoButtonStyle: {
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         width: 250,
-//         height: 30,
-//         borderRadius: 10,
-//         marginTop: 8,
-//         backgroundColor: '#E6E6EB',
-//     },
-//     itemViwStyle: {
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//     },
-//     itemButtonStyle: {
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         width: 200,
-//         height: 50,
-//         borderRadius: 10,
-//         marginTop: 8,
-//         backgroundColor: '#5B89EB',
-//     },
-//     itemTextStyle: {
-//         color: 'white',
-//     },
-// });

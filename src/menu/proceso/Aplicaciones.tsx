@@ -1,127 +1,30 @@
-import { Animated, Text, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import React, { useEffect, useRef, useState } from "react";
+import React from 'react';
 import { CargoType } from '../../../types/cargosType';
+import MenuGrid, { MenuItem } from '../components/MenuGrid';
 
 type propsType = {
     permisos: CargoType | undefined
     seleccionWindow: (e: string) => void
 }
 
-
 export default function Aplicaciones(props: propsType): React.JSX.Element {
-    const lavado = useRef(new Animated.Value(1)).current;
-    const encerado = useRef(new Animated.Value(1)).current;
-    const fotos = useRef(new Animated.Value(1)).current;
-    const listaEmpaque = useRef(new Animated.Value(1)).current;
+    const permKeys = props.permisos?.Proceso?.Aplicaciones ? Object.keys(props.permisos.Proceso.Aplicaciones) : [];
+    const items: MenuItem[] = [];
 
-    const [permisos, setPermisos] = useState<string[]>();
-
-    useEffect(() => {
-        if (props.permisos) {
-            const perm = Object.keys(props.permisos.Proceso.Aplicaciones);
-            setPermisos(perm);
-        }
-    }, [props.permisos]);
-
-    const handlePressIn = (scale: Animated.Value) => {
-        Animated.spring(scale, {
-            toValue: 0.9, // Reducir el tamaño al presionar
-            useNativeDriver: true,
-        }).start();
-    };
-    const handlePressOut = (scale: Animated.Value) => {
-        Animated.spring(scale, {
-            toValue: 1, // Restaurar el tamaño original
-            useNativeDriver: true,
-        }).start();
-    };
+    if (permKeys.includes('Descarte Lavado')) {
+        items.push({ key: 'lavado', label: 'Descarte Lavado', desc: 'Registro de descarte en lavado.', lib: 'mci', icon: 'water', onPress: () => props.seleccionWindow('66b6706477549ed0672a9027') });
+    }
+    if (permKeys.includes('Descarte Encerado')) {
+        items.push({ key: 'encerado', label: 'Descarte Encerado', desc: 'Registro de descarte en encerado.', lib: 'mci', icon: 'spray', onPress: () => props.seleccionWindow('66b6706e77549ed0672a9028') });
+    }
+    if (permKeys.includes('Fotos calidad')) {
+        items.push({ key: 'fotos', label: 'Fotos Calidad', desc: 'Captura de fotos de calidad.', lib: 'feather', icon: 'camera', onPress: () => props.seleccionWindow('66b6705a77549ed0672a9026') });
+    }
+    if (permKeys.includes('Lista de empaque')) {
+        items.push({ key: 'lista_empaque', label: 'Lista de empaque', desc: 'Gestión de listas de empaque.', lib: 'feather', icon: 'clipboard', onPress: () => props.seleccionWindow('66b6707777549ed0672a9029') });
+    }
 
     return (
-        <View style={styles.container}>
-
-            {permisos?.includes('Descarte Lavado') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("66b6706477549ed0672a9027")}
-                    onPressIn={() => handlePressIn(lavado)}
-                    onPressOut={() => handlePressOut(lavado)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: lavado }] }]}>
-                        <Icon name="play-circle-o" size={24} color="#fff" />
-                        <Text style={styles.text}>Descarte Lavado</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-
-            {permisos?.includes('Descarte Encerado') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("66b6706e77549ed0672a9028")}
-                    onPressIn={() => handlePressIn(encerado)}
-                    onPressOut={() => handlePressOut(encerado)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: encerado }] }]}>
-                        <Icon name="play-circle-o" size={24} color="#fff" />
-                        <Text style={styles.text}>Descarte Encerado</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-            {permisos?.includes('Fotos calidad') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("66b6705a77549ed0672a9026")}
-                    onPressIn={() => handlePressIn(fotos)}
-                    onPressOut={() => handlePressOut(fotos)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: fotos }] }]}>
-                        <Icon name="play-circle-o" size={24} color="#fff" />
-                        <Text style={styles.text}>Fotos Calidad</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-            {permisos?.includes('Lista de empaque') && (
-                <TouchableWithoutFeedback
-                    onPress={() => props.seleccionWindow("66b6707777549ed0672a9029")}
-                    onPressIn={() => handlePressIn(listaEmpaque)}
-                    onPressOut={() => handlePressOut(listaEmpaque)}
-                >
-                    <Animated.View style={[styles.button, { transform: [{ scale: listaEmpaque }] }]}>
-                        <Icon name="play-circle-o" size={24} color="#fff" />
-                        <Text style={styles.text}>Lista de empaque</Text>
-                    </Animated.View>
-                </TouchableWithoutFeedback>
-            )}
-
-        </View>
+        <MenuGrid eyebrow="PROCESO · APLICACIONES" title="Aplicaciones" subtitle="Selecciona una opción para continuar." items={items} />
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        width: '100%',
-    },
-    button: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#7D9F3A',
-        gap: 9,
-        padding: 15,
-        borderRadius: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 3,
-        elevation: 5,
-        width: '95%',
-        marginTop: 10,
-    },
-    text: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-});

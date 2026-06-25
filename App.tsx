@@ -179,19 +179,15 @@ function App(): React.JSX.Element {
             />
             {
               !isLogin ?
-                <>
-
-                  <Text>V-{version}</Text>
-                  <Login
-                    obtenerPermisos={obtenerPermisos}
-                    setIslogin={setIslogin} />
-                </>
+                <Login
+                  obtenerPermisos={obtenerPermisos}
+                  setIslogin={setIslogin} />
                 :
                 <View style={styles.container}>
                   <Loader url={env.url} />
 
                   {(section !== '66b6707777549ed0672a9029')
-                    ? <Header seleccionWindow={seleccionWindow} />
+                    ? <Header seleccionWindow={seleccionWindow} userRole={permisos?.Cargo} />
                     : null}
                   {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
                   {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
