@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ZodSchema, ZodError } from "zod";
+import { ZodIssue } from "zod/v3";
 
 type HandleFieldChange<T> = <K extends keyof T>(field: K, value: T[K]) => void;
 type OutType<T> = {
@@ -42,20 +43,20 @@ export default function useForm<T extends Record<string, any>>(initialState?: T)
         }));
     };
 
-    const getErrorMessages = (zodError: ZodError): Partial<Record<keyof T | string, string>> => {
-        const errors: Partial<Record<keyof T | string, string>> = {};
-        zodError.errors.forEach(err => {
-            const path = err.path[0] as keyof T;
-            errors[path] = err.message;
-        });
-        return errors;
+    const getErrorMessages = <T>(zodError: ZodError): Partial<Record<keyof T | string, string>> => {
+        // Quitamos el : ZodIssue, dejamos que TS infiera el tipo automáticamente
+        return zodError.issues.reduce((acc, issue) => {
+            const path = (issue.path[0] as keyof T | string) ?? 'general';
+            acc[path as keyof Partial<Record<keyof T | string, string>>] = issue.message;
+            return acc;
+        }, {} as Partial<Record<keyof T | string, string>>);
     };
 
     const validateForm = (schema: ZodSchema<unknown>): boolean => {
         const result = schema.safeParse(formState);
         if (!result.success) {
-            const errorMap = getErrorMessages(result.error);
-            setFormErrors(errorMap);
+            // TypeScript ahora reconoce que son idénticos
+            setFormErrors(getErrorMessages(result.error));
             return false;
         }
         setFormErrors({});

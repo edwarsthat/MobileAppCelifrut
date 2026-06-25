@@ -3,9 +3,11 @@ import TarjetaProveedor from '../../../src/comercial/proveedores/components/Tarj
 import renderer from 'react-test-renderer';
 import React from 'react';
 import { render } from '@testing-library/react-native';
+import { proveedoresType } from '../../../types/proveedoresType';
 
 describe('TarjetaProveedor Component', () => {
-    const mockProveedor = {
+    const mockProveedor: proveedoresType = {
+        _id: 'proveedor-1',
         'CODIGO INTERNO': 12345,
         PREDIO: 'Finca La Esperanza',
         ICA: {
@@ -32,7 +34,7 @@ describe('TarjetaProveedor Component', () => {
             PREDIO: '',
             ICA: {},
             GGN: null,
-        };
+        } as unknown as proveedoresType;
         const tree = renderer.create(<TarjetaProveedor proveedor={proveedorIncompleto} />).toJSON();
         expect(tree).toMatchSnapshot();
     });
@@ -43,28 +45,28 @@ describe('TarjetaProveedor Component', () => {
             PREDIO: null,
             ICA: null,
             GGN: {},
-        };
+        } as unknown as proveedoresType;
         const tree = renderer.create(<TarjetaProveedor proveedor={proveedorIncompleto} />).toJSON();
         expect(tree).toMatchSnapshot();
     });
-    test('Debe renderizar el código del proveedor', () => {
-        const { getByText } = render(<TarjetaProveedor proveedor={mockProveedor} />);
+    test('Debe renderizar el código del proveedor', async () => {
+        const { getByText } = await render(<TarjetaProveedor proveedor={mockProveedor} />);
         expect(getByText(/Codigo 12345/i)).toBeTruthy();
     });
 
-    test('Debe renderizar el predio correctamente', () => {
-        const { getByText } = render(<TarjetaProveedor proveedor={mockProveedor} />);
+    test('Debe renderizar el predio correctamente', async () => {
+        const { getByText } = await render(<TarjetaProveedor proveedor={mockProveedor} />);
         expect(getByText(/Finca La Esperanza/i)).toBeTruthy();
     });
-    test('Debe renderizar los datos de ICA correctamente', () => {
-        const { getByText } = render(<TarjetaProveedor proveedor={mockProveedor} />);
+    test('Debe renderizar los datos de ICA correctamente', async () => {
+        const { getByText } = await render(<TarjetaProveedor proveedor={mockProveedor} />);
         expect(getByText(/ICA-6789/i)).toBeTruthy();
         expect(getByText(/Banana, Mango,/i)).toBeTruthy();
         expect(getByText(/2025-12-31/i)).toBeTruthy();
     });
 
-    test('Debe renderizar los datos de GGN correctamente', () => {
-        const { getByText } = render(<TarjetaProveedor proveedor={mockProveedor} />);
+    test('Debe renderizar los datos de GGN correctamente', async () => {
+        const { getByText } = await render(<TarjetaProveedor proveedor={mockProveedor} />);
         expect(getByText(/GGN-9876/i)).toBeTruthy();
         expect(getByText(/Banana, Papaya,/i)).toBeTruthy();
         expect(getByText(/2026-06-15/i)).toBeTruthy();

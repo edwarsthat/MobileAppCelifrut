@@ -30,7 +30,7 @@ export default function TaejetaLote(props: propsType): React.JSX.Element {
                     <Text style={styles.textStyle}>{props.data.predio.PREDIO}</Text>
                 </View>
                 <View>
-                    <Text style={styles.textStyle}>{props.data.tipoFruta}</Text>
+                    <Text style={styles.textStyle}>{props.data.tipoFruta.tipoFruta}</Text>
                 </View>
                 <View>
                     <Text style={styles.textStyle}>Canastillas: {props.data.inventario}</Text>
@@ -53,9 +53,6 @@ export default function TaejetaLote(props: propsType): React.JSX.Element {
                             Fecha Ingreso:
                             {new Date(props.data.fechaIngreso ? props.data.fechaIngreso : new Date()).toLocaleString('es-ES', { timeZone: 'America/Bogota' })}
                         </Text>
-                    </View>
-                    <View>
-                        <Text style={styles.textStyle}>Calidad: {props.data.clasificacionCalidad}</Text>
                     </View>
                     <View>
                         <Text style={styles.textStyle}>Observaciones: {props.data.observaciones}</Text>

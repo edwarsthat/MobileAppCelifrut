@@ -10,7 +10,7 @@ import FormInput from "../../../UI/components/FormInput";
 import { useSocketStore } from "../../../stores/useSocketStore";
 import { getCredentials } from "../../../../utils/auth";
 
-export default function DescarteEncerado(): JSX.Element {
+export default function DescarteEncerado(): React.JSX.Element {
     const setLoading = useAppStore(state => state.setLoading);
     const loading = useAppStore(state => state.loading);
     const tiposFruta = useTipoFrutaStore(state => state.tiposFruta);

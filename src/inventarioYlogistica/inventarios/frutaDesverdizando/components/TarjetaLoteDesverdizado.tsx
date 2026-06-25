@@ -31,13 +31,13 @@ export default function TarjetaLoteDesverdizado(props: propsType): React.JSX.Ele
                     <Text style={styles.textStyle}> Canastillas: {props.data.inventario}</Text>
                 </View>
                 <View>
-                    <Text style={styles.textStyle}>{props.data.tipoFruta}</Text>
+                    <Text style={styles.textStyle}>{props.data.tipoFruta.tipoFruta}</Text>
                 </View>
             </TouchableOpacity>
             {moreInfo &&
                 <View style={styles.descarteContainer}>
                     <View>
-                        <Text style={styles.textStyle}>ICA: {props.data.predio.ICA}</Text>
+                        <Text style={styles.textStyle}>ICA: {props.data.predio.ICA?.code}</Text>
                     </View>
                     <View>
                         <Text style={styles.textStyle}>
@@ -46,9 +46,9 @@ export default function TarjetaLoteDesverdizado(props: propsType): React.JSX.Ele
                                 props.data.fechaIngreso : new Date()).toLocaleString('es-ES', { timeZone: 'America/Bogota' })}
                         </Text>
                     </View>
-                    <View>
+                    {/* <View>
                         <Text style={styles.textStyle}>Calidad: {props.data.clasificacionCalidad}</Text>
-                    </View>
+                    </View> */}
                     <View>
                         <Text style={styles.textStyle}>Obervaciones: {props.data.observaciones}</Text>
                     </View>

@@ -19,7 +19,7 @@ export default function FormInput({
     error,
     placeholder,
     disabled = false,
-}: FormInputProps): JSX.Element {
+}: FormInputProps): React.JSX.Element {
     const [isFocused, setIsFocused] = useState(false);
 
     const keyboardType =

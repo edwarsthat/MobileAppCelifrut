@@ -74,7 +74,7 @@ beforeEach(() => {
 describe('InfoProveedores Component', () => {
 
     test("Se renderiza bien el componente", async () => {
-        const { getByText } = render(<InfoProveedores />);
+        const { getByText } = await render(<InfoProveedores />);
 
 
         expect(getByText(/Proveedores/i)).toBeTruthy();
@@ -82,7 +82,7 @@ describe('InfoProveedores Component', () => {
     });
 
     test('Renderiza los 4 proveedores en el FlatList', async () => {
-        const { findAllByTestId, getByTestId } = render(<InfoProveedores />);
+        const { findAllByTestId, getByTestId } = await render(<InfoProveedores />);
 
         const items = await findAllByTestId('tarjeta_proveedor_id');
 

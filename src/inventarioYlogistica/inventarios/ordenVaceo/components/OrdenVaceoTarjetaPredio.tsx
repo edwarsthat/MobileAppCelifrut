@@ -37,7 +37,7 @@ export default function OrdenVaceoTarjetaPredio(props: propsType): React.JSX.Ele
                 <Text style={styles.detailText}>Canastillas:{" "}
                     <Text style={styles.detailHighlight}>{props.lote.inventario}</Text>
                 </Text>
-                <Text style={styles.detailText}>{props.lote.tipoFruta}</Text>
+                <Text style={styles.detailText}>{props.lote.tipoFruta.tipoFruta}</Text>
             </View>
 
         </View>

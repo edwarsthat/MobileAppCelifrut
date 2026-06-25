@@ -48,19 +48,14 @@ export const validarResta = (itemPallet: itemPalletType, cajas: number, seleccio
 export const validarEnviarCuartoFrioRequest = (): z.ZodSchema => {
     return z.object({
         _id: z.string().min(1, "Seleccione un contenedor"),
-        action: z.literal("put_inventarios_pallet_eviarCuartoFrio", {
-            errorMap: () => ({ message: "Acción no válida" }),
-        }),
+        action: z.literal("put_inventarios_pallet_eviarCuartoFrio"),
         cuartoFrio: z.object({
             _id: z.string().min(1, "Seleccione un cuarto frío"),
             nombre: z.string().min(1, "El cuarto frío debe tener un nombre"),
-        }, {
-            errorMap: () => ({ message: "Seleccione un cuarto frío válido" }),
         }),
-        pallet: z.number({
-            required_error: "Escoja un pallet",
-            invalid_type_error: "Escoja un pallet válido",
-        }).int("Escoja un pallet válido").min(0, "Escoja un pallet válido"),
+        // Solución: Define los errores en los métodos, no en el constructor
+        pallet: z.number()
+        .int("Escoja un pallet válido")
+        .min(0, "Escoja un pallet válido"),
     });
 };
-

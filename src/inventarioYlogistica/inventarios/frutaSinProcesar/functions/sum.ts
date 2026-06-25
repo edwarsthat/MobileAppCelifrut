@@ -9,9 +9,9 @@ export function sumatoriasInventario(data:lotesType[]){
 
     for(let i = 0; i < len; i++){
         total += (data[i].inventario ?? 0 ) * (data[i].promedio ?? 0);
-        if(data[i].tipoFruta === 'Limon'){
+        if(data[i].tipoFruta.tipoFruta === 'Limon'){
             limon += (data[i].inventario ?? 0)  * (data[i].promedio ?? 0);
-        } else if(data[i].tipoFruta === 'Naranja'){
+        } else if(data[i].tipoFruta.tipoFruta === 'Naranja'){
             naranja += (data[i].inventario ?? 0)  * (data[i].promedio ?? 0);
         }
     }

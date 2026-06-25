@@ -43,7 +43,7 @@ export default function InventarioDesverdizado(): React.JSX.Element {
         if (dataOriginal !== undefined && filtro !== '') {
             const datos = dataOriginal.filter(lote =>
             (lote.predio.PREDIO.toLowerCase().startsWith(filtro.toLowerCase()) ||
-                lote.tipoFruta.toLowerCase().startsWith(filtro.toLowerCase()) ||
+                lote.tipoFruta.tipoFruta.toLowerCase().startsWith(filtro.toLowerCase()) ||
                 lote.enf.toLowerCase().startsWith(filtro.toLowerCase())));
 
             setData(datos);
