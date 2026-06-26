@@ -15,22 +15,18 @@ import {
     useWindowDimensions,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import * as Keychain from 'react-native-keychain';
 import DeviceInfo from 'react-native-device-info';
 import ReactNativeBlobUtil from 'react-native-blob-util';
-import { CargoType } from '../../types/cargosType';
 import useEnvContext from '../hooks/useEnvContext';
 import { useAppStore } from '../stores/useAppStore';
 import { celifrut } from '../theme/celifrutTokens';
+import useSessionStore from '../stores/useSessionStore';
 const { ApkInstaller } = NativeModules;
 
-type propsType = {
-    setIslogin: (e: boolean) => void
-    obtenerPermisos: (e: CargoType) => void
-}
 
-export default function Login(props: propsType): React.JSX.Element {
+export default function Login(): React.JSX.Element {
     const { url } = useEnvContext();
+    const login = useSessionStore((s) => s.login);
     const setLoading = useAppStore((state) => state.setLoading);
     const loading = useAppStore((state) => state.loading);
     // Layout de dos columnas en tablet horizontal (= @media min-width:760 y min-aspect-ratio 5/4)
@@ -39,7 +35,7 @@ export default function Login(props: propsType): React.JSX.Element {
 
     const [user, setUser] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<number>(0);
+    const [error, setError] = useState<string>('');
     const [isDownload, setIsDownload] = useState<boolean>(false);
     const [showPass, setShowPass] = useState<boolean>(false);
     // const [remember, setRemember] = useState<boolean>(true);
@@ -53,7 +49,8 @@ export default function Login(props: propsType): React.JSX.Element {
                 const v = DeviceInfo.getVersion();
                 const responseJSON = await fetch(`${url}/sistema/check_mobile_version`);
                 const response = await responseJSON.json();
-                if (v !== response.data.version) {
+                const versionRemota = response?.data?.version;
+                if (versionRemota && v !== versionRemota) {
                     Alert.alert(
                         'Actualización disponible',
                         '¿Deseas actualizar la aplicación?',
@@ -75,48 +72,18 @@ export default function Login(props: propsType): React.JSX.Element {
 
     const handlelogin = async (): Promise<void> => {
         if (!user.trim() || !password.trim()) {
-            setError(400);
-            setTimeout(() => setError(0), 3000);
+            setError('Ingresa usuario y contraseña.');
+            setTimeout(() => setError(''), 3000);
             return;
         }
         try {
             setLoading(true);
-
-            const responseJSON = await fetch(`${url}/login2`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    user: user,
-                    password: password,
-                }),
-            });
-            const response = await responseJSON.json();
-            console.log(response)
-
-            if (response.status === 401) {
-                setError(401);
-                setTimeout(() => {
-                    setError(0);
-                }, 3000);
-                return;
-            } else if (response.status === 402) {
-                setError(402);
-                setTimeout(() => {
-                    setError(0);
-                }, 3000);
-                return;
-            }
-            else if (response.status === 200) {
-                props.setIslogin(true);
-                props.obtenerPermisos(response.permisos);
-                await Keychain.setGenericPassword('user', response.accesToken);
-            }
+            setError('');
+            await login(user, password, url)
         } catch (err) {
-            if (err instanceof Error) {
-                Alert.alert(`Error: ${err.message}`);
-            }
+            const mensaje = err instanceof Error ? err.message : 'Ocurrió un error inesperado.';
+            setError(mensaje);
+            setTimeout(() => setError(''), 3000);
         } finally {
             setLoading(false);
         }
@@ -152,10 +119,7 @@ export default function Login(props: propsType): React.JSX.Element {
         }
     };
 
-    const errorMessage =
-        error === 400 ? 'Ingresa usuario y contraseña.' :
-        error === 401 ? 'Usuario incorrecto.' :
-        error === 402 ? 'Contraseña incorrecta.' : '';
+    const errorMessage = error;
 
     if (isDownload) {
         return (

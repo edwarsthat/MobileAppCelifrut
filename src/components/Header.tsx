@@ -2,21 +2,18 @@ import React from 'react';
 import { Pressable, Image, StyleSheet, View, Text, useWindowDimensions } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import { celifrut } from '../theme/celifrutTokens';
+import useSessionStore from '../stores/useSessionStore';
 const logoImage = require('../../assets/logo_celifrut.png');
 
 type propsType = {
     seleccionWindow: (e: string) => void
-    userName?: string
-    userRole?: string
 }
 
-export default function Header(props: propsType) {
+export default function Header(props:propsType) {
     const { width } = useWindowDimensions();
     const showUserInfo = width >= 540;
-
-    const name = props.userName?.trim() || 'Usuario';
-    const role = props.userRole?.trim() || 'Celifrut';
-    const initial = name.charAt(0).toUpperCase();
+    const { user, cargo } = useSessionStore();
+    const initial = user ? user.charAt(0).toUpperCase() : "C";
 
     return (
         <View style={styles.top}>
@@ -38,8 +35,8 @@ export default function Header(props: propsType) {
                 </View>
                 {showUserInfo && (
                     <View style={styles.userInfo}>
-                        <Text style={styles.userName} numberOfLines={1}>{name}</Text>
-                        <Text style={styles.userRole} numberOfLines={1}>{role}</Text>
+                        <Text style={styles.userName} numberOfLines={1}>{user || ""}</Text>
+                        <Text style={styles.userRole} numberOfLines={1}>{cargo || ""}</Text>
                     </View>
                 )}
             </View>

@@ -2,7 +2,6 @@
 import { useContext } from "react";
 import { envContext } from "../../App";
 
-
 type EnvContextType = {
     url: string,
     socketURL: string

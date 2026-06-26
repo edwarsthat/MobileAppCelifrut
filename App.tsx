@@ -59,6 +59,7 @@ import { useSocketStore } from './src/stores/useSocketStore';
 import * as Keychain from 'react-native-keychain';
 import { obtenerAccessToken } from './src/utils/auth';
 import CuartosFrios from './src/inventarioYlogistica/inventarios/cuartosFrios/CuartosFrios';
+import useSessionStore from './src/stores/useSessionStore';
 
 type envContexttype = {
   url: string,
@@ -74,10 +75,9 @@ export const deviceWidth = createContext<number>(0);
 export const stackContext = createContext<string[]>([]);
 
 function App(): React.JSX.Element {
+  const { isAuth, logout, permisos } = useSessionStore();
   const loading = useAppStore((state) => state.loading);
   const isDarkMode = useColorScheme() === 'dark';
-  const [isLogin, setIslogin] = useState<boolean>(false);
-  const [permisos, setPermisos] = useState<CargoType>();
   const [section, setSection] = useState<string>('menu');
   const [anchoDevice, setAnchoDevice] = useState<number>(0);
   const [version, setVersion] = useState<string>('');
@@ -86,8 +86,6 @@ function App(): React.JSX.Element {
   const connectSocket = useSocketStore((state) => state.connect);
   const disconnectSocket = useSocketStore((state) => state.disconnect);
 
-  //estado lote seleccionado para las diferentes aplicaciones
-  const [lote, setLote] = useState<lotesType>();
 
   // ===================== ENTORNO =====================
   // Descomenta solo UNA de las siguientes líneas:
@@ -135,7 +133,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     const connectIfNeeded = async () => {
-      if (isLogin) {
+      if (isAuth) {
         const credentials = await Keychain.getGenericPassword();
         if (!credentials) {
           throw new Error("Error no hay token de validadcion");
@@ -149,7 +147,7 @@ function App(): React.JSX.Element {
       }
     };
     connectIfNeeded();
-  }, [isLogin]);
+  }, [isAuth]);
 
 
   const backgroundStyle = {
@@ -160,12 +158,8 @@ function App(): React.JSX.Element {
     setStack(prev => [...prev, data]);
     setSection(data);
   };
-  const obtenerPermisos = (cargo: CargoType): void => {
-    setPermisos(cargo);
-  };
   const closeSesion = (): void => {
-    setIslogin(false);
-    setPermisos(undefined);
+    logout();
   };
 
   return (
@@ -178,16 +172,14 @@ function App(): React.JSX.Element {
               backgroundColor={backgroundStyle.backgroundColor}
             />
             {
-              !isLogin ?
-                <Login
-                  obtenerPermisos={obtenerPermisos}
-                  setIslogin={setIslogin} />
+              !isAuth ?
+                <Login/>
                 :
                 <View style={styles.container}>
                   <Loader url={env.url} />
 
                   {(section !== '66b6707777549ed0672a9029')
-                    ? <Header seleccionWindow={seleccionWindow} userRole={permisos?.Cargo} />
+                    ? <Header seleccionWindow={seleccionWindow} />
                     : null}
                   {section === 'menu' && <Menu permisos={permisos} seleccionWindow={seleccionWindow} />}
                   {section === 'Inventario y Logística' && <InventarioyLogistica permisos={permisos} seleccionWindow={seleccionWindow} />}
