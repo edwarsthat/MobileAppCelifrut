@@ -1,79 +1,111 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Aplicacion Movil de Gestion de Empaque y Exportacion
 
-# Getting Started
+**Autor:** Edwar Stheven Ariza Torres
+**Version:** 1.14.1
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+> **Aviso Legal y Licencia**
+>
+> Este software es propiedad intelectual de Edwar Stheven Ariza Torres y se desarrolla para uso exclusivo de la empresa **Celifrut**. Todos los derechos de explotacion, uso y distribucion corresponden unicamente a Celifrut, pero el derecho de autor intelectual permanece en cabeza del desarrollador original.
+>
+> Queda prohibida la copia, distribucion o uso fuera de la empresa sin autorizacion expresa y por escrito del autor y de Celifrut.
 
-## Step 1: Start the Metro Server
+Aplicacion movil (React Native) que sirve como cliente operativo del sistema de gestion de empaque, procesamiento y exportacion de frutas de Celifrut. Permite al personal de planta registrar y consultar informacion directamente desde el punto de trabajo: control de calidad, ingresos de fruta, inventarios, logistica y seguimiento de los procesos de empaque. Se comunica en tiempo real con el servidor backend mediante sockets.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+---
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Modulos
+
+- **Calidad** — Ingreso de formularios de control de calidad, clasificacion de descarte, registro de higiene del personal y captura de fotos de calidad.
+- **Comercial** — Gestion y consulta de proveedores.
+- **Inventario y Logistica** — Consulta y manejo de inventarios.
+- **Proceso** — Aplicaciones de planta: descarte en encerado, descarte en lavado, fotos de calidad y lista de empaque.
+- **Menu** — Navegacion central hacia cada area operativa.
+
+## Tecnologias
+
+- **React Native** 0.78 / **React** 19
+- **TypeScript**
+- **Zustand** para el manejo de estado
+- **Zod** para validacion de datos
+- **Socket.IO** para la comunicacion en tiempo real con el backend
+- **React Native Vision Camera** para la captura de fotos de calidad
+- **React Native Keychain** para el almacenamiento seguro de credenciales
+
+---
+
+# Puesta en marcha
+
+> **Nota**: Antes de continuar, asegurate de haber completado la guia oficial de [configuracion de entorno de React Native](https://reactnative.dev/docs/environment-setup) hasta el paso "Creating a new application".
+
+## Paso 1: Instalar dependencias
 
 ```bash
-# using npm
+npm install
+```
+
+## Paso 2: Iniciar Metro
+
+Metro es el _bundler_ de JavaScript que se incluye con React Native. Desde la raiz del proyecto:
+
+```bash
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Start your Application
+## Paso 3: Ejecutar la aplicacion
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+Deja Metro corriendo en su propia terminal. Abre una nueva terminal desde la raiz del proyecto y ejecuta:
 
-### For Android
+### Android
 
 ```bash
-# using npm
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### For iOS
+### iOS
 
 ```bash
-# using npm
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+Si todo esta configurado correctamente, la aplicacion se abrira en tu emulador de Android o simulador de iOS. Tambien puedes ejecutarla directamente desde Android Studio o Xcode.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+---
 
-## Step 3: Modifying your App
+# Generar version de produccion (Android)
 
-Now that you have successfully run the app, let's modify it.
+El proyecto sincroniza la version antes de compilar el APK de release:
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+```bash
+# Linux / macOS
+npm run android-release
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+# Windows
+npm run android-release-win
+```
 
-## Congratulations! :tada:
+La sincronizacion de version tambien puede ejecutarse de forma independiente:
 
-You've successfully run and modified your React Native App. :partying_face:
+```bash
+npm run sync-version
+```
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
+# Scripts disponibles
 
-# Troubleshooting
+| Script | Descripcion |
+| --- | --- |
+| `npm start` | Inicia el servidor de Metro. |
+| `npm run android` | Compila y ejecuta la app en Android. |
+| `npm run ios` | Compila y ejecuta la app en iOS. |
+| `npm run lint` | Ejecuta ESLint sobre el proyecto. |
+| `npm test` | Ejecuta las pruebas con Jest. |
+| `npm run android-release` | Sincroniza la version y genera el APK de release (Linux/macOS). |
+| `npm run android-release-win` | Sincroniza la version y genera el APK de release (Windows). |
+| `npm run sync-version` | Sincroniza el numero de version del proyecto. |
 
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+---
 
-# Learn More
+# Solucion de problemas
 
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Si la aplicacion no compila o no se ejecuta, revisa la guia oficial de [Troubleshooting de React Native](https://reactnative.dev/docs/troubleshooting).
