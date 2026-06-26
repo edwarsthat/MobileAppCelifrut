@@ -42,7 +42,7 @@ export default function Login(props: propsType): React.JSX.Element {
     const [error, setError] = useState<number>(0);
     const [isDownload, setIsDownload] = useState<boolean>(false);
     const [showPass, setShowPass] = useState<boolean>(false);
-    const [remember, setRemember] = useState<boolean>(true);
+    // const [remember, setRemember] = useState<boolean>(true);
     const [focused, setFocused] = useState<'user' | 'pass' | null>(null);
     const [version, setVersion] = useState<string>('');
 
@@ -93,7 +93,8 @@ export default function Login(props: propsType): React.JSX.Element {
                 }),
             });
             const response = await responseJSON.json();
-            console.log(response);
+            console.log(response)
+
             if (response.status === 401) {
                 setError(401);
                 setTimeout(() => {
@@ -108,7 +109,6 @@ export default function Login(props: propsType): React.JSX.Element {
                 return;
             }
             else if (response.status === 200) {
-
                 props.setIslogin(true);
                 props.obtenerPermisos(response.permisos);
                 await Keychain.setGenericPassword('user', response.accesToken);
